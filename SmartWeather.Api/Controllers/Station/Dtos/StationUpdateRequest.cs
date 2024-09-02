@@ -4,6 +4,7 @@ public class StationUpdateRequest
 {
     public int Id { get; set; }
     public required string Name { get; set; }
+    public required string MacAddress { get; set; }
     public required string TopicLocation { get; set; }
     public float Latitude { get; set; }
     public float Longitude { get; set; }

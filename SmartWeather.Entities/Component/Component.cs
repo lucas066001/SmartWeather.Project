@@ -16,7 +16,11 @@ public class Component
         @"#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-    public Component(string name, string color, ComponentUnit unit, ComponentType type, int stationId)
+    public Component()
+    {
+    }
+
+    public Component(string name, string color, int unit, int type, int stationId)
     {
         if (String.IsNullOrWhiteSpace(name))
         {
@@ -34,13 +38,15 @@ public class Component
         {
             throw new Exception("Unit type is incorrect");
         }
-        Unit = unit;
+        ComponentUnit foundUnit = (ComponentUnit)unit;
+        Unit = foundUnit;
 
         if (!Enum.IsDefined(typeof(ComponentType), type))
         {
             throw new Exception("Component type is incorrect");
         }
-        Type = type;
+        ComponentType foundType = (ComponentType)type;
+        Type = foundType;
 
         if (!(stationId > 0))
         {

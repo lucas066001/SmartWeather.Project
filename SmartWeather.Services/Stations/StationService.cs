@@ -13,9 +13,9 @@ namespace SmartWeather.Services.Stations
 {
     public class StationService(IRepository<Station> stationBaseRepository, IStationRepository stationRepository)
     {
-        public Station AddNewStation(string name, float latitude, float longitude, string topicLocation, int userId)
+        public Station AddNewStation(string name, string macAddress, float latitude, float longitude, string topicLocation, int userId)
         {
-            Station stationToCreate = new(name, latitude, longitude, topicLocation, userId);
+            Station stationToCreate = new(name, macAddress, latitude, longitude, topicLocation, userId);
             return stationBaseRepository.Create(stationToCreate);
         }
 
@@ -24,19 +24,19 @@ namespace SmartWeather.Services.Stations
             return stationBaseRepository.Delete(idStation) != null;
         }
 
-        public Station UpdateStation(int id, string name, float latitude, float longitude, string topicLocation, int userId)
+        public Station UpdateStation(int id, string name, string macAddress, float latitude, float longitude, string topicLocation, int userId)
         {
-            Station stationToUpdate = new(name, latitude, longitude, topicLocation, userId)
+            Station stationToUpdate = new(name, macAddress, latitude, longitude, topicLocation, userId)
             {
                 Id = id
             };
             return stationBaseRepository.Update(stationToUpdate);
         }
 
-        //public User GetUserById(int idUser)
-        //{
-        //    return userRepository.GetById(idUser);
-        //}
+        public Station GetStationById(int idStation)
+        {
+            return stationBaseRepository.GetById(idStation);
+        }
 
         //public IEnumerable<User> GetUserList(IEnumerable<int>? idsUser = null)
         //{

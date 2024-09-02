@@ -27,7 +27,6 @@ namespace SmartWeather.Api.Controllers.User
             _authenticationService = authenticationService;
         }
 
-        [AllowAnonymous]
         [HttpPost(nameof(Create))]
         public ActionResult<ApiResponse<UserCreateResponse>> Create(UserCreateRequest request)
         {
@@ -56,7 +55,6 @@ namespace SmartWeather.Api.Controllers.User
             return Ok(response);
         }
 
-        [Authorize]
         [HttpPut(nameof(Update))]
         public ActionResult<ApiResponse<UserResponse>> Update(UserUpdateRequest request)
         {
@@ -86,7 +84,6 @@ namespace SmartWeather.Api.Controllers.User
             return Ok(response);
         }
 
-        [Authorize]
         [HttpDelete(nameof(Delete))]
         public ActionResult<ApiResponse<EmptyResponse>> Delete(int idUser)
         {
@@ -120,7 +117,6 @@ namespace SmartWeather.Api.Controllers.User
             return Ok(response);
         }
 
-        [Authorize]
         [HttpGet(nameof(GetById))]
         public ActionResult<ApiResponse<UserResponse>> GetById(int idUser)
         {
@@ -154,7 +150,6 @@ namespace SmartWeather.Api.Controllers.User
             return Ok(response);
         }
 
-        [Authorize]
         [HttpGet(nameof(GetAll))]
         public ActionResult<ApiResponse<UserListResponse>> GetAll()
         {

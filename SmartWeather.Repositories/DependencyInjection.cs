@@ -14,6 +14,8 @@ using SmartWeather.Repositories.Authentication;
 using SmartWeather.Services.Repositories;
 using SmartWeather.Services.Stations;
 using SmartWeather.Repositories.Stations;
+using SmartWeather.Services.Components;
+using SmartWeather.Repositories.Components;
 
 namespace SmartWeather.Repositories
 {
@@ -39,6 +41,7 @@ namespace SmartWeather.Repositories
             services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
             services.AddScoped(typeof(IAuthenticationRepository), typeof(AuthenticationRepository));
             services.AddScoped(typeof(IStationRepository), typeof(StationRepository));
+            services.AddScoped(typeof(IComponentRepository), typeof(ComponentRepository));
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         }
     }

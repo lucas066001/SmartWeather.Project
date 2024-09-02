@@ -21,7 +21,6 @@ public class StationController : ControllerBase
         _stationService = stationService;
     }
 
-    [Authorize]
     [HttpPost(nameof(Create))]
     public ActionResult<ApiResponse<StationResponse>> Create(StationCreateRequest request)
     {
@@ -37,7 +36,7 @@ public class StationController : ControllerBase
 
         try
         {
-            Entities.Station.Station createdStation = _stationService.AddNewStation(request.Name, request.Latitude, request.Longitude, request.TopicLocation, request.UserId);
+            Entities.Station.Station createdStation = _stationService.AddNewStation(request.Name, request.MacAddress, request.Latitude, request.Longitude, request.TopicLocation, request.UserId);
             formattedResponse = StationResponseConverter.ConvertStationToStationResponse(createdStation);
             response = ApiResponse<StationResponse>.Success(formattedResponse);
         }
@@ -50,7 +49,6 @@ public class StationController : ControllerBase
         return Ok(response);
     }
 
-    [Authorize]
     [HttpPut(nameof(Update))]
     public ActionResult<ApiResponse<StationResponse>> Update(StationUpdateRequest request)
     {
@@ -67,7 +65,7 @@ public class StationController : ControllerBase
 
         try
         {
-            Entities.Station.Station updatedStation = _stationService.UpdateStation(request.Id, request.Name, request.Latitude, request.Longitude, request.TopicLocation, request.UserId);
+            Entities.Station.Station updatedStation = _stationService.UpdateStation(request.Id, request.Name, request.MacAddress, request.Latitude, request.Longitude, request.TopicLocation, request.UserId);
             formattedResponse = StationResponseConverter.ConvertStationToStationResponse(updatedStation);
             response = ApiResponse<StationResponse>.Success(formattedResponse);
         }
@@ -80,7 +78,6 @@ public class StationController : ControllerBase
         return Ok(response);
     }
 
-    [Authorize]
     [HttpDelete(nameof(Delete))]
     public ActionResult<ApiResponse<EmptyResponse>> Delete(int idStation)
     {
@@ -114,7 +111,6 @@ public class StationController : ControllerBase
         return Ok(response);
     }
 
-    [Authorize]
     [HttpGet(nameof(GetFromUser))]
     public ActionResult<ApiResponse<StationListResponse>> GetFromUser(int userId)
     {
@@ -150,41 +146,39 @@ public class StationController : ControllerBase
     }
 
 
-    //[Authorize]
-    //[HttpGet(nameof(GetById))]
-    //public ActionResult<ApiResponse<UserResponse>> GetById(int idUser)
-    //{
-    //    // Later will need to restrict this to admin or current token user privilege
-    //    ApiResponse<UserResponse> response;
+    [HttpGet(nameof(GetById))]
+    public ActionResult<ApiResponse<StationResponse>> GetById(int idStation)
+    {
+        // Later will need to restrict this to admin or current token user privilege
+        ApiResponse<StationResponse> response;
 
-    //    if (!(idUser > 0))
-    //    {
-    //        return BadRequest(ApiResponse<UserResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
-    //    }
+        if (!(idStation > 0))
+        {
+            return BadRequest(ApiResponse<StationResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
+        }
 
-    //    try
-    //    {
-    //        SmartWeather.Entities.User.User userRetreived = _userService.GetUserById(idUser);
-    //        if (userRetreived != null)
-    //        {
-    //            response = ApiResponse<UserResponse>.Success(UserResponseConverter.ConvertUserToUserResponse(userRetreived));
-    //        }
-    //        else
-    //        {
-    //            response = ApiResponse<UserResponse>.Failure(BaseResponses.INTERNAL_ERROR);
-    //        }
+        try
+        {
+            Station stationRetreived = _stationService.GetStationById(idStation);
+            if (stationRetreived != null)
+            {
+                response = ApiResponse<StationResponse>.Success(StationResponseConverter.ConvertStationToStationResponse(stationRetreived));
+            }
+            else
+            {
+                response = ApiResponse<StationResponse>.Failure(BaseResponses.INTERNAL_ERROR);
+            }
 
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        response = ApiResponse<UserResponse>.Failure(String.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-    //        return BadRequest(response);
-    //    }
+        }
+        catch (Exception ex)
+        {
+            response = ApiResponse<StationResponse>.Failure(String.Format(BaseResponses.FORMAT_ERROR, ex.Message));
+            return BadRequest(response);
+        }
 
-    //    return Ok(response);
-    //}
+        return Ok(response);
+    }
 
-    //[Authorize]
     //[HttpGet(nameof(GetAll))]
     //public ActionResult<ApiResponse<UserListResponse>> GetAll()
     //{
