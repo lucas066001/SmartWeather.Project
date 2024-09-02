@@ -1,5 +1,6 @@
 ﻿namespace SmartWeather.Entities.Component;
 using SmartWeather.Entities.Station;
+using SmartWeather.Entities.ComponentData;
 using System.Text.RegularExpressions;
 
 public class Component
@@ -11,6 +12,7 @@ public class Component
     public ComponentType Type { get; set; }
     public int StationId { get; set; }
     public virtual Station Station { get; set; } = null!;
+    public virtual IEnumerable<ComponentData> ComponentDatas { get; set; } = null!;
 
     private static readonly Regex HexColorRegex = new Regex(
         @"#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
