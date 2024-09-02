@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34408.163
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartWeather.Api", "SmartWeather.Api\SmartWeather.Api.csproj", "{3775F75E-9B11-48B0-82E4-6C31450F1419}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartWeather.Entities", "SmartWeather.Entities\SmartWeather.Entities.csproj", "{80D494FC-2E4A-4240-8446-5E9D5FFC70F4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartWeather.Repositories", "SmartWeather.Repositories\SmartWeather.Repositories.csproj", "{4FC32B82-C799-4874-B82A-3EF47B0749EE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartWeather.Services", "SmartWeather.Services\SmartWeather.Services.csproj", "{2E8178DE-80EC-4E12-A335-0ED02F7F4094}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MigrationCommands", "MigrationCommands", "{6E8F08B7-D1D3-492A-B32C-4A890C4FE5A0}"
+	ProjectSection(SolutionItems) = preProject
+		MigrationCommands.txt = MigrationCommands.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{B3BC554F-21BC-4CAF-AD18-6F5774A61030}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3775F75E-9B11-48B0-82E4-6C31450F1419}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3775F75E-9B11-48B0-82E4-6C31450F1419}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3775F75E-9B11-48B0-82E4-6C31450F1419}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3775F75E-9B11-48B0-82E4-6C31450F1419}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80D494FC-2E4A-4240-8446-5E9D5FFC70F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80D494FC-2E4A-4240-8446-5E9D5FFC70F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80D494FC-2E4A-4240-8446-5E9D5FFC70F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80D494FC-2E4A-4240-8446-5E9D5FFC70F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FC32B82-C799-4874-B82A-3EF47B0749EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FC32B82-C799-4874-B82A-3EF47B0749EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FC32B82-C799-4874-B82A-3EF47B0749EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FC32B82-C799-4874-B82A-3EF47B0749EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E8178DE-80EC-4E12-A335-0ED02F7F4094}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E8178DE-80EC-4E12-A335-0ED02F7F4094}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E8178DE-80EC-4E12-A335-0ED02F7F4094}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E8178DE-80EC-4E12-A335-0ED02F7F4094}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CC8FFC4C-7C1E-44E3-A97F-62419BD07818}
+	EndGlobalSection
+EndGlobal

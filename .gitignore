@@ -1,0 +1,8 @@
+.github/*
+bin/
+obj/
+.vs/
+data/
+log/
+secrets/
+appsettings*.json
