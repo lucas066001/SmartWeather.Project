@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SmartWeather.Services.Authentication;
 using SmartWeather.Services.ComponentDatas;
 using SmartWeather.Services.Components;
+using SmartWeather.Services.Mqtt;
 using SmartWeather.Services.Stations;
 using SmartWeather.Services.Users;
 

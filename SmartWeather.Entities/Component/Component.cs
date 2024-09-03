@@ -11,6 +11,7 @@ public class Component
     public ComponentUnit Unit { get; set; }
     public ComponentType Type { get; set; }
     public int StationId { get; set; }
+    public int GpioPin { get; set; }
     public virtual Station Station { get; set; } = null!;
     public virtual IEnumerable<ComponentData> ComponentDatas { get; set; } = null!;
 

@@ -1,11 +1,12 @@
-﻿namespace SmartWeather.Api.Contract;
+﻿namespace SmartWeather.Services.Mqtt.Contract;
 
 public enum Status
 {
     OK,
     INTERNAL_ERROR,
     TIMEOUT_ERROR,
-    DATABASE_ERROR
+    DATABASE_ERROR,
+    PARSE_ERROR
 }
 
 public class BaseResponses
@@ -16,4 +17,19 @@ public class BaseResponses
     public const string TIMEOUT_ERROR = "Timeout error occured due to processing time taking too long";
     public const string DATABASE_ERROR = "Database error occured";
     public const string FORMAT_ERROR = "Runtime error : {0}";
+}
+
+public enum ObjectTypes
+{
+    CONFIG_REQUEST,
+    CONFIG_RESPONSE,
+    SAVING_REQUEST,
+    ACTUATOR_REQUEST,
+    ACTUATOR_RESPONSE
+}
+
+public class DefaultIdentifiers
+{
+    public const string DEFAULT_REQUEST_ID = "UNKNOWN";
+    public const string DEFAULT_SENDER_ID = "UNKNOWN";
 }

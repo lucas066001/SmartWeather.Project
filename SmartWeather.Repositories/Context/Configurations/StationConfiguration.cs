@@ -24,8 +24,8 @@ internal class StationConfiguration : IEntityTypeConfiguration<Station>
         builder.Property(station => station.UserId);
         builder.HasOne(e => e.User)
                             .WithMany(e => e.Stations)
-                            .HasForeignKey(e => e.UserId)
-                            .IsRequired();
+                            .HasForeignKey(e => e.UserId);
+
         builder.HasMany(e => e.Components)
                             .WithOne(e => e.Station)
                             .HasForeignKey(e => e.StationId)

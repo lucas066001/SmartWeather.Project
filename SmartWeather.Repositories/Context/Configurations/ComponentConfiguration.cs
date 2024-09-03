@@ -14,6 +14,7 @@ internal class ComponentConfiguration : IEntityTypeConfiguration<Component>
         builder.Property(component => component.Color);
         builder.Property(component => component.Unit);
         builder.Property(component => component.Type);
+        builder.Property(component => component.GpioPin);
         builder.Property(component => component.StationId);
         builder.HasOne(e => e.Station)
                             .WithMany(e => e.Components)

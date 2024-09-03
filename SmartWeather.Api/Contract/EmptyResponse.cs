@@ -1,6 +1,5 @@
-﻿namespace SmartWeather.Api.Contract
+﻿namespace SmartWeather.Api.Contract;
+
+public class EmptyResponse
 {
-    public class EmptyResponse
-    {
-    }
 }
