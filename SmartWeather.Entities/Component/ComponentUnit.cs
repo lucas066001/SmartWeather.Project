@@ -2,6 +2,7 @@
 
 public enum ComponentUnit
 {
+    Unknown,
     Celsius,
     Percentage,
     UvStrength

@@ -2,6 +2,7 @@
 
 public enum ComponentType
 {
+    Unknown,
     Sensor,
     Actuator
 }

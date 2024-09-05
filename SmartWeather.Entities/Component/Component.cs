@@ -23,7 +23,7 @@ public class Component
     {
     }
 
-    public Component(string name, string color, int unit, int type, int stationId)
+    public Component(string name, string color, int unit, int type, int stationId, int gpioPin)
     {
         if (String.IsNullOrWhiteSpace(name))
         {
@@ -56,5 +56,11 @@ public class Component
             throw new Exception("Invalid StationId");
         }
         StationId = stationId;
+
+        if(!(gpioPin >= 0))
+        {
+            throw new Exception("Invalid GpioPin");
+        }
+        GpioPin = gpioPin;
     }
 }

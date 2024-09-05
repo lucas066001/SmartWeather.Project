@@ -8,10 +8,21 @@ namespace SmartWeather.Services.Components;
 
 public class ComponentService (IRepository<Component> componentBaseRepository, IComponentRepository componentRepository)
 {
-    public Component AddNewComponent(string name, string color, int unit, int type, int stationId)
+    public Component AddNewComponent(string name, string color, int unit, int type, int stationId, int gpioPin)
     {
-        Component componentToCreate = new(name, color, unit, type, stationId);
+        Component componentToCreate = new(name, color, unit, type, stationId, gpioPin);
         return componentBaseRepository.Create(componentToCreate);
+    }
+    public IEnumerable<Component> AddGenericComponentPool(int stationId, IEnumerable<int> gpioPins)
+    {
+        var createdComponents = new List<Component>();
+        foreach (var pin in gpioPins)
+        {
+            Component componentToCreate = new("Unnamed component", "#000000", (int)ComponentUnit.Unknown, (int)ComponentType.Unknown, stationId, pin);
+            componentBaseRepository.Create(componentToCreate);
+            createdComponents.Add(componentToCreate);
+        }
+        return createdComponents;
     }
 
     public bool DeleteComponent(int idComponent)
@@ -19,9 +30,9 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
         return componentBaseRepository.Delete(idComponent) != null;
     }
 
-    public Component UpdateComponent(int id, string name, string color, int unit, int type, int stationId)
+    public Component UpdateComponent(int id, string name, string color, int unit, int type, int stationId, int gpioPin)
     {
-        Component componentToUpdate = new(name, color, unit, type, stationId)
+        Component componentToUpdate = new(name, color, unit, type, stationId, gpioPin)
         {
             Id = id
         };

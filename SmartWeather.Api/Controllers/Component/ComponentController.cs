@@ -32,6 +32,7 @@ public class ComponentController : ControllerBase
 
         if (String.IsNullOrWhiteSpace(request.Name) ||
             String.IsNullOrWhiteSpace(request.Color) ||
+            !(request.GpioPin >= 0) ||
             !(request.StationId > 0))
         {
             return BadRequest(ApiResponse<ComponentResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
@@ -39,7 +40,7 @@ public class ComponentController : ControllerBase
 
         try
         {
-            Component createdComponent = _componentService.AddNewComponent(request.Name, request.Color, request.Unit, request.Type, request.StationId);
+            Component createdComponent = _componentService.AddNewComponent(request.Name, request.Color, request.Unit, request.Type, request.StationId, request.GpioPin);
             formattedResponse = ComponentResponseConverter.ConvertComponentToComponentResponse(createdComponent);
             response = ApiResponse<ComponentResponse>.Success(formattedResponse);
         }
@@ -93,6 +94,7 @@ public class ComponentController : ControllerBase
 
         if (String.IsNullOrWhiteSpace(request.Name) ||
             String.IsNullOrWhiteSpace(request.Color) ||
+            !(request.GpioPin >= 0) ||
             !(request.StationId > 0))
         {
             return BadRequest(ApiResponse<ComponentResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
@@ -100,7 +102,7 @@ public class ComponentController : ControllerBase
 
         try
         {
-            Component updatedComponent = _componentService.UpdateComponent(request.Id, request.Name, request.Color, request.Unit, request.Type, request.StationId);
+            Component updatedComponent = _componentService.UpdateComponent(request.Id, request.Name, request.Color, request.Unit, request.Type, request.StationId, request.GpioPin);
             formattedResponse = ComponentResponseConverter.ConvertComponentToComponentResponse(updatedComponent);
             response = ApiResponse<ComponentResponse>.Success(formattedResponse);
         }

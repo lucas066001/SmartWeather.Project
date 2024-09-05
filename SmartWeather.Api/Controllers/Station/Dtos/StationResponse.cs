@@ -8,5 +8,5 @@ public class StationResponse
     public float Longitude { get; set; }
     public required string TopicLocation { get; set; }
     public required Entities.Station.StationType Type { get; set; }
-    public int UserId { get; set; }
+    public int? UserId { get; set; }
 }

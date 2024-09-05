@@ -14,15 +14,15 @@ public class Station
     public float Longitude { get; set; }
     public string TopicLocation { get; set; }
     public StationType Type { get; set; }
-    public int UserId { get; set; }
-    public virtual User User { get; set; } = null!;
+    public int? UserId { get; set; }
+    public virtual User? User { get; set; } = null!;
     public virtual ICollection<Component> Components { get; set; } = new List<Component>();
 
     private static readonly Regex MacAddressRegex = new Regex(
         @"^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-    public Station(string name, string macAddress, float latitude, float longitude, string topicLocation, int userId ,StationType type = StationType.Private) {
+    public Station(string name, string macAddress, float latitude, float longitude, string topicLocation, int? userId ,StationType type = StationType.Private) {
         
         if (String.IsNullOrWhiteSpace(name))
         {

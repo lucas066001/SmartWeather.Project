@@ -10,6 +10,7 @@ public class ComponentResponseConverter
     {
         return new ComponentResponse() { 
             Id = component.Id,
+            GpioPin = component.GpioPin,
             Color = component.Color,
             Name = component.Name,
             StationId = component.StationId,

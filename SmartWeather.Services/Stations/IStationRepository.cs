@@ -5,4 +5,5 @@ using System.Collections.Generic;
 public interface IStationRepository
 {
     public IEnumerable<Station> GetFromUser(int userId);
+    public Station? GetByMacAddress(string macAddress);
 }

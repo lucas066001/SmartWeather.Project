@@ -2,6 +2,6 @@
 
 public class StationConfigRequest
 {
-    public int MacAddress { get; set; }
+    public required string MacAddress { get; set; }
     public IEnumerable<int> ActivePins { get; set; } = null!;
 }

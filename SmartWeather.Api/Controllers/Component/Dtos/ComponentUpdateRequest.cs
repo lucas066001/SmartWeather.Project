@@ -5,6 +5,7 @@ namespace SmartWeather.Api.Controllers.Component.Dtos;
 public class ComponentUpdateRequest
 {
     public int Id { get; set; }
+    public int GpioPin { get; set; }
     public required string Name { get; set; }
     public required string Color { get; set; }
     public int Unit { get; set; }

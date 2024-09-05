@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartWeather.Repositories.Context;
 
@@ -11,9 +12,11 @@ using SmartWeather.Repositories.Context;
 namespace SmartWeather.Repositories.Migrations
 {
     [DbContext(typeof(SmartWeatherContext))]
-    partial class SmartWeatherContextModelSnapshot : ModelSnapshot
+    [Migration("20240905145144_UpdateStationUserId")]
+    partial class UpdateStationUserId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,7 +100,7 @@ namespace SmartWeather.Repositories.Migrations
 
                     b.Property<string>("MacAddress")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -114,9 +117,6 @@ namespace SmartWeather.Repositories.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("MacAddress")
-                        .IsUnique();
 
                     b.HasIndex("UserId");
 

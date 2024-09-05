@@ -21,15 +21,17 @@ internal class StationConfiguration : IEntityTypeConfiguration<Station>
         builder.Property(station => station.Longitude);
         builder.Property(station => station.Type);
         builder.Property(station => station.TopicLocation);
-        builder.Property(station => station.UserId);
+        builder.Property(station => station.UserId).IsRequired(false);
         builder.HasOne(e => e.User)
                             .WithMany(e => e.Stations)
-                            .HasForeignKey(e => e.UserId);
+                            .HasForeignKey(e => e.UserId)
+                            .IsRequired(false);
 
         builder.HasMany(e => e.Components)
                             .WithOne(e => e.Station)
                             .HasForeignKey(e => e.StationId)
                             .IsRequired();
         builder.HasIndex(e => e.UserId);
+        builder.HasIndex(e => e.MacAddress).IsUnique();
     }
 }

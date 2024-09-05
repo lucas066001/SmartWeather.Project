@@ -23,5 +23,6 @@ public static class DependencyInjection
         services.AddScoped<StationService>();
         services.AddScoped<ComponentService>();
         services.AddScoped<ComponentDataService>();
+        services.AddSingleton<MqttService>();
     }
 }
