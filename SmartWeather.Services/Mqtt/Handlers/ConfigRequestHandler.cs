@@ -29,7 +29,7 @@ public class ConfigRequestHandler : IMqttHandler
     {
         if (!Enum.IsDefined(typeof(ObjectTypes), request.JsonType) || request.JsonType != (int)ObjectTypes.CONFIG_REQUEST)
         {
-            await _mqttService.SendErrorResponse(request, "Unknown object type -> " + request.JsonType.ToString());
+            await _mqttService.SendErrorResponse(request, originTopic, "Unknown object type -> " + request.JsonType.ToString(), Status.CONTRACT_ERROR);
             return;
         }
 
@@ -60,7 +60,7 @@ public class ConfigRequestHandler : IMqttHandler
             }
             catch (Exception ex)
             {
-                await _mqttService.SendErrorResponse(request, originTopic, "Unable to create a station : " + ex.Message);
+                await _mqttService.SendErrorResponse(request, originTopic, "Unable to create a station : " + ex.Message, Status.DATABASE_ERROR);
                 return;
             }
 
@@ -72,9 +72,7 @@ public class ConfigRequestHandler : IMqttHandler
                 }
                 catch (Exception ex)
                 {
-                    // Undo station creation and send error details
-                    _stationService.DeleteStation(newStation.Id);
-                    await _mqttService.SendErrorResponse(request, originTopic, "Unable to create components for your station : " + ex.Message);
+                    await _mqttService.SendErrorResponse(request, originTopic, "Unable to create components for your station : " + ex.Message, Status.DATABASE_ERROR);
                     return;
                 }
 

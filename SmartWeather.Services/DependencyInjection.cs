@@ -25,6 +25,7 @@ public static class DependencyInjection
         services.AddScoped<ComponentService>();
         services.AddScoped<ComponentDataService>();
         services.AddScoped<ConfigRequestHandler>();
+        services.AddScoped<SavingRequestHandler>();
         services.AddSingleton<MqttService>();
     }
 }

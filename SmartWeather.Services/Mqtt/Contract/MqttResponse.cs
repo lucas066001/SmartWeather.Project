@@ -30,8 +30,8 @@ public class MqttResponse
         return new MqttResponse(requestHeader, Status.OK, BaseResponses.OK, jsonString, jsonString.Count(), type);
     }
 
-    public static MqttResponse Failure(MqttHeader requestHeader, string customMessage = BaseResponses.INTERNAL_ERROR)
+    public static MqttResponse Failure(MqttHeader requestHeader, string customMessage = BaseResponses.INTERNAL_ERROR, Status status = Status.INTERNAL_ERROR)
     {
-        return new MqttResponse(requestHeader, Status.INTERNAL_ERROR, customMessage, String.Empty, 0, null);
+        return new MqttResponse(requestHeader, status, customMessage, String.Empty, 0, null);
     }
 }

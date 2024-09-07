@@ -53,10 +53,10 @@ namespace SmartWeather.Services.Stations
             return stationRepository.GetByMacAddress(macAddress) == null;
         }
 
-        //public IEnumerable<User> GetUserList(IEnumerable<int>? idsUser = null)
-        //{
-        //    return userRepository.GetAll(idsUser);
-        //}
+        public IEnumerable<Station> GetAll()
+        {
+            return stationBaseRepository.GetAll();
+        }
 
         public IEnumerable<Station> GetFromUser(int userId) {
             return stationRepository.GetFromUser(userId);

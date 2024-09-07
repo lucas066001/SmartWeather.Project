@@ -6,7 +6,8 @@ public enum Status
     INTERNAL_ERROR,
     TIMEOUT_ERROR,
     DATABASE_ERROR,
-    PARSE_ERROR
+    PARSE_ERROR,
+    CONTRACT_ERROR
 }
 
 public class BaseResponses
@@ -24,6 +25,7 @@ public enum ObjectTypes
     CONFIG_REQUEST,
     CONFIG_RESPONSE,
     SAVING_REQUEST,
+    SAVING_RESPONSE,
     ACTUATOR_REQUEST,
     ACTUATOR_RESPONSE
 }

@@ -8,13 +8,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MQTTnet;
 using MQTTnet.Client;
-using SmartWeather.Entities.Component;
 using SmartWeather.Entities.Station;
-using SmartWeather.Services.Components;
 using SmartWeather.Services.Constants;
 using SmartWeather.Services.Mqtt.Contract;
-using SmartWeather.Services.Mqtt.Dtos;
-using SmartWeather.Services.Mqtt.Dtos.Converters;
 using SmartWeather.Services.Options;
 using SmartWeather.Services.Stations;
 
@@ -23,9 +19,11 @@ public class MqttService
     private readonly IMqttClient mqttClient;
     private readonly MqttClientOptions mqttOptions;
     private List<IMqttHandler> _requestHandlers;
+    private StationService _stationService;
 
-    public MqttService()
+    public MqttService(IServiceScopeFactory scopeFactory)
     {
+        _stationService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<StationService>();
         _requestHandlers = new List<IMqttHandler>();
 
         IConfiguration configuration = new ConfigurationBuilder()
@@ -58,9 +56,14 @@ public class MqttService
             await mqttClient.ConnectAsync(mqttOptions);
 
             await mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(CommunicationConstants.MQTT_CONFIG_REQUEST_TOPIC).Build());
-            
-            // Will need to add subscribtion to all station topics
-            // retreive all station, go accross and subscribe
+
+            IEnumerable<Station> allStations = _stationService.GetAll();
+
+            foreach (var station in allStations)
+            {
+                var stationTopic = string.Format(CommunicationConstants.MQTT_COMPONENT_DATA_TOPIC_FORMAT, station.Id.ToString());
+                await mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(stationTopic).Build());
+            }
         }
     }
 
@@ -72,7 +75,7 @@ public class MqttService
         }
     }
 
-    public async Task SendErrorResponse(MqttRequest? request, string originTopic, string errorMessage = BaseResponses.INTERNAL_ERROR)
+    public async Task SendErrorResponse(MqttRequest? request, string originTopic, string errorMessage = BaseResponses.INTERNAL_ERROR, Status status = Status.INTERNAL_ERROR)
     {
         MqttHeader errorHeader;
 
@@ -95,7 +98,7 @@ public class MqttService
             };
         }
 
-        var errorResponse = MqttResponse.Failure(errorHeader, string.Format(BaseResponses.FORMAT_ERROR, errorMessage));
+        var errorResponse = MqttResponse.Failure(errorHeader, string.Format(BaseResponses.FORMAT_ERROR, errorMessage), status);
         await PublishAsync(originTopic.Replace("request", "response"), JsonSerializer.Serialize(errorResponse));
     }
 
@@ -127,7 +130,7 @@ public class MqttService
         }
         catch (Exception ex)
         {
-            await SendErrorResponse(request, topic, "Unable to deserialize Mqtt object : " + ex.Message);
+            await SendErrorResponse(request, topic, "Unable to deserialize Mqtt object : " + ex.Message, Status.PARSE_ERROR);
         }
 
         return objectFound;
@@ -173,7 +176,7 @@ public class MqttService
 
         if (!handled)
         {
-            await SendErrorResponse(request, e.ApplicationMessage.Topic, "Server is not able to handle your request");
+            await SendErrorResponse(request, e.ApplicationMessage.Topic, "Server is not able to handle your request", Status.CONTRACT_ERROR);
         }
 
         return;
