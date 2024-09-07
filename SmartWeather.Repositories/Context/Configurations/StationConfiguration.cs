@@ -20,7 +20,6 @@ internal class StationConfiguration : IEntityTypeConfiguration<Station>
         builder.Property(station => station.Latitude);
         builder.Property(station => station.Longitude);
         builder.Property(station => station.Type);
-        builder.Property(station => station.TopicLocation);
         builder.Property(station => station.UserId).IsRequired(false);
         builder.HasOne(e => e.User)
                             .WithMany(e => e.Stations)
@@ -31,7 +30,9 @@ internal class StationConfiguration : IEntityTypeConfiguration<Station>
                             .WithOne(e => e.Station)
                             .HasForeignKey(e => e.StationId)
                             .IsRequired();
-        builder.HasIndex(e => e.UserId);
+
+        builder.HasIndex(e => e.UserId).IsUnique(false);
+        
         builder.HasIndex(e => e.MacAddress).IsUnique();
     }
 }

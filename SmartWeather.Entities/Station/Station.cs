@@ -12,17 +12,16 @@ public class Station
     public string MacAddress { get; set; }
     public float Latitude { get; set; }
     public float Longitude { get; set; }
-    public string TopicLocation { get; set; }
     public StationType Type { get; set; }
     public int? UserId { get; set; }
     public virtual User? User { get; set; } = null!;
     public virtual ICollection<Component> Components { get; set; } = new List<Component>();
 
     private static readonly Regex MacAddressRegex = new Regex(
-        @"^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$",
+        @"^([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}$",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-    public Station(string name, string macAddress, float latitude, float longitude, string topicLocation, int? userId ,StationType type = StationType.Private) {
+    public Station(string name, string macAddress, float latitude, float longitude, int? userId ,StationType type = StationType.Private) {
         
         if (String.IsNullOrWhiteSpace(name))
         {
@@ -48,18 +47,12 @@ public class Station
         }
         Longitude = longitude;
 
-        if (String.IsNullOrWhiteSpace(topicLocation))
-        {
-            throw new Exception("Name must be filled");
-        }
-
         if (userId <= 0)
         {
             throw new Exception("Invalid UserId");
         }
         UserId = userId;
         
-        TopicLocation = topicLocation; 
         Type = type;
 
     }

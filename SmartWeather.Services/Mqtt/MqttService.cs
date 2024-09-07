@@ -22,13 +22,11 @@ public class MqttService
 {
     private readonly IMqttClient mqttClient;
     private readonly MqttClientOptions mqttOptions;
-    private readonly StationService _stationService;
-    private readonly ComponentService _componentService;
+    private List<IMqttHandler> _requestHandlers;
 
-    public MqttService(IServiceScopeFactory scopeFactory)
+    public MqttService()
     {
-        _componentService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<ComponentService>();
-        _stationService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<StationService>();
+        _requestHandlers = new List<IMqttHandler>();
 
         IConfiguration configuration = new ConfigurationBuilder()
            .AddJsonFile("appsettings.json")
@@ -47,6 +45,7 @@ public class MqttService
             .WithClientId(clientId)
             .WithTcpServer(brokerAddress, brokerPort) 
             .WithCleanSession()
+            .WithKeepAlivePeriod(new TimeSpan(0,5,0))
             .Build();
 
         mqttClient.ApplicationMessageReceivedAsync += MessageHandler;
@@ -58,7 +57,7 @@ public class MqttService
         {
             await mqttClient.ConnectAsync(mqttOptions);
 
-            await mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(CommunicationConstants.MQTT_CONFIG_TOPIC).Build());
+            await mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(CommunicationConstants.MQTT_CONFIG_REQUEST_TOPIC).Build());
             
             // Will need to add subscribtion to all station topics
             // retreive all station, go accross and subscribe
@@ -73,7 +72,68 @@ public class MqttService
         }
     }
 
-    public async Task PublishAsync(string topic, string payload)
+    public async Task SendErrorResponse(MqttRequest? request, string originTopic, string errorMessage = BaseResponses.INTERNAL_ERROR)
+    {
+        MqttHeader errorHeader;
+
+        if (request != null)
+        {
+            errorHeader = new MqttHeader()
+            {
+                RequestEmitter = request.Header.RequestEmitter,
+                RequestIdentifier = request.Header.RequestIdentifier,
+                DateTime = DateTime.Now
+            };
+        }
+        else
+        {
+            errorHeader = new MqttHeader()
+            {
+                RequestEmitter = DefaultIdentifiers.DEFAULT_SENDER_ID,
+                RequestIdentifier = DefaultIdentifiers.DEFAULT_REQUEST_ID,
+                DateTime = DateTime.Now
+            };
+        }
+
+        var errorResponse = MqttResponse.Failure(errorHeader, string.Format(BaseResponses.FORMAT_ERROR, errorMessage));
+        await PublishAsync(originTopic.Replace("request", "response"), JsonSerializer.Serialize(errorResponse));
+    }
+
+    public async Task SendSuccessResponse(MqttRequest request, string originTopic, ObjectTypes objectType, Object data)
+    {
+        var successHeader = new MqttHeader()
+        {
+            RequestEmitter = request.Header.RequestEmitter,
+            RequestIdentifier = request.Header.RequestIdentifier,
+            DateTime = DateTime.Now
+        };
+
+        var errorResponse = MqttResponse.Success(successHeader, objectType, data);
+        await PublishAsync(originTopic.Replace("request", "response"), JsonSerializer.Serialize(errorResponse));
+    }
+
+    public void RegisterHandler(IMqttHandler handler)
+    {
+        _requestHandlers.Add(handler);
+    }
+    
+    public async Task<T?> RetreiveMqttObject<T>(string message, string topic, MqttRequest? request = null) where T : class
+    {
+        T? objectFound = null;
+
+        try
+        {
+            objectFound = JsonSerializer.Deserialize<T>(message);
+        }
+        catch (Exception ex)
+        {
+            await SendErrorResponse(request, topic, "Unable to deserialize Mqtt object : " + ex.Message);
+        }
+
+        return objectFound;
+    }
+
+    private async Task PublishAsync(string topic, string payload)
     {
         if (!mqttClient.IsConnected)
         {
@@ -90,147 +150,32 @@ public class MqttService
         await mqttClient.PublishAsync(mqttMessage);
     }
 
-    public Task MessageHandler(MqttApplicationMessageReceivedEventArgs e)
+    private async Task MessageHandler(MqttApplicationMessageReceivedEventArgs e)
     {
-        if(e.ApplicationMessage.Topic == CommunicationConstants.MQTT_CONFIG_TOPIC)
-        {
-            // Should be a registering request
-            Task.Run(() => HandleConfigRequest(e.ApplicationMessage));
-        }
-        else if (e.ApplicationMessage.Topic.Contains(CommunicationConstants.MQTT_COMPONENT_DATA_TOPIC))
-        {
-            // Should be a saving data action
-            Task.Run(() => HandleSavingRequest(e.ApplicationMessage));
-        }
-        else if (e.ApplicationMessage.Topic.Contains(CommunicationConstants.MQTT_COMPONENT_ACTUATOR_TOPIC))
-        {
-            // Should be a response to actuator command
-            Task.Run(() => HandleActuatorResponse(e.ApplicationMessage));
-        }
-
-        return Task.CompletedTask;
-    }
-
-    private async Task<T?> RetreiveMqttObject<T>(string message, string topic, MqttHeader? errorHeader = null) where T : class
-    {
-        T? objectFound = null;
-
-        if (errorHeader == null)
-        {
-            errorHeader = new MqttHeader()
-            {
-                RequestEmitter = DefaultIdentifiers.DEFAULT_SENDER_ID,
-                RequestIdentifier = DefaultIdentifiers.DEFAULT_REQUEST_ID,
-                DateTime = DateTime.Now,
-            };
-        }
-
-        try
-        {
-            objectFound = JsonSerializer.Deserialize<T>(message);
-        }
-        catch (Exception ex)
-        {
-            var errorResponse = MqttResponse.Failure(errorHeader, string.Format(BaseResponses.FORMAT_ERROR, "Unable to parse Mqtt Object -> " + ex.Message));
-            await PublishAsync(topic, JsonSerializer.Serialize(errorResponse));
-        }
-
-        return objectFound;
-    }
-
-    public async Task SendErrorResponse(MqttApplicationMessage message, string errorMessage = BaseResponses.INTERNAL_ERROR)
-    {
-        var errorHeader = new MqttHeader()
-        {
-            RequestEmitter = DefaultIdentifiers.DEFAULT_SENDER_ID,
-            RequestIdentifier = DefaultIdentifiers.DEFAULT_REQUEST_ID,
-            DateTime = DateTime.Now,
-        };
-
-        var errorResponse = MqttResponse.Failure(errorHeader, string.Format(BaseResponses.FORMAT_ERROR, errorMessage));
-        await PublishAsync(message.Topic, JsonSerializer.Serialize(errorResponse));
-    }
-
-    public async Task HandleConfigRequest(MqttApplicationMessage message)
-    {
-        var request = await RetreiveMqttObject<MqttRequest>(message.ConvertPayloadToString(), message.Topic);
+        bool handled = false;
+        var request = await RetreiveMqttObject<MqttRequest>(e.ApplicationMessage.ConvertPayloadToString(), e.ApplicationMessage.Topic);
 
         if (request == null)
         {
-            await SendErrorResponse(message, "Unable to cast your request");
+            await SendErrorResponse(request, e.ApplicationMessage.Topic);
             return;
         }
 
-        if (!Enum.IsDefined(typeof(ObjectTypes), request.JsonType) || request.JsonType != (int)ObjectTypes.CONFIG_REQUEST)
+        foreach (var handler in _requestHandlers)
         {
-            await SendErrorResponse(message, "Unknown object type -> " + request.JsonType.ToString());
-            return;
-        }
-
-        var configRequest = await RetreiveMqttObject<StationConfigRequest>(request.JsonObject, message.Topic, request.Header);
-
-        if (configRequest == null)
-        {
-            await SendErrorResponse(message);
-            return;
-        }
-
-        var macAdress = configRequest.MacAddress;
-
-        Station? retrievedStation = _stationService.GetStationByMacAddress(macAdress);
-
-        if (retrievedStation != null)
-        {
-            retrievedStation.Components = _componentService.GetFromStation(retrievedStation.Id).ToList();
-            var formattedData = StationConfigResponseConverter.ConvertStationToStationConfigResponse(retrievedStation);
-            MqttResponse response = MqttResponse.Success(request.Header, ObjectTypes.CONFIG_RESPONSE, formattedData);
-            await PublishAsync(message.Topic, JsonSerializer.Serialize(response));
-        }
-        else
-        {
-            Station newStation;
-            try
+            if (handler.IsAbleToHandle(request.JsonType))
             {
-                newStation = _stationService.AddGenericStation(macAdress);
+                handled = true;
+                handler.Handle(request, e.ApplicationMessage.Topic);
+                break;
             }
-            catch (Exception ex)
-            {
-                await SendErrorResponse(message, "Unable to create a station : " + ex.Message);
-                return;
-            }
-
-            if (configRequest.ActivePins.Any())
-            {
-                try
-                {
-                    newStation.Components = _componentService.AddGenericComponentPool(newStation.Id, configRequest.ActivePins).ToList();
-                }
-                catch (Exception ex)
-                {
-                    // Undo station creation and send error details
-                    _stationService.DeleteStation(newStation.Id);
-                    await SendErrorResponse(message, "Unable to create a station : " + ex.Message);
-                    return;
-                }
-
-                var formattedData = StationConfigResponseConverter.ConvertStationToStationConfigResponse(newStation);
-                MqttResponse response = MqttResponse.Success(request.Header, ObjectTypes.CONFIG_RESPONSE, formattedData);
-                await PublishAsync(message.Topic, JsonSerializer.Serialize(response));
-            }
-
         }
+
+        if (!handled)
+        {
+            await SendErrorResponse(request, e.ApplicationMessage.Topic, "Server is not able to handle your request");
+        }
+
+        return;
     }
-
-    public Task HandleSavingRequest(MqttApplicationMessage message)
-    {
-
-        return Task.CompletedTask;
-    }
-
-    public Task HandleActuatorResponse(MqttApplicationMessage message)
-    {
-
-        return Task.CompletedTask;
-    }
-
 }

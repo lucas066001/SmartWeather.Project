@@ -6,6 +6,7 @@ using SmartWeather.Services.Authentication;
 using SmartWeather.Services.ComponentDatas;
 using SmartWeather.Services.Components;
 using SmartWeather.Services.Mqtt;
+using SmartWeather.Services.Mqtt.Handlers;
 using SmartWeather.Services.Stations;
 using SmartWeather.Services.Users;
 
@@ -23,6 +24,7 @@ public static class DependencyInjection
         services.AddScoped<StationService>();
         services.AddScoped<ComponentService>();
         services.AddScoped<ComponentDataService>();
+        services.AddScoped<ConfigRequestHandler>();
         services.AddSingleton<MqttService>();
     }
 }

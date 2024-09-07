@@ -13,15 +13,15 @@ namespace SmartWeather.Services.Stations
 {
     public class StationService(IRepository<Station> stationBaseRepository, IStationRepository stationRepository)
     {
-        public Station AddNewStation(string name, string macAddress, float latitude, float longitude, string topicLocation, int? userId)
+        public Station AddNewStation(string name, string macAddress, float latitude, float longitude, int? userId)
         {
-            Station stationToCreate = new(name, macAddress, latitude, longitude, topicLocation, userId);
+            Station stationToCreate = new(name, macAddress, latitude, longitude, userId);
             return stationBaseRepository.Create(stationToCreate);
         }
 
         public Station AddGenericStation(string macAddress)
         {
-            return AddNewStation("Unnamed Station", macAddress, 0.0f, 0.0f, macAddress, null);
+            return AddNewStation("Unnamed Station", macAddress, 0.0f, 0.0f, null);
         }
 
         public bool DeleteStation(int idStation)
@@ -29,9 +29,9 @@ namespace SmartWeather.Services.Stations
             return stationBaseRepository.Delete(idStation) != null;
         }
 
-        public Station UpdateStation(int id, string name, string macAddress, float latitude, float longitude, string topicLocation, int userId)
+        public Station UpdateStation(int id, string name, string macAddress, float latitude, float longitude, int userId)
         {
-            Station stationToUpdate = new(name, macAddress, latitude, longitude, topicLocation, userId)
+            Station stationToUpdate = new(name, macAddress, latitude, longitude, userId)
             {
                 Id = id
             };

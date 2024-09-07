@@ -13,7 +13,7 @@ public class StationConfigResponseConverter
 {
     public static StationConfigResponse ConvertStationToStationConfigResponse(Station station)
     {
-        return new(station.Id, station.TopicLocation, ConvertListComponentToListComponentConfig(station.Components));
+        return new(station.Id, ConvertListComponentToListComponentConfig(station.Components));
     }
 
     public static IEnumerable<ComponentConfig> ConvertListComponentToListComponentConfig(IEnumerable<Component> components)

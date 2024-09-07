@@ -28,7 +28,6 @@ public class StationController : ControllerBase
         StationResponse formattedResponse;
 
         if (String.IsNullOrWhiteSpace(request.Name) ||
-            String.IsNullOrWhiteSpace(request.TopicLocation) ||
             !(request.UserId > 0))
         {
             return BadRequest(ApiResponse<StationResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
@@ -36,7 +35,7 @@ public class StationController : ControllerBase
 
         try
         {
-            Entities.Station.Station createdStation = _stationService.AddNewStation(request.Name, request.MacAddress, request.Latitude, request.Longitude, request.TopicLocation, request.UserId);
+            Entities.Station.Station createdStation = _stationService.AddNewStation(request.Name, request.MacAddress, request.Latitude, request.Longitude, request.UserId);
             formattedResponse = StationResponseConverter.ConvertStationToStationResponse(createdStation);
             response = ApiResponse<StationResponse>.Success(formattedResponse);
         }
@@ -57,7 +56,6 @@ public class StationController : ControllerBase
 
         if (!(request.Id > 0) ||
             String.IsNullOrWhiteSpace(request.Name) ||
-            String.IsNullOrWhiteSpace(request.TopicLocation) ||
             !(request.Id > 0))
         {
             return BadRequest(ApiResponse<StationResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
@@ -65,7 +63,7 @@ public class StationController : ControllerBase
 
         try
         {
-            Entities.Station.Station updatedStation = _stationService.UpdateStation(request.Id, request.Name, request.MacAddress, request.Latitude, request.Longitude, request.TopicLocation, request.UserId);
+            Entities.Station.Station updatedStation = _stationService.UpdateStation(request.Id, request.Name, request.MacAddress, request.Latitude, request.Longitude, request.UserId);
             formattedResponse = StationResponseConverter.ConvertStationToStationResponse(updatedStation);
             response = ApiResponse<StationResponse>.Success(formattedResponse);
         }
