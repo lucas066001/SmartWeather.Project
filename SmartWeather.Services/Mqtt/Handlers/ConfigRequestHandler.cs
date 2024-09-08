@@ -7,7 +7,7 @@ using SmartWeather.Services.Mqtt.Dtos.Converters;
 using SmartWeather.Services.Mqtt.Dtos;
 using SmartWeather.Services.Stations;
 
-public class ConfigRequestHandler : IMqttHandler
+public class ConfigRequestHandler : IMqttRequestHandler
 {
     private MqttSingleton _mqttSingleton;
     private StationService _stationService;

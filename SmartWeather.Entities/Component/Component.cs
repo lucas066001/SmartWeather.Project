@@ -6,8 +6,8 @@ using System.Text.RegularExpressions;
 public class Component
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string Color { get; set; }
+    public string Name { get; set; } = null!;
+    public string Color { get; set; } = null !;
     public ComponentUnit Unit { get; set; }
     public ComponentType Type { get; set; }
     public int StationId { get; set; }

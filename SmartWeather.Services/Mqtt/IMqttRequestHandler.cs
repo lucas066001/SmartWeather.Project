@@ -4,7 +4,7 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace SmartWeather.Services.Mqtt;
 
-public interface IMqttHandler
+public interface IMqttRequestHandler
 {
     public void Handle(MqttRequest message, string originTopic);
     public bool IsAbleToHandle(int requestType);

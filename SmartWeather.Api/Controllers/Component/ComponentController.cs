@@ -11,6 +11,7 @@ using SmartWeather.Services.Users;
 using SmartWeather.Api.Controllers.Station.Dtos.Converters;
 using SmartWeather.Api.Controllers.Station.Dtos;
 using SmartWeather.Services.Stations;
+using SmartWeather.Services.Mqtt;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -18,9 +19,12 @@ using SmartWeather.Services.Stations;
 public class ComponentController : ControllerBase
 {
     private readonly ComponentService _componentService;
+    private readonly MqttService _mqttService;
 
-    public ComponentController(ComponentService componentService)
+    public ComponentController(ComponentService componentService,
+                                MqttService mqttService)
     {
+        _mqttService = mqttService;
         _componentService = componentService;
     }
 
@@ -168,6 +172,42 @@ public class ComponentController : ControllerBase
         catch (Exception ex)
         {
             response = ApiResponse<ComponentResponse>.Failure(String.Format(BaseResponses.FORMAT_ERROR, ex.Message));
+            return BadRequest(response);
+        }
+
+        return Ok(response);
+    }
+
+    [HttpPut(nameof(ActuatorCommand))]
+    public async Task<ActionResult<ApiResponse<EmptyResponse>>> ActuatorCommand(ActuatorCommandRequest request)
+    {
+        ApiResponse<EmptyResponse> response;
+
+        if (!(request.ComponentId > 0) ||
+            !(request.StationId > 0)
+            )
+        {
+            return BadRequest(ApiResponse<EmptyResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
+        }
+
+        try
+        {
+            bool isActionExecuted = await _mqttService.SendActuatorCommand(request.StationId,
+                                                                     request.ComponentId,
+                                                                     request.ComponentValueUpdate);
+            if (isActionExecuted)
+            {
+                response = ApiResponse<EmptyResponse>.Success(null);
+            }
+            else
+            {
+                response = ApiResponse<EmptyResponse>.Failure(BaseResponses.INTERNAL_ERROR);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            response = ApiResponse<EmptyResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
             return BadRequest(response);
         }
 

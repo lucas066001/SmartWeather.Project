@@ -4,7 +4,7 @@ using SmartWeather.Services.ComponentDatas;
 
 namespace SmartWeather.Services.Mqtt.Handlers;
 
-public class SavingRequestHandler : IMqttHandler
+public class SavingRequestHandler : IMqttRequestHandler
 {
     private MqttSingleton _mqttSingleton;
     private ComponentDataService _componentDataService;

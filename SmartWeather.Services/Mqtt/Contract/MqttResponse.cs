@@ -12,9 +12,9 @@ public class MqttResponse
     public string ExecutionMessage { get; set; }
     public string JsonObject { get; set; }
     public int JsonLenght { get; set; }
-    public ObjectTypes? JsonType { get; set; }
+    public int JsonType { get; set; }
 
-    public MqttResponse(MqttHeader header, Status executionResult, string executionMessage, string jsonObject, int jsonLenght, ObjectTypes? jsonType)
+    public MqttResponse(MqttHeader header, Status executionResult, string executionMessage, string jsonObject, int jsonLenght, int jsonType = -1)
     {
         Header = header;
         ExecutionResult = executionResult;
@@ -24,7 +24,7 @@ public class MqttResponse
         JsonType = jsonType;
     }
 
-    public static MqttResponse Success(MqttHeader requestHeader, ObjectTypes type, Object data)
+    public static MqttResponse Success(MqttHeader requestHeader, int type, Object data)
     {
         string jsonString = JsonSerializer.Serialize(data);
         return new MqttResponse(requestHeader, Status.OK, BaseResponses.OK, jsonString, jsonString.Count(), type);
@@ -32,6 +32,6 @@ public class MqttResponse
 
     public static MqttResponse Failure(MqttHeader requestHeader, string customMessage = BaseResponses.INTERNAL_ERROR, Status status = Status.INTERNAL_ERROR)
     {
-        return new MqttResponse(requestHeader, status, customMessage, String.Empty, 0, null);
+        return new MqttResponse(requestHeader, status, customMessage, String.Empty, 0, -1);
     }
 }
