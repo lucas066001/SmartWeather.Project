@@ -8,12 +8,12 @@ namespace SmartWeather.Api.Configuration;
 
 public class PostStartup : IHostedService
 {
-    private readonly MqttService _mqttService;
+    private readonly MqttSingleton _mqttService;
     private readonly StationService _stationService;
     private readonly ComponentService _componentService;
     private readonly ComponentDataService _componentDataService;
 
-    public PostStartup(MqttService mqttService, IServiceScopeFactory scopeFactory)
+    public PostStartup(MqttSingleton mqttService, IServiceScopeFactory scopeFactory)
     {
         _mqttService = mqttService;
         _stationService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<StationService>();
