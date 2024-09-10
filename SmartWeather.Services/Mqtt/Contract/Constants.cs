@@ -2,12 +2,12 @@
 
 public enum Status
 {
-    OK,
     INTERNAL_ERROR,
     TIMEOUT_ERROR,
     DATABASE_ERROR,
     PARSE_ERROR,
-    CONTRACT_ERROR
+    CONTRACT_ERROR,
+    OK
 }
 
 public class BaseResponses

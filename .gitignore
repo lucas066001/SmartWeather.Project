@@ -5,4 +5,4 @@ obj/
 data/
 log/
 secrets/
-appsettings*.json
+_out/
