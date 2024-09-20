@@ -22,6 +22,7 @@ public class BaseResponses
 
 public enum ObjectTypes
 {
+    UNKNOWN,
     CONFIG_REQUEST,
     CONFIG_RESPONSE,
     SENSOR_SAVING_REQUEST,

@@ -14,7 +14,7 @@ public class MqttResponse
     public int JsonLenght { get; set; }
     public int JsonType { get; set; }
 
-    public MqttResponse(MqttHeader header, Status executionResult, string executionMessage, string jsonObject, int jsonLenght, int jsonType = -1)
+    public MqttResponse(MqttHeader header, Status executionResult, string executionMessage, string jsonObject, int jsonLenght, int jsonType)
     {
         Header = header;
         ExecutionResult = executionResult;
@@ -32,6 +32,6 @@ public class MqttResponse
 
     public static MqttResponse Failure(MqttHeader requestHeader, string customMessage = BaseResponses.INTERNAL_ERROR, Status status = Status.INTERNAL_ERROR)
     {
-        return new MqttResponse(requestHeader, status, customMessage, String.Empty, 0, -1);
+        return new MqttResponse(requestHeader, status, customMessage, String.Empty, 0, (int)ObjectTypes.UNKNOWN);
     }
 }

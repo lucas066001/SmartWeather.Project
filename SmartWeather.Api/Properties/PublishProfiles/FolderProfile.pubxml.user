@@ -5,7 +5,18 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 <Project>
   <PropertyGroup>
     <_PublishTargetUrl>C:\Users\chapu\E.Lucas\Perso\Github\SmartWeather.Server\_out\folderDeploy</_PublishTargetUrl>
-    <History>True|2024-09-10T19:52:05.6748937Z;</History>
+    <History>True|2024-09-11T15:32:02.3415115Z;True|2024-09-11T17:28:07.1430586+02:00;True|2024-09-10T21:52:05.6748937+02:00;</History>
     <LastFailureDetails />
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
   </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="SmartWeatherDatabase">
+      <Value>Server=localhost%3bDatabase=smart_weather%3bTrustServerCertificate=True%3bTrusted_Connection=True%3bUser Id=smart_weather_api%3b Password=1234</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+  <ItemGroup>
+    <EFMigrations Include="SmartWeather.Repositories.Context.SmartWeatherContext">
+      <Value>Server=localhost%3bDatabase=smart_weather%3bTrustServerCertificate=True%3bTrusted_Connection=True%3bUser Id=smart_weather_api%3b Password=1234</Value>
+    </EFMigrations>
+  </ItemGroup>
 </Project>
