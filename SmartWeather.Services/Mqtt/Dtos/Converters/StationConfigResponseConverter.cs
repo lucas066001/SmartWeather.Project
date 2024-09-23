@@ -1,4 +1,5 @@
 ﻿using SmartWeather.Entities.Component;
+using SmartWeather.Entities.MeasurePoint;
 using SmartWeather.Entities.Station;
 using System;
 using System.Collections.Generic;
@@ -31,8 +32,30 @@ public class StationConfigResponseConverter
     {
         return new ComponentConfig()
         {
-            ComponentDatabaseId = component.Id,
-            GpioPin = component.GpioPin
+            DatabaseId = component.Id,
+            GpioPin = component.GpioPin,
+            MeasurePointsConfigs = ConvertListMeasurePointToListMeasurePointConfig(component.MeasurePoints)
+        };
+    }
+
+    public static IEnumerable<MeasurePointConfig> ConvertListMeasurePointToListMeasurePointConfig(IEnumerable<MeasurePoint> measurePoints)
+    {
+        var result = new List<MeasurePointConfig>();
+
+        foreach (var mp in measurePoints)
+        {
+            result.Add(ConvertMeasurePointToMeasurePointConfig(mp));
+        }
+        return result;
+    }
+
+    public static MeasurePointConfig ConvertMeasurePointToMeasurePointConfig(MeasurePoint measurePoint)
+    {
+        return new MeasurePointConfig()
+        {
+            Id = measurePoint.Id,
+            DatabaseId = measurePoint.Id,
+            
         };
     }
 }

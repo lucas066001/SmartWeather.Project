@@ -11,6 +11,7 @@ public class MeasurePointConfiguration : IEntityTypeConfiguration<MeasurePoint>
     {
         builder.ToTable(nameof(MeasurePoint));
         builder.HasKey(mp => mp.Id);
+        builder.Property(mp => mp.LocalId);
         builder.Property(mp => mp.Name);
         builder.Property(mp => mp.Color);
         builder.Property(mp => mp.Unit);

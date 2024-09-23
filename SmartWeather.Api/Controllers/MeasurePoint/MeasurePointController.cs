@@ -31,7 +31,8 @@ public class MeasurePointController : Controller
 
         if (String.IsNullOrWhiteSpace(request.Name) ||
             String.IsNullOrWhiteSpace(request.Color) ||
-            !(request.ComponentId > 0) || 
+            !(request.ComponentId > 0) ||
+            !(request.LocalId > 0) ||
             !(request.Unit >= 0))
         {
             return BadRequest(ApiResponse<MeasurePointResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
@@ -39,7 +40,7 @@ public class MeasurePointController : Controller
 
         try
         {
-            MeasurePoint createdComponentData = _measurePointService.AddNewMeasurePoint(request.Name, request.Color, request.Unit, request.ComponentId);
+            MeasurePoint createdComponentData = _measurePointService.AddNewMeasurePoint(request.LocalId, request.Name, request.Color, request.Unit, request.ComponentId);
             formattedResponse = MeasurePointConverter.ConvertMeasurePointToMeasurePointResponse(createdComponentData);
             response = ApiResponse<MeasurePointResponse>.Success(formattedResponse);
         }
@@ -94,6 +95,7 @@ public class MeasurePointController : Controller
             String.IsNullOrWhiteSpace(request.Name) ||
             String.IsNullOrWhiteSpace(request.Color) ||
             !(request.ComponentId > 0) ||
+            !(request.LocalId > 0) || 
             !(request.Unit >= 0))
         {
             return BadRequest(ApiResponse<MeasurePointResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
@@ -101,7 +103,7 @@ public class MeasurePointController : Controller
 
         try
         {
-            MeasurePoint updatedMeasurePoint = _measurePointService.UpdateMeasurePoint(request.Id, request.Name, request.Color, request.Unit, request.ComponentId);
+            MeasurePoint updatedMeasurePoint = _measurePointService.UpdateMeasurePoint(request.Id, request.LocalId, request.Name, request.Color, request.Unit, request.ComponentId);
             formattedResponse = MeasurePointConverter.ConvertMeasurePointToMeasurePointResponse(updatedMeasurePoint);
             response = ApiResponse<MeasurePointResponse>.Success(formattedResponse);
         }

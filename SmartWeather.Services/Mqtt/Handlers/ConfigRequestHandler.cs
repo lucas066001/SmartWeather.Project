@@ -6,20 +6,26 @@ using SmartWeather.Services.Mqtt.Contract;
 using SmartWeather.Services.Mqtt.Dtos.Converters;
 using SmartWeather.Services.Mqtt.Dtos;
 using SmartWeather.Services.Stations;
+using SmartWeather.Services.MeasurePoints;
+using SmartWeather.Entities.Component;
+using SmartWeather.Entities.MeasurePoint;
 
 public class ConfigRequestHandler : IMqttRequestHandler
 {
     private MqttSingleton _mqttSingleton;
     private StationService _stationService;
     private ComponentService _componentService;
+    private MeasurePointService _measurePointService;
 
     public ConfigRequestHandler(MqttSingleton mqttSingleton, 
                                 StationService stationService, 
-                                ComponentService componentService)
+                                ComponentService componentService,
+                                MeasurePointService measurePointService)
     {
         _mqttSingleton = mqttSingleton;
         _stationService = stationService;
         _componentService = componentService;
+        _measurePointService = measurePointService;
     }
 
     public async void Handle(MqttRequest request, string originTopic)
@@ -45,6 +51,10 @@ public class ConfigRequestHandler : IMqttRequestHandler
         if (retrievedStation != null)
         {
             retrievedStation.Components = _componentService.GetFromStation(retrievedStation.Id).ToList();
+            foreach (var component in retrievedStation.Components)
+            {
+                component.MeasurePoints = _measurePointService.GetFromComponent(component.Id);
+            }
             var formattedData = StationConfigResponseConverter.ConvertStationToStationConfigResponse(retrievedStation);
             await _mqttSingleton.SendSuccessResponse(request, originTopic, ObjectTypes.CONFIG_RESPONSE, formattedData);
         }
@@ -61,11 +71,33 @@ public class ConfigRequestHandler : IMqttRequestHandler
                 return;
             }
 
-            if (configRequest.ActivePins.Any())
+            if (configRequest.ComponentsConfigs.Any())
             {
                 try
                 {
-                    newStation.Components = _componentService.AddGenericComponentPool(newStation.Id, configRequest.ActivePins).ToList();
+                    var createdComponents = new List<Component>();
+
+                    foreach (var compConf in configRequest.ComponentsConfigs)
+                    {
+                        var createdComponent = _componentService.AddNewComponent(compConf.DefaultName,
+                                                                                     "#000000",
+                                                                                     compConf.ComponentType,
+                                                                                     newStation.Id,
+                                                                                     compConf.GpioPin);
+                        createdComponent.MeasurePoints = new List<MeasurePoint>();
+                        foreach (var mpConf in compConf.MeasurePoints)
+                        {
+                            var createdMeasurePoint = _measurePointService.AddNewMeasurePoint(mpConf.LocalId,
+                                                                                                mpConf.DefaultName,
+                                                                                                "#000000",
+                                                                                                mpConf.Unit,
+                                                                                                createdComponent.Id);
+                            _ = createdComponent.MeasurePoints.Append(createdMeasurePoint);
+                        }
+                        createdComponents.Add(createdComponent);
+                    }
+
+                    newStation.Components = createdComponents;
                 }
                 catch (Exception ex)
                 {

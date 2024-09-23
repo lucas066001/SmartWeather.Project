@@ -2,10 +2,16 @@
 
 public class StationConfigResponse
 {
+    public record MeasurePointConfig
+    {
+        public int Id { get; set; }
+        public int DatabaseId { get; set; }
+    }
     public record ComponentConfig
     {
-        public required int GpioPin { get; set; }
-        public required int ComponentDatabaseId { get; set; }
+        public int GpioPin { get; set; }
+        public int DatabaseId { get; set; }
+        public IEnumerable<MeasurePointConfig> MeasurePointsConfigs { get; set; } = null!;
     }
     public int StationDatabaseId { get; set; }
     public IEnumerable<ComponentConfig> ConfigComponents { get; set; }

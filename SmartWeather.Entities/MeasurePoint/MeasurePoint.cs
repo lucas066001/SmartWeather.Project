@@ -6,6 +6,7 @@ using SmartWeather.Entities.ComponentData;
 public class MeasurePoint
 {
     public int Id { get; set; }
+    public int LocalId { get; set; }
     public string Name { get; set; } = null!;
     public string Color { get; set; } = null!;
     public MeasureUnit Unit { get; set; }
@@ -17,8 +18,14 @@ public class MeasurePoint
     {
     }
 
-    public MeasurePoint(string name, string color, int unit, int componentId) 
+    public MeasurePoint(int localId, string name, string color, int unit, int componentId) 
     {
+        if (!(localId > 0))
+        {
+            throw new Exception("LocalId should be > 0");
+        }
+        LocalId = localId;
+
         if (String.IsNullOrWhiteSpace(name))
         {
             throw new Exception("Name must be filled");

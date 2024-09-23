@@ -5,9 +5,9 @@ using SmartWeather.Services.Repositories;
 
 public class MeasurePointService (IRepository<MeasurePoint> measurePointBaseRepository, IMeasurePointRepository measurePointRepository)
 {
-    public MeasurePoint AddNewMeasurePoint(string name, string color, int unit, int componentId)
+    public MeasurePoint AddNewMeasurePoint(int localId, string name, string color, int unit, int componentId)
     {
-        MeasurePoint MeasurePointToCreate = new(name, color, unit, componentId);
+        MeasurePoint MeasurePointToCreate = new(localId, name, color, unit, componentId);
         return measurePointBaseRepository.Create(MeasurePointToCreate);
     }
 
@@ -16,9 +16,9 @@ public class MeasurePointService (IRepository<MeasurePoint> measurePointBaseRepo
         return measurePointBaseRepository.Delete(idMeasurePoint) != null;
     }
 
-    public MeasurePoint UpdateMeasurePoint(int id, string name, string color, int unit, int componentId)
+    public MeasurePoint UpdateMeasurePoint(int id, int localId, string name, string color, int unit, int componentId)
     {
-        MeasurePoint MeasurePointToUpdate = new(name, color, unit, componentId)
+        MeasurePoint MeasurePointToUpdate = new(localId, name, color, unit, componentId)
         {
             Id = id
         };
