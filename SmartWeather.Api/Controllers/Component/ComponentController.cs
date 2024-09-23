@@ -7,10 +7,6 @@ using SmartWeather.Services.Components;
 using SmartWeather.Api.Controllers.Component.Dtos;
 using SmartWeather.Entities.Component;
 using SmartWeather.Api.Controllers.Component.Dtos.Converters;
-using SmartWeather.Services.Users;
-using SmartWeather.Api.Controllers.Station.Dtos.Converters;
-using SmartWeather.Api.Controllers.Station.Dtos;
-using SmartWeather.Services.Stations;
 using SmartWeather.Services.Mqtt;
 
 [Route("api/[controller]")]
@@ -44,7 +40,7 @@ public class ComponentController : ControllerBase
 
         try
         {
-            Component createdComponent = _componentService.AddNewComponent(request.Name, request.Color, request.Unit, request.Type, request.StationId, request.GpioPin);
+            Component createdComponent = _componentService.AddNewComponent(request.Name, request.Color, request.Type, request.StationId, request.GpioPin);
             formattedResponse = ComponentResponseConverter.ConvertComponentToComponentResponse(createdComponent);
             response = ApiResponse<ComponentResponse>.Success(formattedResponse);
         }
@@ -106,7 +102,7 @@ public class ComponentController : ControllerBase
 
         try
         {
-            Component updatedComponent = _componentService.UpdateComponent(request.Id, request.Name, request.Color, request.Unit, request.Type, request.StationId, request.GpioPin);
+            Component updatedComponent = _componentService.UpdateComponent(request.Id, request.Name, request.Color, request.Type, request.StationId, request.GpioPin);
             formattedResponse = ComponentResponseConverter.ConvertComponentToComponentResponse(updatedComponent);
             response = ApiResponse<ComponentResponse>.Success(formattedResponse);
         }

@@ -15,6 +15,8 @@ using SmartWeather.Services.Components;
 using SmartWeather.Repositories.Components;
 using SmartWeather.Services.ComponentDatas;
 using SmartWeather.Repositories.ComponentDatas;
+using SmartWeather.Services.MeasurePoints;
+using SmartWeather.Repositories.MeasurePoints;
 
 public static class DependencyInjection
 {
@@ -39,7 +41,8 @@ public static class DependencyInjection
         services.AddScoped(typeof(IAuthenticationRepository), typeof(AuthenticationRepository));
         services.AddScoped(typeof(IStationRepository), typeof(StationRepository));
         services.AddScoped(typeof(IComponentRepository), typeof(ComponentRepository));
-        services.AddScoped(typeof(IComponentDataRepository), typeof(ComponentDataRepository));
+        services.AddScoped(typeof(IMeasurePointRepository), typeof(MeasurePointRepository));
+        services.AddScoped(typeof(IMeasureDataRepository), typeof(MeasureDataRepository));
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SmartWeather.Services.Authentication;
 using SmartWeather.Services.ComponentDatas;
 using SmartWeather.Services.Components;
+using SmartWeather.Services.MeasurePoints;
 using SmartWeather.Services.Mqtt;
 using SmartWeather.Services.Mqtt.Handlers;
 using SmartWeather.Services.Stations;
@@ -23,7 +24,8 @@ public static class DependencyInjection
         services.AddScoped<AuthenticationService>();
         services.AddScoped<StationService>();
         services.AddScoped<ComponentService>();
-        services.AddScoped<ComponentDataService>();
+        services.AddScoped<MeasurePointService>();
+        services.AddScoped<MeasureDataService>();
         services.AddScoped<ConfigRequestHandler>();
         services.AddScoped<SavingRequestHandler>();
         services.AddScoped<MqttService>();

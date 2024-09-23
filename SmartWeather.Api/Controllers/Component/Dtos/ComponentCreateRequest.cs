@@ -7,7 +7,6 @@ public class ComponentCreateRequest
     public required string Name { get; set; }
     public required string Color { get; set; }
     public int GpioPin { get; set; }
-    public int Unit { get; set; }
     public int Type { get; set; }
     public int StationId { get; set; }
 }

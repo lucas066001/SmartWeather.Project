@@ -7,10 +7,10 @@ namespace SmartWeather.Services.Mqtt.Handlers;
 public class SavingRequestHandler : IMqttRequestHandler
 {
     private MqttSingleton _mqttSingleton;
-    private ComponentDataService _componentDataService;
+    private MeasureDataService _componentDataService;
 
     public SavingRequestHandler(MqttSingleton mqttSingleton,
-                                ComponentDataService componentDataService)
+                                MeasureDataService componentDataService)
     {
         _mqttSingleton = mqttSingleton;
         _componentDataService = componentDataService;

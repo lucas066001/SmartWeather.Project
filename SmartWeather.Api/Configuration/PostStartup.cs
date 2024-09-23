@@ -11,14 +11,14 @@ public class PostStartup : IHostedService
     private readonly MqttSingleton _mqttService;
     private readonly StationService _stationService;
     private readonly ComponentService _componentService;
-    private readonly ComponentDataService _componentDataService;
+    private readonly MeasureDataService _componentDataService;
 
     public PostStartup(MqttSingleton mqttService, IServiceScopeFactory scopeFactory)
     {
         _mqttService = mqttService;
         _stationService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<StationService>();
         _componentService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<ComponentService>();
-        _componentDataService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<ComponentDataService>();
+        _componentDataService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<MeasureDataService>();
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)

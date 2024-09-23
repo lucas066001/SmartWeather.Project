@@ -1,8 +1,9 @@
 ﻿namespace SmartWeather.Api.Controllers.ComponentData.Dtos;
 
-public class ComponentDataResponse
+public class MeasureDataUpdateRequest
 {
-    public int ComponentId { get; set; }
+    public int Id { get; set; }
+    public int MeasurePointId { get; set; }
     public int Value { get; set; }
     public DateTime DateTime { get; set; }
 }

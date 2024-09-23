@@ -195,7 +195,7 @@ public class MqttSingleton
                                                               null,
                                                               false);
 
-        if (response != null)
+        if (response != null && ContractHelper.IsResponseType(response.JsonType))
         {
             var pendingRequest = PendingRequestList.Where(pr => pr.OriginalRequestHeader.RequestIdentifier == response.Header.RequestIdentifier).FirstOrDefault();
 
@@ -213,16 +213,8 @@ public class MqttSingleton
                                                             null,
                                                             false);
 
-        if (request == null && response == null) 
-        {
-            await SendErrorResponse(null, 
-                                    e.ApplicationMessage.Topic, 
-                                    "Unable to deserialize Mqtt request nor Mqtt response", 
-                                    Status.PARSE_ERROR);
-        }
 
-
-        if (request != null)
+        if (request != null && ContractHelper.IsRequestType(request.JsonType))
         {
             foreach (var handler in _requestHandlers)
             {
@@ -233,6 +225,14 @@ public class MqttSingleton
                     break;
                 }
             }
+        }
+
+        if (request == null && response == null)
+        {
+            await SendErrorResponse(null,
+                                    e.ApplicationMessage.Topic,
+                                    "Unable to deserialize Mqtt request nor Mqtt response",
+                                    Status.PARSE_ERROR);
         }
 
         if (!handled)

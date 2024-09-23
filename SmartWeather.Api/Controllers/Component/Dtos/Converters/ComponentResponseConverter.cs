@@ -15,7 +15,6 @@ public class ComponentResponseConverter
             Name = component.Name,
             StationId = component.StationId,
             Type = component.Type,  
-            Unit = component.Unit
         };
     }
 }

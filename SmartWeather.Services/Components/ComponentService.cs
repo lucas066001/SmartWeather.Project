@@ -1,16 +1,13 @@
 ﻿using SmartWeather.Entities.Component;
-using SmartWeather.Entities.Station;
-using SmartWeather.Entities.User;
 using SmartWeather.Services.Repositories;
-using SmartWeather.Services.Users;
 
 namespace SmartWeather.Services.Components;
 
 public class ComponentService (IRepository<Component> componentBaseRepository, IComponentRepository componentRepository)
 {
-    public Component AddNewComponent(string name, string color, int unit, int type, int stationId, int gpioPin)
+    public Component AddNewComponent(string name, string color, int type, int stationId, int gpioPin)
     {
-        Component componentToCreate = new(name, color, unit, type, stationId, gpioPin);
+        Component componentToCreate = new(name, color, type, stationId, gpioPin);
         return componentBaseRepository.Create(componentToCreate);
     }
     public IEnumerable<Component> AddGenericComponentPool(int stationId, IEnumerable<int> gpioPins)
@@ -18,7 +15,7 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
         var createdComponents = new List<Component>();
         foreach (var pin in gpioPins)
         {
-            Component componentToCreate = new("Unnamed component", "#000000", (int)ComponentUnit.Unknown, (int)ComponentType.Unknown, stationId, pin);
+            Component componentToCreate = new("Unnamed component", "#000000", (int)ComponentType.Unknown, stationId, pin);
             componentBaseRepository.Create(componentToCreate);
             createdComponents.Add(componentToCreate);
         }
@@ -30,9 +27,9 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
         return componentBaseRepository.Delete(idComponent) != null;
     }
 
-    public Component UpdateComponent(int id, string name, string color, int unit, int type, int stationId, int gpioPin)
+    public Component UpdateComponent(int id, string name, string color, int type, int stationId, int gpioPin)
     {
-        Component componentToUpdate = new(name, color, unit, type, stationId, gpioPin)
+        Component componentToUpdate = new(name, color, type, stationId, gpioPin)
         {
             Id = id
         };

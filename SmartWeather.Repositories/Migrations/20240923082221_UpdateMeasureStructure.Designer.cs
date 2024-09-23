@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartWeather.Repositories.Context;
 
@@ -11,9 +12,11 @@ using SmartWeather.Repositories.Context;
 namespace SmartWeather.Repositories.Migrations
 {
     [DbContext(typeof(SmartWeatherContext))]
-    partial class SmartWeatherContextModelSnapshot : ModelSnapshot
+    [Migration("20240923082221_UpdateMeasureStructure")]
+    partial class UpdateMeasureStructure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

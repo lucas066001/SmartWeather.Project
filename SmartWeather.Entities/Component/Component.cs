@@ -1,6 +1,6 @@
 ﻿namespace SmartWeather.Entities.Component;
 using SmartWeather.Entities.Station;
-using SmartWeather.Entities.ComponentData;
+using SmartWeather.Entities.MeasurePoint;
 using System.Text.RegularExpressions;
 
 public class Component
@@ -8,14 +8,13 @@ public class Component
     public int Id { get; set; }
     public string Name { get; set; } = null!;
     public string Color { get; set; } = null !;
-    public ComponentUnit Unit { get; set; }
     public ComponentType Type { get; set; }
     public int StationId { get; set; }
     public int GpioPin { get; set; }
     public virtual Station Station { get; set; } = null!;
-    public virtual IEnumerable<ComponentData> ComponentDatas { get; set; } = null!;
+    public virtual IEnumerable<MeasurePoint> MeasurePoints { get; set; } = null!;
 
-    private static readonly Regex HexColorRegex = new Regex(
+    public static readonly Regex HexColorRegex = new Regex(
         @"#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
@@ -23,7 +22,7 @@ public class Component
     {
     }
 
-    public Component(string name, string color, int unit, int type, int stationId, int gpioPin)
+    public Component(string name, string color, int type, int stationId, int gpioPin)
     {
         if (String.IsNullOrWhiteSpace(name))
         {
@@ -36,13 +35,6 @@ public class Component
             throw new Exception("Color format is incorrect");
         }
         Color = color;
-        
-        if(!Enum.IsDefined(typeof(ComponentUnit), unit))
-        {
-            throw new Exception("Unit type is incorrect");
-        }
-        ComponentUnit foundUnit = (ComponentUnit)unit;
-        Unit = foundUnit;
 
         if (!Enum.IsDefined(typeof(ComponentType), type))
         {

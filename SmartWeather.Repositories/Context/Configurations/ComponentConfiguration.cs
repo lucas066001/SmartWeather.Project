@@ -12,7 +12,6 @@ internal class ComponentConfiguration : IEntityTypeConfiguration<Component>
         builder.HasKey(component => component.Id);
         builder.Property(component => component.Name);
         builder.Property(component => component.Color);
-        builder.Property(component => component.Unit);
         builder.Property(component => component.Type);
         builder.Property(component => component.GpioPin);
         builder.Property(component => component.StationId);
