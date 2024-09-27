@@ -3,17 +3,17 @@
 using SmartWeather.Entities.ComponentData;
 using SmartWeather.Services.Repositories;
 
-public class MeasureDataService (IRepository<MeasureData> componentDataBaseRepository, IMeasureDataRepository componentDataRepository)
+public class MeasureDataService (IRepository<MeasureData> measureDataBaseRepository, IMeasureDataRepository measureDataRepository)
 {
-    public MeasureData AddNewComponentData(int componentId, float value, DateTime dateTime)
+    public MeasureData AddNewMeasureData(int measurePointId, float value, DateTime dateTime)
     {
-        MeasureData ComponentDataToCreate = new(componentId, value, dateTime);
-        return componentDataBaseRepository.Create(ComponentDataToCreate);
+        MeasureData ComponentDataToCreate = new(measurePointId, value, dateTime);
+        return measureDataBaseRepository.Create(ComponentDataToCreate);
     }
 
     public bool DeleteComponentData(int idComponentData)
     {
-        return componentDataBaseRepository.Delete(idComponentData) != null;
+        return measureDataBaseRepository.Delete(idComponentData) != null;
     }
 
     public MeasureData UpdateComponentData(int id, int componentId, int value, DateTime dateTime)
@@ -22,11 +22,11 @@ public class MeasureDataService (IRepository<MeasureData> componentDataBaseRepos
         {
             Id = id
         };
-        return componentDataBaseRepository.Update(ComponentDataToUpdate);
+        return measureDataBaseRepository.Update(ComponentDataToUpdate);
     }
 
     public IEnumerable<MeasureData> GetFromMeasurePoint(int idMeasurePoint, DateTime? startPeriod, DateTime? endPeriod)
     {
-        return componentDataRepository.GetFromMeasurePoint(idMeasurePoint, startPeriod, endPeriod);
+        return measureDataRepository.GetFromMeasurePoint(idMeasurePoint, startPeriod, endPeriod);
     }
 }

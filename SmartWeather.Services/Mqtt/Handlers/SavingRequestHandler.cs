@@ -24,7 +24,7 @@ public class SavingRequestHandler : IMqttRequestHandler
             return;
         }
 
-        var componentSavingRequest = await _mqttSingleton.RetreiveMqttObject<ComponentDataSavingRequest>(request.JsonObject, originTopic, request);
+        var componentSavingRequest = await _mqttSingleton.RetreiveMqttObject<MeasureDataSavingRequest>(request.JsonObject, originTopic, request);
 
         if (componentSavingRequest == null)
         {
@@ -34,7 +34,7 @@ public class SavingRequestHandler : IMqttRequestHandler
 
         try
         {
-            _componentDataService.AddNewComponentData(componentSavingRequest.ComponentId, componentSavingRequest.Value, componentSavingRequest.DateTime);
+            _componentDataService.AddNewMeasureData(componentSavingRequest.MeasurePointId, componentSavingRequest.Value, request.Header.DateTime);
             await _mqttSingleton.SendSuccessResponse(request, originTopic, ObjectTypes.SENSOR_SAVING_RESPONSE, new EmptyResponse());
         }
         catch(Exception ex)

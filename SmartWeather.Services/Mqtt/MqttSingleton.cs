@@ -65,6 +65,7 @@ public class MqttSingleton
             
             var stationsSensorsTopic = string.Format(CommunicationConstants.MQTT_SENSOR_TOPIC_FORMAT, 
                                                         CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
+                                                        CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
                                                         CommunicationConstants.MQTT_SERVER_TARGET);
             await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(stationsSensorsTopic).Build());
 

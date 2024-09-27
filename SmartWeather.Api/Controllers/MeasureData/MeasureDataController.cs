@@ -33,7 +33,7 @@ public class MeasureDataController : ControllerBase
 
         try
         {
-            MeasureData createdComponentData = _componentDataService.AddNewComponentData(request.MeasurePointId, request.Value, request.DateTime);
+            MeasureData createdComponentData = _componentDataService.AddNewMeasureData(request.MeasurePointId, request.Value, request.DateTime);
             formattedResponse = MeasureDataResponseConverter.ConvertComponentDataToComponentDataResponse(createdComponentData);
             response = ApiResponse<MeasureDataResponse>.Success(formattedResponse);
         }
