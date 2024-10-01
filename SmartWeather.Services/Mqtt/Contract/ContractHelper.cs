@@ -13,7 +13,6 @@ public class ContractHelper
         switch ((ObjectTypes)objectType)
         {
             case ObjectTypes.CONFIG_RESPONSE:
-            case ObjectTypes.SENSOR_SAVING_RESPONSE:
             case ObjectTypes.ACTUATOR_RESPONSE:
                 return true;
             default:
@@ -26,7 +25,6 @@ public class ContractHelper
         switch ((ObjectTypes)objectType)
         {
             case ObjectTypes.CONFIG_REQUEST:
-            case ObjectTypes.SENSOR_SAVING_REQUEST:
             case ObjectTypes.ACTUATOR_REQUEST:
                 return true;
             default:

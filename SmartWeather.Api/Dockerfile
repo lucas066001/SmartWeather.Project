@@ -9,9 +9,8 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Debug
 WORKDIR /src
-COPY ["SmartWeather.Api/SmartWeather.Api.csproj", "SmartWeather.Api/"]
-RUN dotnet restore "./SmartWeather.Api/SmartWeather.Api.csproj"
 COPY . .
+RUN dotnet restore "./SmartWeather.Api/SmartWeather.Api.csproj"
 WORKDIR "/src/SmartWeather.Api"
 RUN dotnet build "./SmartWeather.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 

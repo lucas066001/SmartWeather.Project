@@ -17,6 +17,7 @@ public class MqttSingleton
     private readonly IMqttClient _mqttClient;
     private readonly MqttClientOptions _mqttOptions;
     private List<IMqttRequestHandler> _requestHandlers;
+    private List<IMqttMessageHandler> _messageHandlers;
     internal record MqttPendingRequest
     {
         public required MqttHeader OriginalRequestHeader { get; set; }
@@ -28,6 +29,7 @@ public class MqttSingleton
     public MqttSingleton(IServiceScopeFactory scopeFactory)
     {
         _requestHandlers = new List<IMqttRequestHandler>();
+        _messageHandlers = new List<IMqttMessageHandler>();
         _mqttClient = new MqttFactory().CreateMqttClient();
         PendingRequestList = new List<MqttPendingRequest>();
 
@@ -73,6 +75,14 @@ public class MqttSingleton
                                                         CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
                                                         CommunicationConstants.MQTT_SERVER_TARGET);
             await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(stationsActuatorsTopic).Build());
+        }
+    }
+
+    public void CheckIfConnected()
+    {
+        if(_mqttClient.IsConnected)
+        {
+            var test = "connected";
         }
     }
 
@@ -147,11 +157,16 @@ public class MqttSingleton
         return;
     }
 
-    public void RegisterHandler(IMqttRequestHandler handler)
+    public void RegisterRequestHandler(IMqttRequestHandler handler)
     {
         _requestHandlers.Add(handler);
     }
-    
+
+    public void RegisterMessageHandler(IMqttMessageHandler handler)
+    {
+        _messageHandlers.Add(handler);
+    }
+
     public async Task<T?> RetreiveMqttObject<T>(string message, string topic, MqttRequest? request = null, bool automaticMqttError = true) where T : class
     {
         T? objectFound = null;
@@ -191,6 +206,16 @@ public class MqttSingleton
     private async Task MessageHandler(MqttApplicationMessageReceivedEventArgs e)
     {
         bool handled = false;
+
+        foreach (var handler in _messageHandlers)
+        {
+            if (handler.IsAbleToHandle(e.ApplicationMessage.Topic))
+            {
+                handler.Handle(e.ApplicationMessage.ConvertPayloadToString(), e.ApplicationMessage.Topic);
+                return;
+            }
+        }
+
         var response = await RetreiveMqttObject<MqttResponse>(e.ApplicationMessage.ConvertPayloadToString(),
                                                               e.ApplicationMessage.Topic,
                                                               null,

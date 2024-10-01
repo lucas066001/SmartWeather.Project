@@ -3,11 +3,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using SmartWeather.Services;
 using Microsoft.IdentityModel.Tokens;
 using SmartWeather.Services.Options;
-using System.Configuration;
 using System.Text;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.OpenApi.Models;
-using SmartWeather.Api.Configuration;
 using SmartWeather.Repositories.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +15,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRepositories(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);
-builder.Services.AddHostedService<PostStartup>();
 
 var issuer = builder.Configuration.GetSection(nameof(Jwt))[nameof(Jwt.Issuer)];
 var audience = builder.Configuration.GetSection(nameof(Jwt))[nameof(Jwt.Audience)];

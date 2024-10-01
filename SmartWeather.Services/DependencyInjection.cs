@@ -27,7 +27,7 @@ public static class DependencyInjection
         services.AddScoped<MeasurePointService>();
         services.AddScoped<MeasureDataService>();
         services.AddScoped<ConfigRequestHandler>();
-        services.AddScoped<SavingRequestHandler>();
+        services.AddScoped<MeasureDataMessageHandler>();
         services.AddScoped<MqttService>();
         services.AddSingleton<MqttSingleton>();
     }
