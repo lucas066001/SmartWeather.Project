@@ -1,0 +1,6 @@
+@SmartWeather.Historian_HostAddress = http://localhost:5197
+
+GET {{SmartWeather.Historian_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
