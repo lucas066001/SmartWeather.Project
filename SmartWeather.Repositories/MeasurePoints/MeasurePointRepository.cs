@@ -5,12 +5,12 @@ using SmartWeather.Services.MeasurePoints;
 
 namespace SmartWeather.Repositories.MeasurePoints;
 
-public class MeasurePointRepository(Func<SmartWeatherReadOnlyContext> contextFactory) : IMeasurePointRepository
+public class MeasurePointRepository(Func<SmartWeatherReadOnlyContext> readOnlyContextFactory) : IMeasurePointRepository
 {
     public IEnumerable<MeasurePoint> GetFromComponent(int idComponent)
     {
         IEnumerable<MeasurePoint> measurePointsRetreived = null!;
-        using (var roContext = contextFactory())
+        using (var roContext = readOnlyContextFactory())
         {
             try
             {

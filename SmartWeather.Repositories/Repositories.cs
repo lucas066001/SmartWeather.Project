@@ -4,67 +4,76 @@ using SmartWeather.Services.Repositories;
 
 namespace SmartWeather.Repositories
 {
-    public class Repository<T>(SmartWeatherContext masterContext, Func<SmartWeatherReadOnlyContext> contextFactory) : IRepository<T> where T : class
+    public class Repository<T>(Func<SmartWeatherReadOnlyContext> masterContextFactory, Func<SmartWeatherReadOnlyContext> readOnlyContextFactory) : IRepository<T> where T : class
     {
         public T Create(T entity)
         {
-            try
+            using(var masterContext = masterContextFactory())
             {
-                var create = masterContext.Set<T>().Add(entity);
-                masterContext.SaveChanges();
+                try
+                {
+                    var create = masterContext.Set<T>().Add(entity);
+                    masterContext.SaveChanges();
 
-                return create.Entity;
-            }
-            catch 
-            {
-                throw new Exception("Unable to create entity in database, Entity : " + nameof(T));
+                    return create.Entity;
+                }
+                catch 
+                {
+                    throw new Exception("Unable to create entity in database, Entity : " + nameof(T));
+                }
             }
         }
 
         public T Update(T entity)
         {
-            try
+            using (var masterContext = masterContextFactory())
             {
-                var update = masterContext.Set<T>().Update(entity);
-                masterContext.SaveChanges();
+                try
+                {
+                    var update = masterContext.Set<T>().Update(entity);
+                    masterContext.SaveChanges();
 
-                return update.Entity;
-            }
-            catch 
-            {
-                throw new Exception("Unable to update entity in database, Entity : " + nameof(T));
+                    return update.Entity;
+                }
+                catch
+                {
+                    throw new Exception("Unable to update entity in database, Entity : " + nameof(T));
 
+                }
             }
         }
 
         public T Delete(int entityId)
         {
-            try
+            using (var masterContext = masterContextFactory())
             {
-                var found = masterContext.Set<T>().Find([entityId]);
-                EntityEntry<T> trackedDeletion;
-
-                if (found != null)
+                try
                 {
-                    trackedDeletion = masterContext.Set<T>().Remove(found);
-                    masterContext.SaveChanges();
-                }
-                else
-                {
-                    throw new Exception("Unable to find entity to delete base on it's Id : " + entityId.ToString());
-                }
+                    var found = masterContext.Set<T>().Find([entityId]);
+                    EntityEntry<T> trackedDeletion;
 
-                return trackedDeletion.Entity;
-            }
-            catch 
-            {
-                throw new Exception("Unable to delete entity in database, Entity : " + nameof(T));
+                    if (found != null)
+                    {
+                        trackedDeletion = masterContext.Set<T>().Remove(found);
+                        masterContext.SaveChanges();
+                    }
+                    else
+                    {
+                        throw new Exception("Unable to find entity to delete base on it's Id : " + entityId.ToString());
+                    }
+
+                    return trackedDeletion.Entity;
+                }
+                catch
+                {
+                    throw new Exception("Unable to delete entity in database, Entity : " + nameof(T));
+                }
             }
         }
 
         public T GetById(int id)
         {
-            using (var roContext = contextFactory())
+            using (var roContext = readOnlyContextFactory())
             {
                 try
                 {
@@ -83,7 +92,7 @@ namespace SmartWeather.Repositories
 
         public IEnumerable<T> GetAll()
         {
-            using (var roContext = contextFactory())
+            using (var roContext = readOnlyContextFactory())
             {
                 try
                 {

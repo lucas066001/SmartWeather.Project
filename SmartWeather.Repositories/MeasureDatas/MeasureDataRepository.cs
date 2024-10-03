@@ -4,12 +4,12 @@ using SmartWeather.Services.ComponentDatas;
 
 namespace SmartWeather.Repositories.ComponentDatas;
 
-public class MeasureDataRepository(Func<SmartWeatherReadOnlyContext> contextFactory) : IMeasureDataRepository
+public class MeasureDataRepository(Func<SmartWeatherReadOnlyContext> readOnlyContextFactory) : IMeasureDataRepository
 {
     public IEnumerable<MeasureData> GetFromMeasurePoint(int idMeasurePoint, DateTime? startPeriod = null, DateTime? endPeriod = null)
     {
         IEnumerable<MeasureData> componentDatasRetreived = null!;
-        using (var roContext = contextFactory())
+        using (var roContext = readOnlyContextFactory())
         {
             try
             {

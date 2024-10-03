@@ -37,10 +37,14 @@ public static class DependencyInjection
 
     private static void ConfigureRepositories(this IServiceCollection services)
     {
-        // Setup interface implementation for upper dependencies
         services.AddScoped<Func<SmartWeatherReadOnlyContext>>(provider =>
         {
             var dbContextFactory = () => provider.GetService<SmartWeatherReadOnlyContext>();
+            return dbContextFactory;
+        });
+        services.AddScoped<Func<SmartWeatherContext>>(provider =>
+        {
+            var dbContextFactory = () => provider.GetService<SmartWeatherContext>();
             return dbContextFactory;
         });
         services.AddScoped(typeof(IUserRepository), typeof(UserRepository));

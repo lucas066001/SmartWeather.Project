@@ -6,12 +6,12 @@ using SmartWeather.Services.Components;
 using System;
 using System.Collections.Generic;
 
-internal class ComponentRepository(Func<SmartWeatherReadOnlyContext> contextFactory) : IComponentRepository
+internal class ComponentRepository(Func<SmartWeatherReadOnlyContext> readOnlyContextFactory) : IComponentRepository
 {
     public IEnumerable<Component> GetFromStation(int stationId)
     {
         IEnumerable<Component> componentsRetreived = null!;
-        using (var roContext = contextFactory())
+        using (var roContext = readOnlyContextFactory())
         {
             try
             {

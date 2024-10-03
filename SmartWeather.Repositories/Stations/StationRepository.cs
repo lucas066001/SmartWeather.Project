@@ -8,12 +8,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class StationRepository(Func<SmartWeatherReadOnlyContext> contextFactory) : IStationRepository
+public class StationRepository(Func<SmartWeatherReadOnlyContext> readOnlyContextFactory) : IStationRepository
 {
     public Station? GetByMacAddress(string macAddress)
     {
         Station? stationsRetreived = null;
-        using (var roContext = contextFactory())
+        using (var roContext = readOnlyContextFactory())
         {
             try
             {
@@ -31,7 +31,7 @@ public class StationRepository(Func<SmartWeatherReadOnlyContext> contextFactory)
     public IEnumerable<Station> GetFromUser(int userId)
     {
         IEnumerable<Station> stationsRetreived = null!;
-        using (var roContext = contextFactory())
+        using (var roContext = readOnlyContextFactory())
         {
             try
             {

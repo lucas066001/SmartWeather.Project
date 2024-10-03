@@ -4,12 +4,12 @@ using SmartWeather.Services.Authentication;
 
 namespace SmartWeather.Repositories.Authentication;
 
-public class AuthenticationRepository(Func<SmartWeatherReadOnlyContext> contextFactory) : IAuthenticationRepository
+public class AuthenticationRepository(Func<SmartWeatherReadOnlyContext> readOnlyContextFactory) : IAuthenticationRepository
 {
     public User AreCredentialsCorrect(string hashedPassword, string email)
     {
         User connectedUser;
-        using (var roContext = contextFactory())
+        using (var roContext = readOnlyContextFactory())
         {
             try
             {
