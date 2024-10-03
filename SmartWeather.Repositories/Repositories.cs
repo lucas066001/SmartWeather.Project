@@ -1,22 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SmartWeather.Repositories.Context;
 using SmartWeather.Services.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartWeather.Repositories
 {
-    public class Repository<T>(SmartWeatherContext context) : IRepository<T> where T : class
+    public class Repository<T>(SmartWeatherContext masterContext, Func<SmartWeatherReadOnlyContext> contextFactory) : IRepository<T> where T : class
     {
         public T Create(T entity)
         {
             try
             {
-                var create = context.Set<T>().Add(entity);
-                context.SaveChanges();
+                var create = masterContext.Set<T>().Add(entity);
+                masterContext.SaveChanges();
 
                 return create.Entity;
             }
@@ -30,8 +25,8 @@ namespace SmartWeather.Repositories
         {
             try
             {
-                var update = context.Set<T>().Update(entity);
-                context.SaveChanges();
+                var update = masterContext.Set<T>().Update(entity);
+                masterContext.SaveChanges();
 
                 return update.Entity;
             }
@@ -46,13 +41,13 @@ namespace SmartWeather.Repositories
         {
             try
             {
-                var found = context.Set<T>().Find([entityId]);
+                var found = masterContext.Set<T>().Find([entityId]);
                 EntityEntry<T> trackedDeletion;
 
                 if (found != null)
                 {
-                    trackedDeletion = context.Set<T>().Remove(found);
-                    context.SaveChanges();
+                    trackedDeletion = masterContext.Set<T>().Remove(found);
+                    masterContext.SaveChanges();
                 }
                 else
                 {
@@ -69,30 +64,36 @@ namespace SmartWeather.Repositories
 
         public T GetById(int id)
         {
-            try
+            using (var roContext = contextFactory())
             {
-                var entity = context.Set<T>().Find([id]);
+                try
+                {
+                    var entity = roContext.Set<T>().Find([id]);
 
-                return entity == null
-                    ? throw new Exception("Unable to retreive entity in database, Entity : " + nameof(T) + " | id : " + id.ToString())
-                    : entity;
-            }
-            catch 
-            {
-                throw new Exception("An error occured during GetById database command, Entity : " + nameof(T));
+                    return entity == null
+                        ? throw new Exception("Unable to retreive entity in database, Entity : " + nameof(T) + " | id : " + id.ToString())
+                        : entity;
+                }
+                catch 
+                {
+                    throw new Exception("An error occured during GetById database command, Entity : " + nameof(T));
+                }
             }
         }
 
         public IEnumerable<T> GetAll()
         {
-            try
+            using (var roContext = contextFactory())
             {
-                var entities = context.Set<T>().AsEnumerable();
-                return entities;
-            }
-            catch 
-            {
-                throw new Exception("An error occured during GetAll database command, Entity : " + nameof(T));
+                try
+                {
+                    var entities = roContext.Set<T>().AsEnumerable();
+                    return entities;
+                }
+                catch
+                {
+                    throw new Exception("An error occured during GetAll database command, Entity : " + nameof(T));
+                }
             }
         }
     }

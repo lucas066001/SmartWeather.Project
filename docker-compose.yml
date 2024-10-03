@@ -1,53 +1,11 @@
 version: "3"
+name: smartweather-server
+
+include:
+  - mysql-cluster.yml
+  - hivemq-cluster.yml
+
 services:
-
-  cluster-hivemq:
-    image: hivemq/hivemq4:dns-latest
-    deploy:
-      replicas: 2
-    volumes:
-      - cluster-hivemq_node_1_data:/hivemq/data:rw
-      - cluster-hivemq_node_2_data:/hivemq/data:rw
-    environment:
-      - HIVEMQ_DNS_DISCOVERY_ADDRESS=hivemq-cluster
-    networks:
-      smart-weather-network:
-        aliases:
-          - hivemq-cluster
-
-  haproxy:
-    container_name: haproxy
-    image: haproxy:latest
-    ports:
-      - "1883:1883" 
-    volumes:
-      - ./conf/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
-    depends_on:
-      - cluster-hivemq
-    networks:
-      - smart-weather-network
-
-  sqlserver:
-    container_name: sqlserver
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    user: root
-    environment:
-      - "ACCEPT_EULA=Y"
-      - "MSSQL_SA_PASSWORD=Password123!"
-    ports:
-      - 1433:1433
-    volumes:
-      - ./data:/var/opt/mssql/data
-      - ./log:/var/opt/mssql/log
-      - ./secrets:/var/opt/mssql/secrets
-    healthcheck:
-      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "Password123!" -Q "SELECT 1" || exit 1
-      interval: 10s
-      timeout: 3s
-      retries: 10
-      start_period: 10s
-    networks:
-      - smart-weather-network
 
   smart-weather-api:
     build:
@@ -57,8 +15,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      sqlserver:
-        condition: service_healthy
+      - mysql-master
+      - mysql-proxy
     networks:
       - smart-weather-network
 
@@ -68,15 +26,10 @@ services:
       context: .
       dockerfile: SmartWeather.Historian/Dockerfile
     depends_on:
-      sqlserver:
-        condition: service_healthy
+      - mysql-master
+      - mysql-proxy
     networks:
       - smart-weather-network
-
-volumes:
-  sqlserver_data:
-  cluster-hivemq_node_1_data:
-  cluster-hivemq_node_2_data:
 
 networks:
   smart-weather-network:

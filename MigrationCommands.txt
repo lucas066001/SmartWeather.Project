@@ -1,2 +1,2 @@
-dotnet ef migrations add MIGRATION_NAME --project SmartWeather.Repositories --startup-project SmartWeather.Api
+dotnet ef migrations add Init_Mysql --project SmartWeather.Repositories --startup-project SmartWeather.Api --context SmartWeatherContext
 dotnet ef database update --project SmartWeather.Repositories --startup-project SmartWeather.Api

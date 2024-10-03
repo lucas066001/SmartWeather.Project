@@ -1,0 +1,46 @@
+version: "3.7"
+name: hivemq-cluster
+services:
+
+  hivemq-proxy:
+    container_name: hivemq-proxy
+    image: haproxy:latest
+    ports:
+      - "1883:1883" 
+    volumes:
+      - ./conf/hivemq_proxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    depends_on:
+      - cluster-hivemq
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 5
+    networks:
+      - smart-weather-network
+
+  cluster-hivemq:
+    image: hivemq/hivemq4:dns-latest
+    volumes:
+      - cluster-hivemq_node_1_data:/hivemq/data:rw
+      - cluster-hivemq_node_2_data:/hivemq/data:rw
+    environment:
+      - HIVEMQ_DNS_DISCOVERY_ADDRESS=hivemq-cluster
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 5
+    networks:
+      smart-weather-network:
+        aliases:
+          - hivemq-cluster
+
+volumes:
+  cluster-hivemq_node_1_data:
+  cluster-hivemq_node_2_data:
+
+networks:
+  smart-weather-network:
+    driver: bridge

@@ -1,24 +1,20 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SmartWeather.Entities.User;
+﻿using SmartWeather.Entities.User;
 using SmartWeather.Repositories.Context;
 using SmartWeather.Services.Authentication;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SmartWeather.Repositories.Authentication
+namespace SmartWeather.Repositories.Authentication;
+
+public class AuthenticationRepository(Func<SmartWeatherReadOnlyContext> contextFactory) : IAuthenticationRepository
 {
-    public class AuthenticationRepository(SmartWeatherContext context) : IAuthenticationRepository
+    public User AreCredentialsCorrect(string hashedPassword, string email)
     {
-        public User AreCredentialsCorrect(string hashedPassword, string email)
+        User connectedUser;
+        using (var roContext = contextFactory())
         {
-            User connectedUser;
             try
             {
-                var tmpUser = context.Users.Where(u => u.Email == email && u.PasswordHash == hashedPassword).FirstOrDefault();
-                
+                var tmpUser = roContext.Users.Where(u => u.Email == email && u.PasswordHash == hashedPassword).FirstOrDefault();
+            
                 if(tmpUser != null)
                 {
                     connectedUser = tmpUser;
@@ -32,8 +28,8 @@ namespace SmartWeather.Repositories.Authentication
             {
                 throw new Exception("Authentication error : " + ex.Message);
             }
-
-            return connectedUser;
         }
+
+        return connectedUser;
     }
 }

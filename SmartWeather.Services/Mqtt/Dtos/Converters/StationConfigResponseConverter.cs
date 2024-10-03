@@ -53,7 +53,7 @@ public class StationConfigResponseConverter
     {
         return new MeasurePointConfig()
         {
-            Id = measurePoint.Id,
+            Id = measurePoint.LocalId,
             DatabaseId = measurePoint.Id,
             
         };

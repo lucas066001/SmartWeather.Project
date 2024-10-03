@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartWeather.Repositories.Context;
@@ -12,8 +11,8 @@ using SmartWeather.Repositories.Context;
 namespace SmartWeather.Repositories.Migrations
 {
     [DbContext(typeof(SmartWeatherContext))]
-    [Migration("20240905145144_UpdateStationUserId")]
-    partial class UpdateStationUserId
+    [Migration("20241003090916_Init_Mysql")]
+    partial class Init_Mysql
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,9 +20,7 @@ namespace SmartWeather.Repositories.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.8")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
-
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("SmartWeather.Entities.Component.Component", b =>
                 {
@@ -31,26 +28,21 @@ namespace SmartWeather.Repositories.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<string>("Color")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("GpioPin")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("StationId")
                         .HasColumnType("int");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Unit")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -60,28 +52,56 @@ namespace SmartWeather.Repositories.Migrations
                     b.ToTable("Component", (string)null);
                 });
 
-            modelBuilder.Entity("SmartWeather.Entities.ComponentData.ComponentData", b =>
+            modelBuilder.Entity("SmartWeather.Entities.ComponentData.MeasureData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("MeasurePointId")
+                        .HasColumnType("int");
+
+                    b.Property<float>("Value")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MeasurePointId", "DateTime");
+
+                    b.ToTable("MeasureData", (string)null);
+                });
+
+            modelBuilder.Entity("SmartWeather.Entities.MeasurePoint.MeasurePoint", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<int>("ComponentId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("LocalId")
+                        .HasColumnType("int");
 
-                    b.Property<int>("Value")
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Unit")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ComponentId", "DateTime");
+                    b.HasIndex("ComponentId");
 
-                    b.ToTable("ComponentData", (string)null);
+                    b.ToTable("MeasurePoint", (string)null);
                 });
 
             modelBuilder.Entity("SmartWeather.Entities.Station.Station", b =>
@@ -90,25 +110,19 @@ namespace SmartWeather.Repositories.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<float>("Latitude")
-                        .HasColumnType("real");
+                        .HasColumnType("float");
 
                     b.Property<float>("Longitude")
-                        .HasColumnType("real");
+                        .HasColumnType("float");
 
                     b.Property<string>("MacAddress")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TopicLocation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
@@ -117,6 +131,9 @@ namespace SmartWeather.Repositories.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MacAddress")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -129,22 +146,20 @@ namespace SmartWeather.Repositories.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -165,10 +180,21 @@ namespace SmartWeather.Repositories.Migrations
                     b.Navigation("Station");
                 });
 
-            modelBuilder.Entity("SmartWeather.Entities.ComponentData.ComponentData", b =>
+            modelBuilder.Entity("SmartWeather.Entities.ComponentData.MeasureData", b =>
+                {
+                    b.HasOne("SmartWeather.Entities.MeasurePoint.MeasurePoint", "MeasurePoint")
+                        .WithMany("MeasureDatas")
+                        .HasForeignKey("MeasurePointId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MeasurePoint");
+                });
+
+            modelBuilder.Entity("SmartWeather.Entities.MeasurePoint.MeasurePoint", b =>
                 {
                     b.HasOne("SmartWeather.Entities.Component.Component", "Component")
-                        .WithMany("ComponentDatas")
+                        .WithMany("MeasurePoints")
                         .HasForeignKey("ComponentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -187,7 +213,12 @@ namespace SmartWeather.Repositories.Migrations
 
             modelBuilder.Entity("SmartWeather.Entities.Component.Component", b =>
                 {
-                    b.Navigation("ComponentDatas");
+                    b.Navigation("MeasurePoints");
+                });
+
+            modelBuilder.Entity("SmartWeather.Entities.MeasurePoint.MeasurePoint", b =>
+                {
+                    b.Navigation("MeasureDatas");
                 });
 
             modelBuilder.Entity("SmartWeather.Entities.Station.Station", b =>

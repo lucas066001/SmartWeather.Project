@@ -5,18 +5,21 @@ using SmartWeather.Services.MeasurePoints;
 
 namespace SmartWeather.Repositories.MeasurePoints;
 
-public class MeasurePointRepository(SmartWeatherContext context) : IMeasurePointRepository
+public class MeasurePointRepository(Func<SmartWeatherReadOnlyContext> contextFactory) : IMeasurePointRepository
 {
     public IEnumerable<MeasurePoint> GetFromComponent(int idComponent)
     {
         IEnumerable<MeasurePoint> measurePointsRetreived = null!;
-        try
+        using (var roContext = contextFactory())
         {
-            measurePointsRetreived = context.MeasurePoints.Where(cd => cd.ComponentId == idComponent).ToList();
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Unable to retreive measurePoints from component in database : " + ex.Message);
+            try
+            {
+                measurePointsRetreived = roContext.MeasurePoints.Where(cd => cd.ComponentId == idComponent).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unable to retreive measurePoints from component in database : " + ex.Message);
+            }
         }
 
         return measurePointsRetreived;

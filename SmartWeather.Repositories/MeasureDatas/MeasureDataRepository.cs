@@ -4,25 +4,28 @@ using SmartWeather.Services.ComponentDatas;
 
 namespace SmartWeather.Repositories.ComponentDatas;
 
-public class MeasureDataRepository(SmartWeatherContext context) : IMeasureDataRepository
+public class MeasureDataRepository(Func<SmartWeatherReadOnlyContext> contextFactory) : IMeasureDataRepository
 {
     public IEnumerable<MeasureData> GetFromMeasurePoint(int idMeasurePoint, DateTime? startPeriod = null, DateTime? endPeriod = null)
     {
         IEnumerable<MeasureData> componentDatasRetreived = null!;
-        try
+        using (var roContext = contextFactory())
         {
-            if (startPeriod != null && endPeriod != null)
+            try
             {
-                componentDatasRetreived = context.MeasureDatas.Where(cd => cd.MeasurePointId == idMeasurePoint && (cd.DateTime >= startPeriod && cd.DateTime <= endPeriod)).ToList();
+                if (startPeriod != null && endPeriod != null)
+                {
+                    componentDatasRetreived = roContext.MeasureDatas.Where(cd => cd.MeasurePointId == idMeasurePoint && (cd.DateTime >= startPeriod && cd.DateTime <= endPeriod)).ToList();
+                }
+                else
+                {
+                    componentDatasRetreived = roContext.MeasureDatas.Where(cd => cd.MeasurePointId == idMeasurePoint).ToList();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                componentDatasRetreived = context.MeasureDatas.Where(cd => cd.MeasurePointId == idMeasurePoint).ToList();
+                throw new Exception("Unable to retreive components from station in database : " + ex.Message);
             }
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Unable to retreive components from station in database : " + ex.Message);
         }
 
         return componentDatasRetreived;

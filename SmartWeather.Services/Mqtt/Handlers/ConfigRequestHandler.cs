@@ -51,6 +51,37 @@ public class ConfigRequestHandler : IMqttRequestHandler
         if (retrievedStation != null)
         {
             retrievedStation.Components = _componentService.GetFromStation(retrievedStation.Id).ToList();
+
+            // User may added sensors, so we need to add them to db
+            var componentsToAdd = configRequest.ComponentsConfigs
+                                                .Where(cc => 
+                                                !retrievedStation.Components.Any(c => c.GpioPin == cc.GpioPin))
+                                                .ToList();
+            
+            
+            if (componentsToAdd != null && componentsToAdd.Any())
+            {
+                foreach (var compConf in componentsToAdd)
+                {
+                    var createdComponent = _componentService.AddNewComponent(compConf.DefaultName,
+                                                                                 "#000000",
+                                                                                 compConf.ComponentType,
+                                                                                 retrievedStation.Id,
+                                                                                 compConf.GpioPin);
+                    createdComponent.MeasurePoints = new List<MeasurePoint>();
+                    foreach (var mpConf in compConf.MeasurePoints)
+                    {
+                        var createdMeasurePoint = _measurePointService.AddNewMeasurePoint(mpConf.LocalId,
+                                                                                            mpConf.DefaultName,
+                                                                                            "#000000",
+                                                                                            mpConf.Unit,
+                                                                                            createdComponent.Id);
+                        _ = createdComponent.MeasurePoints.Append(createdMeasurePoint);
+                    }
+                    retrievedStation.Components.Add(createdComponent);
+                }
+            }
+
             foreach (var component in retrievedStation.Components)
             {
                 component.MeasurePoints = _measurePointService.GetFromComponent(component.Id);

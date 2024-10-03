@@ -1,16 +1,9 @@
-﻿using Azure.Core;
-using Azure;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.AspNetCore.Mvc;
-using NuGet.Protocol.Plugins;
+﻿using Microsoft.AspNetCore.Mvc;
 using SmartWeather.Api.Contract;
 using SmartWeather.Api.Controllers.User.Dtos;
 using SmartWeather.Services.Authentication;
 using SmartWeather.Services.Users;
 using SmartWeather.Api.Controllers.User.Dtos.Converters;
-using SmartWeather.Entities.User;
 
 namespace SmartWeather.Api.Controllers.User
 {

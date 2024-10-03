@@ -49,6 +49,11 @@ public class MqttSingleton
             .WithClientId(clientId)
             .WithTcpServer(brokerAddress, brokerPort) 
             .WithCleanSession()
+            .WithTlsOptions(new MqttClientTlsOptions
+            {
+                UseTls = false,
+                AllowUntrustedCertificates = true
+            })
             .WithKeepAlivePeriod(new TimeSpan(0,5,0))
             .Build();
 
