@@ -12,7 +12,7 @@ public class Component
     public int StationId { get; set; }
     public int GpioPin { get; set; }
     public virtual Station Station { get; set; } = null!;
-    public virtual IEnumerable<MeasurePoint> MeasurePoints { get; set; } = null!;
+    public virtual ICollection<MeasurePoint> MeasurePoints { get; set; } = null!;
 
     public static readonly Regex HexColorRegex = new Regex(
         @"#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",

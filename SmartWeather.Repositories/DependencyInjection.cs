@@ -33,6 +33,7 @@ public static class DependencyInjection
             options.UseMySQL(configuration.GetConnectionString("SmartWeatherMaster") ?? string.Empty));
         services.AddDbContext<SmartWeatherReadOnlyContext>(options =>
             options.UseMySQL(configuration.GetConnectionString("SmartWeatherLb") ?? string.Empty));
+        services.AddScoped(typeof(MeasureDataContext));
     }
 
     private static void ConfigureRepositories(this IServiceCollection services)

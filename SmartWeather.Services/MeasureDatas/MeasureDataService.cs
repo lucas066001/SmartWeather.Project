@@ -11,6 +11,12 @@ public class MeasureDataService (IRepository<MeasureData> measureDataBaseReposit
         return measureDataBaseRepository.Create(ComponentDataToCreate);
     }
 
+    public void InsertMeasureData(int measurePointId, float value, DateTime dateTime)
+    {
+        MeasureData ComponentDataToCreate = new(measurePointId, value, dateTime);
+        measureDataRepository.Create(ComponentDataToCreate);
+    }
+
     public bool DeleteComponentData(int idComponentData)
     {
         return measureDataBaseRepository.Delete(idComponentData) != null;

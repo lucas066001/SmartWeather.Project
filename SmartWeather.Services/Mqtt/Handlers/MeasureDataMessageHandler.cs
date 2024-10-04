@@ -37,7 +37,7 @@ public class MeasureDataMessageHandler : IMqttMessageHandler
 
             try
             {
-                _measureDataService.AddNewMeasureData(measurePointId, measureDataValue, DateTime.Now);
+                _measureDataService.InsertMeasureData(measurePointId, measureDataValue, DateTime.Now);
             }
             catch
             {

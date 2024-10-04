@@ -4,30 +4,27 @@ using SmartWeather.Services.Authentication;
 
 namespace SmartWeather.Repositories.Authentication;
 
-public class AuthenticationRepository(Func<SmartWeatherReadOnlyContext> readOnlyContextFactory) : IAuthenticationRepository
+public class AuthenticationRepository(SmartWeatherReadOnlyContext readOnlyContext) : IAuthenticationRepository
 {
     public User AreCredentialsCorrect(string hashedPassword, string email)
     {
         User connectedUser;
-        using (var roContext = readOnlyContextFactory())
+        try
         {
-            try
-            {
-                var tmpUser = roContext.Users.Where(u => u.Email == email && u.PasswordHash == hashedPassword).FirstOrDefault();
+            var tmpUser = readOnlyContext.Users.Where(u => u.Email == email && u.PasswordHash == hashedPassword).FirstOrDefault();
             
-                if(tmpUser != null)
-                {
-                    connectedUser = tmpUser;
-                }
-                else
-                {
-                    throw new Exception("Credential incorrect, unable to authenticate user from given infos");
-                }
-            }
-            catch (Exception ex)
+            if(tmpUser != null)
             {
-                throw new Exception("Authentication error : " + ex.Message);
+                connectedUser = tmpUser;
             }
+            else
+            {
+                throw new Exception("Credential incorrect, unable to authenticate user from given infos");
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Authentication error : " + ex.Message);
         }
 
         return connectedUser;

@@ -1,0 +1,39 @@
+{
+    "StationDatabaseId": 3,
+    "ConfigComponents": [
+        {
+            "GpioPin": 32,
+            "DatabaseId": 5,
+            "MeasurePointsConfigs": [
+                {
+                    "Id": 1,
+                    "DatabaseId": 6
+                },
+                {
+                    "Id": 2,
+                    "DatabaseId": 7
+                }
+            ]
+        },
+        {
+            "GpioPin": 34,
+            "DatabaseId": 6,
+            "MeasurePointsConfigs": [
+                {
+                    "Id": 1,
+                    "DatabaseId": 8
+                }
+            ]
+        },
+        {
+            "GpioPin": 33,
+            "DatabaseId": 7,
+            "MeasurePointsConfigs": [
+                {
+                    "Id": 1,
+                    "DatabaseId": 9
+                }
+            ]
+        }
+    ]
+}",

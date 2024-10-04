@@ -1,12 +1,6 @@
 -- init-slave.sql
 
--- Attendre que le master soit prêt
-CREATE USER 'haproxy_check'@'%' IDENTIFIED BY 'somepassword';
-GRANT USAGE ON *.* TO 'haproxy_check'@'%';
-FLUSH PRIVILEGES;
-
-
-DO SLEEP(25); -- Délai de 10 secondes (ajuste selon tes besoins)
+DO SLEEP(10); -- Délai de 10 secondes (ajuste selon tes besoins)
 
 -- Changez l'adresse IP et le port du master
 CHANGE MASTER TO

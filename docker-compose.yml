@@ -4,6 +4,7 @@ name: smartweather-server
 include:
   - mysql-cluster.yml
   - hivemq-cluster.yml
+  - influxdb.yml
 
 services:
 
@@ -25,6 +26,8 @@ services:
     build:
       context: .
       dockerfile: SmartWeather.Historian/Dockerfile
+    ports:
+      - "8090:8090"
     depends_on:
       - mysql-master
       - mysql-proxy

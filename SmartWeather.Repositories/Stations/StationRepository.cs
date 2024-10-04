@@ -8,22 +8,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class StationRepository(Func<SmartWeatherReadOnlyContext> readOnlyContextFactory) : IStationRepository
+public class StationRepository(SmartWeatherReadOnlyContext readOnlyContext) : IStationRepository
 {
     public Station? GetByMacAddress(string macAddress)
     {
         Station? stationsRetreived = null;
-        using (var roContext = readOnlyContextFactory())
+
+        try
         {
-            try
-            {
-                stationsRetreived = roContext.Stations.Where(s => s.MacAddress == macAddress).FirstOrDefault();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Unable to retreive stations from user in database : " + ex.Message);
-            }
+            stationsRetreived = readOnlyContext.Stations.Where(s => s.MacAddress == macAddress).FirstOrDefault();
         }
+        catch (Exception ex)
+        {
+            throw new Exception("Unable to retreive stations from user in database : " + ex.Message);
+        }
+
 
         return stationsRetreived;
     }
@@ -31,16 +30,14 @@ public class StationRepository(Func<SmartWeatherReadOnlyContext> readOnlyContext
     public IEnumerable<Station> GetFromUser(int userId)
     {
         IEnumerable<Station> stationsRetreived = null!;
-        using (var roContext = readOnlyContextFactory())
+
+        try
         {
-            try
-            {
-                stationsRetreived = roContext.Stations.Where(s => s.UserId == userId).ToList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Unable to retreive stations from user in database : " + ex.Message);
-            }
+            stationsRetreived = readOnlyContext.Stations.Where(s => s.UserId == userId).ToList();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Unable to retreive stations from user in database : " + ex.Message);
         }
 
         return stationsRetreived;

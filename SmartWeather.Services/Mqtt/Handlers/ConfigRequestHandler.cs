@@ -84,7 +84,7 @@ public class ConfigRequestHandler : IMqttRequestHandler
 
             foreach (var component in retrievedStation.Components)
             {
-                component.MeasurePoints = _measurePointService.GetFromComponent(component.Id);
+                component.MeasurePoints = _measurePointService.GetFromComponent(component.Id).ToList();
             }
             var formattedData = StationConfigResponseConverter.ConvertStationToStationConfigResponse(retrievedStation);
             await _mqttSingleton.SendSuccessResponse(request, originTopic, ObjectTypes.CONFIG_RESPONSE, formattedData);
@@ -123,7 +123,7 @@ public class ConfigRequestHandler : IMqttRequestHandler
                                                                                                 "#000000",
                                                                                                 mpConf.Unit,
                                                                                                 createdComponent.Id);
-                            _ = createdComponent.MeasurePoints.Append(createdMeasurePoint);
+                            createdComponent.MeasurePoints.Add(createdMeasurePoint);
                         }
                         createdComponents.Add(createdComponent);
                     }
