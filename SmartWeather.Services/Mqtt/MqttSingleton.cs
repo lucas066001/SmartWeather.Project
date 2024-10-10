@@ -49,6 +49,7 @@ public class MqttSingleton
             .WithClientId(clientId)
             .WithTcpServer(brokerAddress, brokerPort) 
             .WithCleanSession()
+            .WithWillQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
             .WithTlsOptions(new MqttClientTlsOptions
             {
                 UseTls = false,
@@ -66,20 +67,29 @@ public class MqttSingleton
         {
             await _mqttClient.ConnectAsync(_mqttOptions);
 
-            var stationsConfigsTopic = string.Format(CommunicationConstants.MQTT_CONFIG_TOPIC_FORMAT,
-                                            CommunicationConstants.MQTT_SERVER_TARGET);
-            await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(stationsConfigsTopic).Build());
+            //var stationsConfigsTopic = string.Format(CommunicationConstants.MQTT_CONFIG_TOPIC_FORMAT,
+            //                                CommunicationConstants.MQTT_SERVER_TARGET);
+            //await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(stationsConfigsTopic).Build());
             
-            var stationsSensorsTopic = string.Format(CommunicationConstants.MQTT_SENSOR_TOPIC_FORMAT, 
-                                                        CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
-                                                        CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
-                                                        CommunicationConstants.MQTT_SERVER_TARGET);
-            await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(stationsSensorsTopic).Build());
+            //var stationsSensorsTopic = string.Format(CommunicationConstants.MQTT_SENSOR_TOPIC_FORMAT, 
+            //                                            CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
+            //                                            CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
+            //                                            CommunicationConstants.MQTT_SERVER_TARGET);
+            //await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(stationsSensorsTopic).Build());
 
-            var stationsActuatorsTopic = string.Format(CommunicationConstants.MQTT_ACTUATOR_TOPIC_FORMAT, 
-                                                        CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
-                                                        CommunicationConstants.MQTT_SERVER_TARGET);
-            await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(stationsActuatorsTopic).Build());
+            //var stationsActuatorsTopic = string.Format(CommunicationConstants.MQTT_ACTUATOR_TOPIC_FORMAT, 
+            //                                            CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
+            //                                            CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
+            //                                            CommunicationConstants.MQTT_SERVER_TARGET);
+            //await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(stationsActuatorsTopic).Build());
+        }
+    }
+
+    public async Task SubscribeAsync(string topic)
+    {
+        if (_mqttClient.IsConnected)
+        {
+            await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(topic).Build());
         }
     }
 
@@ -149,8 +159,7 @@ public class MqttSingleton
 
     public async Task SendRequest(MqttHeader requestHeader, string targetTopic, ObjectTypes objectType, Object data)
     {
-        string? rawData = data.ToString();
-        string jsonObject = rawData != null ? JsonSerializer.Serialize(rawData) : string.Empty;
+        string jsonObject = JsonSerializer.Serialize(data);
 
         var serverRequest = new MqttRequest(requestHeader,
                                             jsonObject, 
@@ -258,21 +267,21 @@ public class MqttSingleton
             }
         }
 
-        if (request == null && response == null)
-        {
-            await SendErrorResponse(null,
-                                    e.ApplicationMessage.Topic,
-                                    "Unable to deserialize Mqtt request nor Mqtt response",
-                                    Status.PARSE_ERROR);
-        }
+        //if (request == null && response == null)
+        //{
+        //    await SendErrorResponse(null,
+        //                            e.ApplicationMessage.Topic,
+        //                            "Unable to deserialize Mqtt request nor Mqtt response",
+        //                            Status.PARSE_ERROR);
+        //}
 
-        if (!handled)
-        {
-            await SendErrorResponse(request,
-                                    e.ApplicationMessage.Topic, 
-                                    "Server is not able to handle your request", 
-                                    Status.CONTRACT_ERROR);
-        }
+        //if (!handled)
+        //{
+        //    await SendErrorResponse(request,
+        //                            e.ApplicationMessage.Topic, 
+        //                            "Server is not able to handle your request", 
+        //                            Status.CONTRACT_ERROR);
+        //}
 
         return;
     }

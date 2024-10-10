@@ -8,11 +8,11 @@ using Swashbuckle.AspNetCore.Filters;
 using Microsoft.OpenApi.Models;
 using SmartWeather.Repositories.Context;
 using Microsoft.EntityFrameworkCore;
+using SmartWeather.Api.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddRepositories(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);
 
@@ -47,6 +47,7 @@ builder.Services
     });
 
 builder.Services.AddControllers();
+builder.Services.AddHostedService<PostStartup>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

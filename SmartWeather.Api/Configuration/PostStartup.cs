@@ -7,7 +7,7 @@ using SmartWeather.Services.Mqtt;
 using SmartWeather.Services.Mqtt.Handlers;
 using SmartWeather.Services.Stations;
 
-namespace SmartWeather.Historian.Configuration;
+namespace SmartWeather.Api.Configuration;
 
 public class PostStartup : IHostedService
 {
@@ -30,13 +30,17 @@ public class PostStartup : IHostedService
     {
         await _mqttSingleton.ConnectAsync();
 
-        var stationsSensorsTopic = string.Format(CommunicationConstants.MQTT_SENSOR_TOPIC_FORMAT,
+        var stationsConfigsTopic = string.Format(CommunicationConstants.MQTT_CONFIG_TOPIC_FORMAT,
+                                CommunicationConstants.MQTT_SERVER_TARGET);
+        await _mqttSingleton.SubscribeAsync(stationsConfigsTopic);
+
+        var stationsActuatorsTopic = string.Format(CommunicationConstants.MQTT_ACTUATOR_TOPIC_FORMAT,
                                                     CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
                                                     CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
                                                     CommunicationConstants.MQTT_SERVER_TARGET);
-        await _mqttSingleton.SubscribeAsync(stationsSensorsTopic);
+        await _mqttSingleton.SubscribeAsync(stationsActuatorsTopic);
 
-        _mqttSingleton.RegisterMessageHandler(new MeasureDataMessageHandler(_mqttSingleton, _componentDataService));
+        _mqttSingleton.RegisterRequestHandler(new ConfigRequestHandler(_mqttSingleton, _stationService, _componentService, _measurePointService));
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

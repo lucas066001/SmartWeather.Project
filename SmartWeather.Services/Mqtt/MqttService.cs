@@ -7,12 +7,12 @@ namespace SmartWeather.Services.Mqtt;
 
 public class MqttService(MqttSingleton mqttSingleton)
 {
-    public async Task<bool> SendActuatorCommand(int stationId, int componentId, int newValue)
+    public async Task<bool> SendActuatorCommand(int stationId, int gpioPin, int newValue)
     {
         var request = new ActuatorCommandRequest()
         {
-            ComponentId = componentId,
-            NewValue = newValue
+            GpioPin = gpioPin,
+            Value = newValue
         };
         var targetTopic = string.Format(CommunicationConstants.MQTT_ACTUATOR_TOPIC_FORMAT,
                                         stationId.ToString(),

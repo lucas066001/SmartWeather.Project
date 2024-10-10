@@ -4,6 +4,6 @@ namespace SmartWeather.Services.Mqtt.Dtos;
 
 public class ActuatorCommandRequest
 {
-    public int ComponentId { get; set; }
-    public int NewValue { get; set; }
+    public int GpioPin { get; set; }
+    public int Value { get; set; }
 }
