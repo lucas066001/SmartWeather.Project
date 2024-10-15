@@ -31,4 +31,9 @@
     </Content>
   </ItemGroup>
 
+  <Target Name="SetAppSettingsConfig" BeforeTargets="Compile">
+    <Copy SourceFiles="appsettings.Debug.json" DestinationFiles="appsettings.json" OverwriteReadOnlyFiles="true" Condition=" '$(Configuration)' == Debug"/>
+    <Copy SourceFiles="appsettings.Release.json" DestinationFiles="appsettings.json" OverwriteReadOnlyFiles="true" Condition=" '$(Configuration)' == Release"/>
+  </Target>
+
 </Project>
