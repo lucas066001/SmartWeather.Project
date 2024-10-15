@@ -1,0 +1,33 @@
+<hivemq>
+    <persistence>
+        <publish>
+            <storage>memory</storage>
+        </publish>
+        <client-session>
+            <storage>memory</storage>
+        </client-session>
+    </persistence>
+    
+    <cluster>
+        <transport>
+            <buffers>
+                <send-buffer-size>32KB</send-buffer-size>
+                <receive-buffer-size>32KB</receive-buffer-size>
+            </buffers>
+        </transport>
+    </cluster>
+    
+    <listener>
+        <tcp-listener>
+            <thread-count>3</thread-count>
+        </tcp-listener>
+    </listener>
+    
+    <retained-messages>
+        <max-retained-messages>10000</max-retained-messages>
+    </retained-messages>
+    
+    <keep-alive>
+        <default>300s</default>
+    </keep-alive>
+</hivemq>

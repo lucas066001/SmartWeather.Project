@@ -16,15 +16,13 @@ services:
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=978399d5-522d-4597-ac96-285beeab8bb8
       - DOCKER_INFLUXDB_INIT_RETENTION=0s
     volumes:
-      - ./conf/hivemq_proxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+      - ./config/influxdb.conf:/etc/influxdb2/influxdb.conf
       - influxdb2_data:/var/lib/influxdb2
-      - influxdb2_conf:/etc/influxdb2
     networks:
       - smart-weather-network
 
 volumes:
   influxdb2_data:
-  influxdb2_conf:
 
 networks:
   smart-weather-network:
