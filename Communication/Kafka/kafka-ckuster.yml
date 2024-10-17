@@ -1,0 +1,8 @@
+version: "3.7"
+name: kafka-cluster
+
+# services:
+
+networks:
+  smart-weather-network:
+    driver: bridge

@@ -1,0 +1,1 @@
+# SmartWeather.Acquisition Layer

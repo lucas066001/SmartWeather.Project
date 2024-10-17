@@ -1,2 +1,4 @@
+# SmartWeather.Application Layer
+
 dotnet ef migrations add Init_Mysql --project SmartWeather.Repositories --startup-project SmartWeather.Api --context SmartWeatherContext
 dotnet ef database update --project SmartWeather.Repositories --startup-project SmartWeather.Api

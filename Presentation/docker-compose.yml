@@ -1,0 +1,9 @@
+version: "3.9"
+name: smartweather-project
+
+# include:
+  # Later include presentation projects
+
+networks:
+  smart-weather-network:
+    driver: bridge

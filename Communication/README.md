@@ -1,0 +1,1 @@
+# SmartWeather.Communication Layer

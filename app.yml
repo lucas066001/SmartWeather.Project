@@ -1,0 +1,13 @@
+version: "3.9"
+name: smartweather-project
+
+include:
+  - "./Acquisition/docker-compose.yml"
+  - "./Communication/docker-compose.yml"
+  - "./Persistence/docker-compose.yml"
+  - "./Application/docker-compose.yml"
+  - "./Presentation/docker-compose.yml"
+
+networks:
+  smart-weather-network:
+    driver: bridge

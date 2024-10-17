@@ -1,10 +1,5 @@
 version: "3"
-name: smartweather-server
-
-include:
-  - mysql-cluster.yml
-  - hivemq-cluster.yml
-  - influxdb.yml
+name: smartweather-application-layer
 
 services:
 

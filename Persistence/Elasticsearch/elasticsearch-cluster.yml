@@ -1,0 +1,9 @@
+version: "3.9"
+name: elasticsearch-cluster
+
+services:
+  
+
+networks:
+  smart-weather-network:
+    driver: bridge
