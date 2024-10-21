@@ -1,0 +1,19 @@
+{
+    "name": "mqtt-source-toserver-connector",
+    "config": {
+        "confluent.topic.bootstrap.servers": "broker-1:9092,broker-2:9093,broker-3:9094",
+        "connector.class": "io.confluent.connect.mqtt.MqttSourceConnector",
+        "tasks.max": "1",
+        "mqtt.server.uri": "tcp://hivemq-proxy:1883",
+        "mqtt.topics": "station/config/toserver",
+        "kafka.topic": "station.config.toserver",
+        "mqtt.qos": "1",
+        "mqtt.clean.session": "true",
+        "mqtt.client.id": "kafka-mqtt-source-toserver"
+    }
+}
+
+PS C:\Users\chapu\E.Lucas\Perso\Github\SmartWeather.Project\Communication\Kafka\conf> Invoke-WebRequest -Uri http: //localhost:8083/connectors `
+>>                   -Method POST `
+>>                   -ContentType "application/json" `
+>>                   -Body (Get-Content -Raw -Path "C:\Users\chapu\E.Lucas\Perso\Github\SmartWeather.Project\Communication\Kafka\conf\mqtt_source_config.json")

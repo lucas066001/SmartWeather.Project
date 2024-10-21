@@ -1,0 +1,12 @@
+{
+    "name": "mqtt-sink-tostation-connector",
+    "config": {
+        "connector.class": "org.apache.kafka.connect.mqtt.MqttSinkConnector",
+        "tasks.max": "1",
+        "mqtt.server.uri": "tcp://hivemq-proxy:1883",
+        "topics": "station.config.tostation",
+        "mqtt.topic": "station/config/tostation",
+        "mqtt.qos": "1",
+        "mqtt.client.id": "kafka-mqtt-sink-tostation"
+    }
+}
