@@ -6,6 +6,7 @@ services:
     image: confluentinc/cp-zookeeper:7.3.0
     container_name: zookeeper
     environment:
+      ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
@@ -26,7 +27,6 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker-1:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     networks:
       - smart-weather-network
@@ -44,7 +44,6 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9093
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker-2:9093
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     networks:
       - smart-weather-network
@@ -62,14 +61,29 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9094
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker-3:9094
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     networks:
       - smart-weather-network
 
-  kafka-connect:
-    container_name: kafka-connect
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    depends_on:
+      - broker-1
+      - broker-2
+      - broker-3
+      - zookeeper
+      - hivemq-proxy
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: base_kafka_cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker-1:9092,broker-2:9093,broker-3:9094
+    networks:
+      - smart-weather-network
 
+  mqtt-connector:
+    container_name: mqtt-connector
     image: confluentinc/cp-kafka-connect:7.3.0
     depends_on:
       - broker-1
@@ -96,9 +110,42 @@ services:
     volumes:
       - ./conf:/config
       - ./conf/connect_distributed.properties:/etc/kafka/connect-distributed.properties
-    entrypoint: ["/bin/bash", "/config/entrypoint.sh"] 
+    entrypoint: ["/bin/bash", "/config/mqtt-startup.sh"] 
     networks:
       - smart-weather-network
+
+  # elasticsearch-connector:
+  #   container_name: elasticsearch-connector
+  #   image: confluentinc/cp-kafka-connect:7.3.0
+  #   depends_on:
+  #     - broker-1
+  #     - broker-2
+  #     - broker-3
+  #     - zookeeper
+  #     - elasticsearch
+  #   ports:
+  #     - "8084:8084"
+  #   environment:
+  #     CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
+  #     CONNECT_BOOTSTRAP_SERVERS: broker-1:9092,broker-2:9093,broker-3:9094
+  #     CONNECT_GROUP_ID: kafka-connect-group
+  #     CONNECT_CONFIG_STORAGE_TOPIC: kafka-connect-configs
+  #     CONNECT_OFFSET_STORAGE_TOPIC: kafka-connect-offsets
+  #     CONNECT_STATUS_STORAGE_TOPIC: kafka-connect-status
+  #     CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+  #     CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+  #     CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
+  #     CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
+  #     CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
+  #     CONNECT_REST_PORT: 8084
+  #     CONNECT_PLUGIN_PATH: /usr/share/confluent-hub/components/
+  #   volumes:
+  #     - ./conf:/config
+  #     - ./conf/connect_distributed.properties:/etc/kafka/connect-distributed.properties
+  #   entrypoint: ["/bin/bash", "/config/entrypoint.sh"] 
+  #   networks:
+  #     - smart-weather-network
+
 
 networks:
   smart-weather-network:
