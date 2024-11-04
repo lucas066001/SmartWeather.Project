@@ -1,6 +1,7 @@
 using SmartWeather.Services;
 using SmartWeather.Repositories;
 using SmartWeather.Historian.Configuration;
+using SmartWeather.Repositories.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,16 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<SmartWeatherDocumentsContext>();
+    if (context != null)
+    {
+        await context.ConfigureIndexesAsync();
+    }
 }
 
 app.UseHttpsRedirection();

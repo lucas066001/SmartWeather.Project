@@ -15,7 +15,6 @@ public class SmartWeatherReadOnlyContext(DbContextOptions<SmartWeatherReadOnlyCo
     public DbSet<Station> Stations { get { return Set<Station>(); } }
     public DbSet<Component> Components { get { return Set<Component>(); } }
     public DbSet<MeasurePoint> MeasurePoints { get { return Set<MeasurePoint>(); } }
-    public DbSet<MeasureData> MeasureDatas { get { return Set<MeasureData>(); } }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -23,7 +22,6 @@ public class SmartWeatherReadOnlyContext(DbContextOptions<SmartWeatherReadOnlyCo
         new StationConfiguration().Configure(modelBuilder.Entity<Station>());
         new ComponentConfiguration().Configure(modelBuilder.Entity<Component>());
         new MeasurePointConfiguration().Configure(modelBuilder.Entity<MeasurePoint>());
-        new MeasureDataConfiguration().Configure(modelBuilder.Entity<MeasureData>());
 
         base.OnModelCreating(modelBuilder);
     }

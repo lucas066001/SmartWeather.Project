@@ -1,5 +1,5 @@
 version: "3"
-name: smartweather-application-layer
+name: smartweather-project
 
 services:
 
@@ -9,10 +9,13 @@ services:
       dockerfile: SmartWeather.Api/Dockerfile
     container_name: smart-weather-api
     ports:
-      - "8080:8080"
+      - "8081:8081"
     depends_on:
       - mysql-master
       - mysql-proxy
+      - broker-1
+      - broker-2
+      - broker-3
     networks:
       - smart-weather-network
 
@@ -26,6 +29,9 @@ services:
     depends_on:
       - mysql-master
       - mysql-proxy
+      - broker-1
+      - broker-2
+      - broker-3
     networks:
       - smart-weather-network
 

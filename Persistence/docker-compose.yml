@@ -4,6 +4,7 @@ name: smartweather-project
 include:
   - "./Influxdb/influxdb.yml"
   - "./Mysql/mysql-cluster.yml"
+  - "./Elasticsearch/elasticsearch-cluster.yml"
 
 networks:
   smart-weather-network:

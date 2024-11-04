@@ -33,21 +33,11 @@ public static class DependencyInjection
             options.UseMySQL(configuration.GetConnectionString("SmartWeatherMaster") ?? string.Empty));
         services.AddDbContext<SmartWeatherReadOnlyContext>(options =>
             options.UseMySQL(configuration.GetConnectionString("SmartWeatherLb") ?? string.Empty));
-        services.AddScoped(typeof(MeasureDataContext));
+        services.AddScoped(typeof(SmartWeatherDocumentsContext));
     }
 
     private static void ConfigureRepositories(this IServiceCollection services)
     {
-        services.AddScoped<Func<SmartWeatherReadOnlyContext>>(provider =>
-        {
-            var dbContextFactory = () => provider.GetService<SmartWeatherReadOnlyContext>();
-            return dbContextFactory;
-        });
-        services.AddScoped<Func<SmartWeatherContext>>(provider =>
-        {
-            var dbContextFactory = () => provider.GetService<SmartWeatherContext>();
-            return dbContextFactory;
-        });
         services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
         services.AddScoped(typeof(IAuthenticationRepository), typeof(AuthenticationRepository));
         services.AddScoped(typeof(IStationRepository), typeof(StationRepository));

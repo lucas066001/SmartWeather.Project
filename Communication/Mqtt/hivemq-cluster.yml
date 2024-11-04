@@ -22,7 +22,7 @@ services:
   cluster-hivemq:
     image: hivemq/hivemq4:dns-latest
     volumes:
-      - ./config/hivemq_node.xml:/opt/hivemq/conf/hivemq.xml
+      - ./conf/hivemq_node.xml:/opt/hivemq/conf/hivemq.xml
     environment:
       - HIVEMQ_DNS_DISCOVERY_ADDRESS=hivemq-cluster
     deploy:

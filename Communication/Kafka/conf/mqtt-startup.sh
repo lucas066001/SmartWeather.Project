@@ -23,9 +23,5 @@ sleep 1
 echo "Creating MQTT source connector..."
 curl -X POST -H "Content-Type: application/json" --data @/config/mqtt_source_config.json http://localhost:8083/connectors
 
-# Créer le connecteur sink Kafka vers MQTT
-echo "Creating MQTT sink connector..."
-curl -X POST -H "Content-Type: application/json" --data @/config/mqtt_sink_config.json http://localhost:8083/connectors
-
 # Garder le script actif en attendant les processus enfants (comme connect-distributed)
 wait

@@ -5,12 +5,12 @@
         "connector.class": "io.confluent.connect.mqtt.MqttSourceConnector",
         "tasks.max": "1",
         "mqtt.server.uri": "tcp://hivemq-proxy:1883",
-        "mqtt.topics": "station.config.toserver",
-        "kafka.topic": "station.config.toserver",
-        "value.converter": "org.apache.kafka.connect.json.JsonConverter",
-        "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "mqtt.topics": "station/+/measure_point/+/toserver",
+        "kafka.topic": "smartweather.measure.data",
+        "value.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+        "key.converter": "org.apache.kafka.connect.storage.StringConverter",
         "mqtt.qos": "1",
         "mqtt.clean.session": "true",
-        "mqtt.client.id": "kafka-mqtt-source-toserver"
+        "mqtt.client.id": "kafka-mqtt-source-connector"
     }
 }

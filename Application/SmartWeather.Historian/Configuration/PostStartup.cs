@@ -2,42 +2,42 @@
 using SmartWeather.Services.ComponentDatas;
 using SmartWeather.Services.Components;
 using SmartWeather.Services.Constants;
+using SmartWeather.Services.Kafka;
 using SmartWeather.Services.MeasurePoints;
-using SmartWeather.Services.Mqtt;
-using SmartWeather.Services.Mqtt.Handlers;
+using SmartWeather.Services.Kafka.Handlers;
 using SmartWeather.Services.Stations;
 
 namespace SmartWeather.Historian.Configuration;
 
 public class PostStartup : IHostedService
 {
-    private readonly MqttSingleton _mqttSingleton;
+    private readonly KafkaConsumerSingleton _kafkaConsumer;
     private readonly StationService _stationService;
     private readonly ComponentService _componentService;
-    private readonly MeasureDataService _componentDataService;
+    private readonly MeasureDataService _measureDataService;
     private readonly MeasurePointService _measurePointService;
+    private readonly CancellationTokenSource _serviceCancel;
 
-    public PostStartup(MqttSingleton mqttSingleton, IServiceScopeFactory scopeFactory)
+    public PostStartup(KafkaConsumerSingleton kafkaConsumer, IServiceScopeFactory scopeFactory)
     {
-        _mqttSingleton = mqttSingleton;
+        _serviceCancel= new CancellationTokenSource();
+        _kafkaConsumer = kafkaConsumer;
         _stationService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<StationService>();
         _componentService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<ComponentService>();
-        _componentDataService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<MeasureDataService>();
+        _measureDataService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<MeasureDataService>();
         _measurePointService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<MeasurePointService>();
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-        await _mqttSingleton.ConnectAsync();
-
-        var stationsSensorsTopic = string.Format(CommunicationConstants.MQTT_SENSOR_TOPIC_FORMAT,
-                                                    CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
-                                                    CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
-                                                    CommunicationConstants.MQTT_SERVER_TARGET);
-        await _mqttSingleton.SubscribeAsync(stationsSensorsTopic);
-
-        _mqttSingleton.RegisterMessageHandler(new MeasureDataMessageHandler(_mqttSingleton, _componentDataService));
+        _kafkaConsumer.RegisterMessageHandler(new MeasureDataMessageHandler(_measureDataService));
+        _kafkaConsumer.StartConsuming(_serviceCancel.Token);
+        return Task.CompletedTask;
     }
 
-    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _serviceCancel.Cancel();
+        return Task.CompletedTask;
+    }
 }

@@ -12,7 +12,6 @@ public class MeasurePoint
     public MeasureUnit Unit { get; set; }
     public int ComponentId { get; set; }
     public virtual Component Component { get; set; } = null!;
-    public virtual ICollection<MeasureData> MeasureDatas { get; set; } = new List<MeasureData>();
 
     public MeasurePoint()
     {

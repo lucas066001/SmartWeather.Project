@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SmartWeather.Services.Authentication;
 using SmartWeather.Services.ComponentDatas;
 using SmartWeather.Services.Components;
+using SmartWeather.Services.Kafka;
 using SmartWeather.Services.MeasurePoints;
 using SmartWeather.Services.Mqtt;
 using SmartWeather.Services.Mqtt.Handlers;
@@ -30,5 +31,6 @@ public static class DependencyInjection
         services.AddScoped<MeasureDataMessageHandler>();
         services.AddScoped<MqttService>();
         services.AddSingleton<MqttSingleton>();
+        services.AddSingleton<KafkaConsumerSingleton>();
     }
 }

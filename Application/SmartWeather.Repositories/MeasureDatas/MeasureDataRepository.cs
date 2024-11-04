@@ -1,45 +1,89 @@
-﻿using InfluxDB.Client.Api.Domain;
-using InfluxDB.Client.Writes;
-using MySqlX.XDevAPI;
+﻿using Elastic.Clients.Elasticsearch;
 using SmartWeather.Entities.ComponentData;
 using SmartWeather.Repositories.Context;
 using SmartWeather.Services.ComponentDatas;
 
 namespace SmartWeather.Repositories.ComponentDatas;
 
-public class MeasureDataRepository(SmartWeatherReadOnlyContext readOnlyContext, MeasureDataContext influxContext) : IMeasureDataRepository
+public class MeasureDataRepository(SmartWeatherDocumentsContext elasticContext) : IMeasureDataRepository
 {
-    public void Create(MeasureData data)
+    public async void Create(MeasureData data)
     {
-        var point = PointData
-                        .Measurement("sensor_data")
-                        .Tag(nameof(data.MeasurePointId), data.MeasurePointId.ToString())
-                        .Field(nameof(data.Value), data.Value)
-                        .Timestamp(DateTime.UtcNow, WritePrecision.Ns);
-            
-        var writeApi = influxContext.Client.GetWriteApi();
-        writeApi.WritePoint(point, influxContext.Bucket, influxContext.Org);
+        var response = await elasticContext.Client.IndexAsync(data, idx => idx.Index(elasticContext.MeasureDataIndex));
+        if (!response.IsSuccess())
+        {
+            if (response.ElasticsearchServerError != null)
+            {
+                throw new Exception($"Unable to Create MeasureData into elasticContext : {response.ElasticsearchServerError}");
+            }
+            else
+            {
+                throw new Exception($"Unable to Create MeasureData into elasticContext : UNKNOWN ERROR");
+            }
+        }
     }
 
-    public IEnumerable<MeasureData> GetFromMeasurePoint(int idMeasurePoint, DateTime? startPeriod = null, DateTime? endPeriod = null)
+    public async Task<IEnumerable<MeasureData>> GetFromMeasurePoint(int idMeasurePoint, DateTime? startPeriod = null, DateTime? endPeriod = null)
     {
-        IEnumerable<MeasureData> componentDatasRetreived = null!;
+        SearchResponse<MeasureData>? response = null;
+
         try
         {
             if (startPeriod != null && endPeriod != null)
             {
-                componentDatasRetreived = readOnlyContext.MeasureDatas.Where(cd => cd.MeasurePointId == idMeasurePoint && (cd.DateTime >= startPeriod && cd.DateTime <= endPeriod)).ToList();
+                response = await elasticContext.Client.SearchAsync<MeasureData>(s => s
+                            .Index(elasticContext.MeasureDataIndex)
+                            .Query(q => q
+                                .Bool(b => b
+                                    .Must(
+                                        m => m.Term(t => t
+                                            .Field(f => f.MeasurePointId)
+                                            .Value(idMeasurePoint)
+                                        ),
+                                        m => m.Range(dr => dr
+                                        .DateRange(dt => dt.From(startPeriod))
+                                        ),
+                                        m => m.Range(dr => dr
+                                        .DateRange(dt => dt.To(endPeriod))
+                                        )
+                                    )
+                                )
+                            )
+                        );
             }
             else
             {
-                componentDatasRetreived = readOnlyContext.MeasureDatas.Where(cd => cd.MeasurePointId == idMeasurePoint).ToList();
+                response = await elasticContext.Client.SearchAsync<MeasureData>(s => s
+                    .Index(elasticContext.MeasureDataIndex)
+                    .Query(q => q
+                        .Bool(b => b
+                            .Must(
+                                m => m.Term(t => t
+                                    .Field(f => f.MeasurePointId)
+                                    .Value(idMeasurePoint)
+                                )
+                            )
+                        )
+                    )
+                );
             }
+
+
+
+            if (response.IsValidResponse)
+            {
+                return response.Documents.ToList();
+            }
+            else
+            {
+                Console.WriteLine($"Search Error: {response.ElasticsearchServerError?.ToString()}");
+                return new List<MeasureData>();
+            }
+
         }
         catch (Exception ex)
         {
             throw new Exception("Unable to retreive components from station in database : " + ex.Message);
         }
-
-        return componentDatasRetreived;
     }
 }

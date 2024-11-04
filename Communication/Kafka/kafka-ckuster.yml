@@ -95,16 +95,6 @@ services:
       - "8083:8083"
     environment:
       CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
-      CONNECT_BOOTSTRAP_SERVERS: broker-1:9092,broker-2:9093,broker-3:9094
-      CONNECT_GROUP_ID: kafka-connect-group
-      CONNECT_CONFIG_STORAGE_TOPIC: kafka-connect-configs
-      CONNECT_OFFSET_STORAGE_TOPIC: kafka-connect-offsets
-      CONNECT_STATUS_STORAGE_TOPIC: kafka-connect-status
-      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
-      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
-      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_REST_PORT: 8083
       CONNECT_PLUGIN_PATH: /usr/share/confluent-hub/components/
     volumes:
@@ -113,39 +103,6 @@ services:
     entrypoint: ["/bin/bash", "/config/mqtt-startup.sh"] 
     networks:
       - smart-weather-network
-
-  # elasticsearch-connector:
-  #   container_name: elasticsearch-connector
-  #   image: confluentinc/cp-kafka-connect:7.3.0
-  #   depends_on:
-  #     - broker-1
-  #     - broker-2
-  #     - broker-3
-  #     - zookeeper
-  #     - elasticsearch
-  #   ports:
-  #     - "8084:8084"
-  #   environment:
-  #     CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
-  #     CONNECT_BOOTSTRAP_SERVERS: broker-1:9092,broker-2:9093,broker-3:9094
-  #     CONNECT_GROUP_ID: kafka-connect-group
-  #     CONNECT_CONFIG_STORAGE_TOPIC: kafka-connect-configs
-  #     CONNECT_OFFSET_STORAGE_TOPIC: kafka-connect-offsets
-  #     CONNECT_STATUS_STORAGE_TOPIC: kafka-connect-status
-  #     CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-  #     CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-  #     CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
-  #     CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
-  #     CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
-  #     CONNECT_REST_PORT: 8084
-  #     CONNECT_PLUGIN_PATH: /usr/share/confluent-hub/components/
-  #   volumes:
-  #     - ./conf:/config
-  #     - ./conf/connect_distributed.properties:/etc/kafka/connect-distributed.properties
-  #   entrypoint: ["/bin/bash", "/config/entrypoint.sh"] 
-  #   networks:
-  #     - smart-weather-network
-
 
 networks:
   smart-weather-network:

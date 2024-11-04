@@ -219,8 +219,6 @@ public class MqttSingleton
 
     private async Task MessageHandler(MqttApplicationMessageReceivedEventArgs e)
     {
-        bool handled = false;
-
         foreach (var handler in _messageHandlers)
         {
             if (handler.IsAbleToHandle(e.ApplicationMessage.Topic))
@@ -260,29 +258,11 @@ public class MqttSingleton
             {
                 if (handler.IsAbleToHandle(request.JsonType))
                 {
-                    handled = true;
                     handler.Handle(request, e.ApplicationMessage.Topic);
                     break;
                 }
             }
         }
-
-        //if (request == null && response == null)
-        //{
-        //    await SendErrorResponse(null,
-        //                            e.ApplicationMessage.Topic,
-        //                            "Unable to deserialize Mqtt request nor Mqtt response",
-        //                            Status.PARSE_ERROR);
-        //}
-
-        //if (!handled)
-        //{
-        //    await SendErrorResponse(request,
-        //                            e.ApplicationMessage.Topic, 
-        //                            "Server is not able to handle your request", 
-        //                            Status.CONTRACT_ERROR);
-        //}
-
         return;
     }
 }

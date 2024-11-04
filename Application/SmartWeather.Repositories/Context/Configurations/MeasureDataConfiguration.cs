@@ -1,24 +1,19 @@
 ﻿namespace SmartWeather.Repositories.Context.Configurations;
 
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
 using SmartWeather.Entities.ComponentData;
+using Elastic.Clients.Elasticsearch.Mapping;
 
-public class MeasureDataConfiguration : IEntityTypeConfiguration<MeasureData>
+public class MeasureDataConfiguration : IElasticIndexConfigurator
 {
-    public void Configure(EntityTypeBuilder<MeasureData> builder)
+    public string IndexName => nameof(MeasureData).ToLower();
+
+    public Properties GetProperties()
     {
-        builder.ToTable(nameof(MeasureData));
-        builder.HasKey(md => md.Id);
-        builder.Property(md => md.Value);
-        builder.Property(md => md.DateTime);
-        builder.Property(md => md.MeasurePointId);
-
-        builder.HasOne(e => e.MeasurePoint)
-                            .WithMany(e => e.MeasureDatas)
-                            .HasForeignKey(e => e.MeasurePointId)
-                            .IsRequired();
-
-        builder.HasIndex(e => new { e.MeasurePointId, e.DateTime }).IsUnique(false);
+        return new Properties<MeasureData>()
+        {
+            { nameof(MeasureData.MeasurePointId), new IntegerNumberProperty() },
+            { nameof(MeasureData.Value), new FloatNumberProperty() },
+            { nameof(MeasureData.DateTime), new DateProperty() },
+        };
     }
 }
