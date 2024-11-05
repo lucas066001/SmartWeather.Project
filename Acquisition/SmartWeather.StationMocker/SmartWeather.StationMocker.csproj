@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <UserSecretsId>80c89399-dc3f-479c-a0de-674e3f342c2a</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>.</DockerfileContext>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
+    <PackageReference Include="MQTTnet" Version="4.3.7.1207" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Application\SmartWeather.Repositories\SmartWeather.Repositories.csproj" />
+  </ItemGroup>
+
+  <Target Name="SetAppSettingsConfig" BeforeTargets="Compile">
+	  <Copy SourceFiles="appsettings.Debug.json" DestinationFiles="appsettings.json" OverwriteReadOnlyFiles="true" Condition=" '$(Configuration)' == Debug" />
+	  <Copy SourceFiles="appsettings.Release.json" DestinationFiles="appsettings.json" OverwriteReadOnlyFiles="true" Condition=" '$(Configuration)' == Release" />
+  </Target>
+
+</Project>

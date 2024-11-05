@@ -21,6 +21,15 @@ public class Station
         @"^([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}$",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+    private bool _checkMacAdress(string MacAddress)
+    {
+#if DEBUG
+        return MacAddressRegex.IsMatch(MacAddress) || MacAddress.Contains("MOCK_STATION");
+#elif RELEASE
+        return MacAddressRegex.IsMatch(MacAddress);
+#endif
+    }
+
     public Station(string name, string macAddress, float latitude, float longitude, int? userId ,StationType type = StationType.Private) {
         
         if (String.IsNullOrWhiteSpace(name))
@@ -29,7 +38,7 @@ public class Station
         }
         Name = name;
 
-        if (!MacAddressRegex.IsMatch(macAddress))
+        if (!_checkMacAdress(macAddress))
         {
             throw new Exception("MacAddress format incorrect");
         }

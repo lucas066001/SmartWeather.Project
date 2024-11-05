@@ -1,0 +1,6 @@
+@SmartWeather.StationMocker_HostAddress = http://localhost:5244
+
+GET {{SmartWeather.StationMocker_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

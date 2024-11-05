@@ -1,8 +1,23 @@
 version: "3.9"
 name: smartweather-project
 
-# include:
-  # Later include acquisition projects
+services:
+
+  smart-weather-station-mocker:
+    container_name: smart-weather-station-mocker
+    build:
+      context: ./..
+      dockerfile: Acquisition/SmartWeather.StationMocker/Dockerfile
+    depends_on:
+      - smart-weather-api
+      - mysql-master
+      - mysql-proxy
+      - hivemq-proxy
+      - broker-1
+      - broker-2
+      - broker-3
+    networks:
+      - smart-weather-network
 
 networks:
   smart-weather-network:

@@ -200,7 +200,7 @@ public class MqttSingleton
         return objectFound;
     }
 
-    private async Task PublishAsync(string topic, string payload)
+    public async Task PublishAsync(string topic, string payload)
     {
         if (!_mqttClient.IsConnected)
         {

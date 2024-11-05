@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34408.163
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartWeather.StationMocker", "SmartWeather.StationMocker.csproj", "{EF90F711-673C-4DF9-B77A-65C19582519B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartWeather.Services", "..\..\Application\SmartWeather.Services\SmartWeather.Services.csproj", "{66994F49-8787-4432-91B4-1EDDD2DECF54}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartWeather.Entities", "..\..\Application\SmartWeather.Entities\SmartWeather.Entities.csproj", "{F8687C09-AD39-4C35-8BDA-E7D9C001C9D3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartWeather.Repositories", "..\..\Application\SmartWeather.Repositories\SmartWeather.Repositories.csproj", "{3172048D-89F2-42B4-A174-3921C0444040}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EF90F711-673C-4DF9-B77A-65C19582519B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF90F711-673C-4DF9-B77A-65C19582519B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF90F711-673C-4DF9-B77A-65C19582519B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF90F711-673C-4DF9-B77A-65C19582519B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66994F49-8787-4432-91B4-1EDDD2DECF54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66994F49-8787-4432-91B4-1EDDD2DECF54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66994F49-8787-4432-91B4-1EDDD2DECF54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66994F49-8787-4432-91B4-1EDDD2DECF54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8687C09-AD39-4C35-8BDA-E7D9C001C9D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8687C09-AD39-4C35-8BDA-E7D9C001C9D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8687C09-AD39-4C35-8BDA-E7D9C001C9D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8687C09-AD39-4C35-8BDA-E7D9C001C9D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3172048D-89F2-42B4-A174-3921C0444040}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3172048D-89F2-42B4-A174-3921C0444040}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3172048D-89F2-42B4-A174-3921C0444040}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3172048D-89F2-42B4-A174-3921C0444040}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F06FEC44-817F-47EB-8CB1-432C5EF7B392}
+	EndGlobalSection
+EndGlobal

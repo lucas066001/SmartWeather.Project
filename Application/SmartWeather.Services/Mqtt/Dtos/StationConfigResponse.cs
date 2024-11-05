@@ -16,9 +16,10 @@ public class StationConfigResponse
     public int StationDatabaseId { get; set; }
     public IEnumerable<ComponentConfig> ConfigComponents { get; set; }
 
-    public StationConfigResponse(int stationId, IEnumerable<ComponentConfig> components)
+    public StationConfigResponse(int stationDatabaseId, IEnumerable<ComponentConfig> configComponents)
     {
-        StationDatabaseId = stationId;
-        ConfigComponents = components;
+        StationDatabaseId = stationDatabaseId;
+        ConfigComponents = configComponents;
     }
+
 }
