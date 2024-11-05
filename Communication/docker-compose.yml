@@ -3,7 +3,8 @@ name: smartweather-project
 
 include:
   - "./Kafka/kafka-ckuster.yml"
-  - "./Mqtt/hivemq-cluster.yml"
+  - "./Mqtt/mosquitto.yml"
+  # - "./Mqtt/hivemq-cluster.yml"
 
 networks:
   smart-weather-network:

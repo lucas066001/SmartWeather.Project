@@ -1,0 +1,22 @@
+version: "3.7"
+name: hivemq-cluster
+services:
+
+  hivemq-proxy:
+    container_name: hivemq-proxy
+    image: eclipse-mosquitto:2.0
+    ports:
+      - "1883:1883" 
+    volumes:
+      - ./conf/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 5
+    networks:
+      - smart-weather-network
+
+networks:
+  smart-weather-network:
+    driver: bridge
