@@ -87,13 +87,10 @@ public class MeasureDataRepository(SmartWeatherDocumentsContext elasticContext) 
             {
                 allResults.AddRange(response.Documents);
 
-                // Création de ScrollRequest pour la page suivante
                 var scrollRequest = new ScrollRequest();
 
-                // Récupérer la page suivante en utilisant le ScrollRequest
                 var scrollResponse = await elasticContext.Client.ScrollAsync<MeasureData>(scrollRequest);
 
-                // Vérifier si le scroll est valide
                 if (!scrollResponse.IsValidResponse)
                 {
                     Console.WriteLine("Scroll finished, total elements in request : " + allResults.Count());
@@ -101,7 +98,6 @@ public class MeasureDataRepository(SmartWeatherDocumentsContext elasticContext) 
                 }
             }
 
-            // Nettoyer le contexte de scroll après la récupération des documents
             await elasticContext.Client.ClearScrollAsync(new ClearScrollRequest());
 
             return allResults;

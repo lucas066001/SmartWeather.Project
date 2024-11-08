@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+namespace SmartWeather.Services.Authentication;
 using Microsoft.IdentityModel.Tokens;
 using SmartWeather.Entities.User;
 using SmartWeather.Services.Options;
@@ -7,11 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmartWeather.Services.Authentication;
 
 public class AuthenticationService(IConfiguration configuration, IUserRepository userRepository, IAuthenticationRepository authenticationRepository)
 {
@@ -36,6 +37,7 @@ public class AuthenticationService(IConfiguration configuration, IUserRepository
                 {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.Role.ToString())
             }),
                 Issuer = issuer,
                 Audience = audience,
@@ -53,6 +55,110 @@ public class AuthenticationService(IConfiguration configuration, IUserRepository
             throw new Exception("TOKEN ERROR : " + ex.Message);
         }
     }
+
+    public int GetUserIdFromToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var issuer = configuration.GetSection(nameof(Jwt))[nameof(Jwt.Issuer)];
+        var audience = configuration.GetSection(nameof(Jwt))[nameof(Jwt.Audience)];
+        var key = configuration.GetSection(nameof(Jwt))[nameof(Jwt.Key)];
+        if (string.IsNullOrEmpty(issuer) ||
+            string.IsNullOrEmpty(audience) ||
+            string.IsNullOrEmpty(key))
+        {
+            throw new Exception("Unable to retreive structural jwt infos");
+        }
+
+        try
+        {
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidIssuer = issuer,
+                ValidAudience = audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+            };
+
+            tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+
+            var jwtToken = validatedToken as JwtSecurityToken;
+            if (jwtToken == null)
+            {
+                throw new SecurityTokenException("Invalid token");
+            }
+
+            var claimsUserId = jwtToken.Claims.FirstOrDefault(c => c.Type == "nameid")?.Value;
+            
+            if(int.TryParse(claimsUserId, out int userId))
+            {
+                return userId;
+            }
+            else
+            {
+                throw new SecurityTokenException("Unable to retreive UserId from token");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Erreur lors de la validation du token : " + ex.Message);
+            return 0;
+        }
+    }
+
+    public Role GetUserRoleFromToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var issuer = configuration.GetSection(nameof(Jwt))[nameof(Jwt.Issuer)];
+        var audience = configuration.GetSection(nameof(Jwt))[nameof(Jwt.Audience)];
+        var key = configuration.GetSection(nameof(Jwt))[nameof(Jwt.Key)];
+        if (string.IsNullOrEmpty(issuer) ||
+            string.IsNullOrEmpty(audience) ||
+            string.IsNullOrEmpty(key))
+        {
+            throw new Exception("Unable to retreive structural jwt infos");
+        }
+
+        try
+        {
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidIssuer = issuer,
+                ValidAudience = audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+            };
+
+            tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+
+            var jwtToken = validatedToken as JwtSecurityToken;
+            if (jwtToken == null)
+            {
+                throw new SecurityTokenException("Invalid token");
+            }
+
+            var claimsUserRole = jwtToken.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
+
+            if (int.TryParse(claimsUserRole, out int role))
+            {
+                return (Role)role;
+            }
+            else
+            {
+                throw new SecurityTokenException("Unable to retreive Role from token");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Erreur lors de la validation du token : " + ex.Message);
+            return 0;
+        }
+    }
+
+
 
     public Tuple<User, string> Register(string username, string mail, string password)
     {

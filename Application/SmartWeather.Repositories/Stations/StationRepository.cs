@@ -42,4 +42,16 @@ public class StationRepository(SmartWeatherReadOnlyContext readOnlyContext) : IS
 
         return stationsRetreived;
     }
+
+    public bool IsOwnerOfStation(int userId, int idStation)
+    {
+        try
+        {
+            return readOnlyContext.Stations.Where(s => s.Id == idStation).FirstOrDefault()?.UserId == userId;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Unable to retreive stations from database : " + ex.Message);
+        }
+    }
 }

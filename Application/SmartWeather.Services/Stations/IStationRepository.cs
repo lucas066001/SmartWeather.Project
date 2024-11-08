@@ -6,4 +6,7 @@ public interface IStationRepository
 {
     public IEnumerable<Station> GetFromUser(int userId);
     public Station? GetByMacAddress(string macAddress);
+
+    public bool IsOwnerOfStation(int userId, int idStation);
+
 }

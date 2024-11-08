@@ -4,6 +4,8 @@ using SmartWeather.Api.Controllers.User.Dtos;
 using SmartWeather.Services.Authentication;
 using SmartWeather.Services.Users;
 using SmartWeather.Api.Controllers.User.Dtos.Converters;
+using Microsoft.AspNetCore.Authorization;
+using SmartWeather.Entities.User;
 
 namespace SmartWeather.Api.Controllers.User
 {

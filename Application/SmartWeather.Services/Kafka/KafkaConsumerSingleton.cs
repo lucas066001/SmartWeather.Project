@@ -60,7 +60,7 @@ public class KafkaConsumerSingleton
                 try
                 {
                     var consumeResult = _consumer.Consume(cancellationToken);
-                    Console.WriteLine($"Message received: {consumeResult.Message.Value}");
+                    //Console.WriteLine($"Message received: {consumeResult.Message.Value}");
                     foreach (var handler in _messageHandlers)
                     {
                         if (handler.IsAbleToHandle(consumeResult.Topic))

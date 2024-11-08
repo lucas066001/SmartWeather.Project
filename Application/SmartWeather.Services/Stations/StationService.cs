@@ -1,6 +1,7 @@
 ﻿namespace SmartWeather.Services.Stations;
 
 using SmartWeather.Entities.Station;
+using SmartWeather.Services.MeasurePoints;
 using SmartWeather.Services.Repositories;
 
 public class StationService(IRepository<Station> stationBaseRepository, IStationRepository stationRepository)
@@ -43,6 +44,11 @@ public class StationService(IRepository<Station> stationBaseRepository, IStation
     public bool IsStationRegistered(string macAddress)
     {
         return stationRepository.GetByMacAddress(macAddress) == null;
+    }
+
+    public bool IsOwnerOfStation(int userId, int idStation)
+    {
+        return stationRepository.IsOwnerOfStation(userId, idStation);
     }
 
     public IEnumerable<Station> GetAll()

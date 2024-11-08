@@ -35,6 +35,22 @@ services:
     networks:
       - smart-weather-network
 
+  smart-weather-socket-api:
+    container_name: smart-weather-socket-api
+    build:
+      context: .
+      dockerfile: SmartWeather.Socket.Api/Dockerfile
+    ports:
+      - "8093:8093"
+    depends_on:
+      - mysql-master
+      - mysql-proxy
+      - broker-1
+      - broker-2
+      - broker-3
+    networks:
+      - smart-weather-network
+
 networks:
   smart-weather-network:
     driver: bridge

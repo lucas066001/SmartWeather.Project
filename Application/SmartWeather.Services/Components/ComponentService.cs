@@ -10,6 +10,7 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
         Component componentToCreate = new(name, color, type, stationId, gpioPin);
         return componentBaseRepository.Create(componentToCreate);
     }
+
     public IEnumerable<Component> AddGenericComponentPool(int stationId, IEnumerable<int> gpioPins)
     {
         var createdComponents = new List<Component>();
@@ -45,4 +46,10 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
     {
         return componentBaseRepository.GetById(componentId);
     }
+
+    public bool IsOwnerOfComponent(int userId, int idComponent)
+    {
+        return componentRepository.IsOwnerOfComponent(userId, idComponent);
+    }
+
 }

@@ -29,4 +29,9 @@ public class MeasurePointService (IRepository<MeasurePoint> measurePointBaseRepo
     {
         return measurePointRepository.GetFromComponent(idComponent);
     }
+
+    public bool IsOwnerOfMeasurePoint(int userId, int idMeasurePoint)
+    {
+        return measurePointRepository.IsOwnerOfMeasurePoint(userId, idMeasurePoint);
+    }
 }
