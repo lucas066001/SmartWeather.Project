@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mqtt-proxy
+  name: mqtt-proxy
+  namespace: smartweather-communication
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-proxy
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mqtt-proxy
+    spec:
+      containers:
+        - image: eclipse-mosquitto:2.0
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "500Mi"
+              cpu: "800m"
+          name: mqtt-proxy
+          ports:
+            - containerPort: 1883
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /mosquitto/config/mosquitto.conf
+              name: mqtt-proxy-conf
+              subPath: mosquitto.conf
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            items:
+              - key: mosquitto.conf
+                path: mosquitto.conf
+            name: mqtt-proxy-conf
+          name: mqtt-proxy-conf
+---
+apiVersion: v1
+data:
+  mosquitto.conf: |
+    # mosquitto.conf
+    listener 1883
+    allow_anonymous true
+
+    # Log settings
+    log_dest stdout
+kind: ConfigMap
+metadata:
+  annotations:
+    use-subpath: "true"
+  labels:
+    app: mqtt-proxy
+  name: mqtt-proxy-conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mqtt-proxy
+  name: mqtt-proxy
+spec:
+  ports:
+    - name: "1883"
+      port: 1883
+      targetPort: 1883
+      nodePort: 31883
+  type: NodePort
+  selector:
+    app: mqtt-proxy

@@ -2,9 +2,8 @@ version: "3.9"
 name: smartweather-project
 
 include:
-  - "./Kafka/kafka-ckuster.yml"
+  - "./Kafka/kafka-kraft-cluster.yml"
   - "./Mqtt/mosquitto.yml"
-  # - "./Mqtt/hivemq-cluster.yml"
 
 networks:
   smart-weather-network:

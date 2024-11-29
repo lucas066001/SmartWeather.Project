@@ -1,7 +1,6 @@
 name: kafka-cluster
 
 services:
-
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
     container_name: zookeeper
@@ -13,7 +12,7 @@ services:
       - "2181:2181"
     networks:
       - smart-weather-network
-      
+
   broker-1:
     image: confluentinc/cp-kafka:7.3.0
     container_name: broker-1
@@ -65,23 +64,6 @@ services:
     networks:
       - smart-weather-network
 
-  kafka-ui:
-    container_name: kafka-ui
-    image: provectuslabs/kafka-ui:latest
-    depends_on:
-      - broker-1
-      - broker-2
-      - broker-3
-      - zookeeper
-      - hivemq-proxy
-    ports:
-      - "8080:8080"
-    environment:
-      KAFKA_CLUSTERS_0_NAME: base_kafka_cluster
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker-1:9092,broker-2:9093,broker-3:9094
-    networks:
-      - smart-weather-network
-
   mqtt-connector:
     container_name: mqtt-connector
     image: confluentinc/cp-kafka-connect:7.3.0
@@ -100,7 +82,35 @@ services:
     volumes:
       - ./conf:/config
       - ./conf/connect_distributed.properties:/etc/kafka/connect-distributed.properties
-    entrypoint: ["/bin/bash", "/config/mqtt-startup.sh"] 
+    entrypoint: ["/bin/bash", "/config/mqtt-startup.sh"]
+    networks:
+      - smart-weather-network
+
+  init-kafka:
+    container_name: init-kafka
+    image: confluentinc/cp-kafka:7.3.0
+    depends_on:
+      - broker-1
+      - broker-2
+      - broker-3
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      "
+      # blocks until kafka is reachable
+      kafka-topics --bootstrap-server broker-1:9092 --list
+      kafka-topics --bootstrap-server broker-2:9093 --list
+      kafka-topics --bootstrap-server broker-3:9094 --list
+
+      echo -e 'Creating kafka topics'
+      kafka-topics --bootstrap-server broker-1:9092 --create --if-not-exists --topic smartweather.measure.data --replication-factor 1 --partitions 9
+      kafka-topics --bootstrap-server broker-2:9093 --create --if-not-exists --topic smartweather.measure.data --replication-factor 1 --partitions 9
+      kafka-topics --bootstrap-server broker-3:9094 --create --if-not-exists --topic smartweather.measure.data --replication-factor 1 --partitions 9
+
+      echo -e 'Successfully created the following topics:'
+      kafka-topics --bootstrap-server broker-1:9092 --list
+      kafka-topics --bootstrap-server broker-2:9093 --list
+      kafka-topics --bootstrap-server broker-3:9094 --list
+      "
     networks:
       - smart-weather-network
 
