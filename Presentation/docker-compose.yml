@@ -1,8 +1,9 @@
 version: "3.9"
 name: smartweather-project
 
-# include:
-  # Later include presentation projects
+include:
+  - "./Kafka-ui/kafka-ui.yml"
+  - "./Kibana/kibana.yml"
 
 networks:
   smart-weather-network:
