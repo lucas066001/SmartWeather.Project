@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sm-mocker-deployment
+  namespace: smartweather-acquisition
+  labels:
+    app: sm-mocker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sm-mocker
+  template:
+    metadata:
+      labels:
+        app: sm-mocker
+    spec:
+      containers:
+        - image: smartweather.acquisition.sm-mocker:latest
+          imagePullPolicy: IfNotPresent
+          name: sm-mocker-pod
+          env:
+            - name: STATION_NB
+              value: "30"
+            - name: DATA_FREQ
+              value: "980"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "64Mi"
+              cpu: "400m"

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sm-api-deployment
+  namespace: smartweather-application
+  labels:
+    app: sm-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sm-api
+  template:
+    metadata:
+      labels:
+        app: sm-api
+    spec:
+      containers:
+        - image: smartweather.application.api:latest
+          imagePullPolicy: IfNotPresent
+          name: sm-api-pod
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "500Mi"
+              cpu: "800m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sm-api-service
+spec:
+  selector:
+    app: sm-api
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081

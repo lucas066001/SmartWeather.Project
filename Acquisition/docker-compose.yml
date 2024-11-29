@@ -8,14 +8,17 @@ services:
     build:
       context: ./..
       dockerfile: Acquisition/SmartWeather.StationMocker/Dockerfile
+    environment:
+      STATION_NB : 50
+      DATA_FREQ : 980
     depends_on:
       - smart-weather-api
       - mysql-master
       - mysql-proxy
       - hivemq-proxy
-      - broker-1
-      - broker-2
-      - broker-3
+      - kafka-0
+      - kafka-1
+      - kafka-2
     networks:
       - smart-weather-network
 

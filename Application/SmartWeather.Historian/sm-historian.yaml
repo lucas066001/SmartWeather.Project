@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sm-historian-deployment
+  namespace: smartweather-application
+  labels:
+    app: sm-historian
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sm-historian
+  template:
+    metadata:
+      labels:
+        app: sm-historian
+    spec:
+      containers:
+        - image: smartweather.application.historian:latest
+          imagePullPolicy: IfNotPresent
+          name: sm-historian-pod
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "500Mi"
+              cpu: "800m"

@@ -1,0 +1,31 @@
+version: "3.9"
+name: mysql-cluster
+
+services:
+  mysql-master:
+    image: mysql:5.7
+    container_name: mysql-master
+    user: root
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: smartweather
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpassword
+    volumes:
+      - mysql-master-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 5
+    networks:
+      - smart-weather-network
+
+volumes:
+  mysql-master-data:
+
+networks:
+  smart-weather-network:
+    driver: bridge

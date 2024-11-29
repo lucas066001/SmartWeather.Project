@@ -130,6 +130,9 @@ public class MockerHosted : IHostedService
 
     private async void _mockingLoop(CancellationToken cancellationToken)
     {
+
+        DateTime lastSend = DateTime.Now;
+
         Console.WriteLine("_mockingLoop");
 
         Random random = new Random();
@@ -156,6 +159,9 @@ public class MockerHosted : IHostedService
                     }
                 }
             }
+            DateTime tmpNow = DateTime.Now;
+            Console.WriteLine($"All data send in {lastSend.Subtract(tmpNow).TotalMilliseconds}ms, should be around {_dataFreq}ms, +/-10ms");
+            lastSend = tmpNow;
             Thread.Sleep(_dataFreq);
         }
     }

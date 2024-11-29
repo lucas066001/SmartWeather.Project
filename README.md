@@ -1,13 +1,18 @@
 # SmartWeather
 Personal project that aims to create a complete IOT environment for my own gardening system
 
-# Installation Guide
+## Table of content
 
-Follow these steps to install **Docker**, **Minikube**, **Helm**, and **Make**.
+1. [Install the pre-requisites](#installation)
+2. [Prepare the application](#prepare)
+3. [Helm](#3-helm)
+5. [Final Verification](#final-verification)
 
 ---
 
-## Table of Contents
+## Install the pre-requisites <a name="installation"></a>
+
+Follow these steps to install **Docker**, **Minikube**, **Helm**, and **Make**.
 
 1. [Docker](#1-docker)
    - [Windows](#docker-windows)
@@ -25,9 +30,9 @@ Follow these steps to install **Docker**, **Minikube**, **Helm**, and **Make**.
 
 ---
 
-## 1. Docker <a name="1-docker"></a>
+### 1. Docker <a name="1-docker"></a>
 
-### Windows <a name="docker-windows"></a>
+#### Windows <a name="docker-windows"></a>
 1. **Download Docker Desktop**: [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/).
 2. **Install Docker Desktop**:
    - Run the installer.
@@ -38,7 +43,7 @@ Follow these steps to install **Docker**, **Minikube**, **Helm**, and **Make**.
    docker --version
    ```
 
-### Linux <a name="docker-linux"></a>
+#### Linux <a name="docker-linux"></a>
 1. **Install Docker**:
    - Update your packages:
      ```bash
@@ -60,9 +65,9 @@ Follow these steps to install **Docker**, **Minikube**, **Helm**, and **Make**.
 
 ---
 
-## 2. Minikube <a name="2-minikube"></a>
+### 2. Minikube <a name="2-minikube"></a>
 
-### Windows <a name="minikube-windows"></a>
+#### Windows <a name="minikube-windows"></a>
 1. **Download Minikube**:
    - Using **choco** (if Chocolatey is installed):
      ```bash
@@ -74,7 +79,7 @@ Follow these steps to install **Docker**, **Minikube**, **Helm**, and **Make**.
    minikube version
    ```
 
-### Linux <a name="minikube-linux"></a>
+#### Linux <a name="minikube-linux"></a>
 1. **Install Minikube**:
    - Download the binary:
      ```bash
@@ -92,9 +97,9 @@ Follow these steps to install **Docker**, **Minikube**, **Helm**, and **Make**.
 
 ---
 
-## 3. Helm <a name="3-helm"></a>
+### 3. Helm <a name="3-helm"></a>
 
-### Windows <a name="helm-windows"></a>
+#### Windows <a name="helm-windows"></a>
 1. **Install Helm**:
    - Using **choco**:
      ```bash
@@ -106,7 +111,7 @@ Follow these steps to install **Docker**, **Minikube**, **Helm**, and **Make**.
    helm version
    ```
 
-### Linux <a name="helm-linux"></a>
+#### Linux <a name="helm-linux"></a>
 1. **Install Helm**:
    - Download the installation script:
      ```bash
@@ -119,9 +124,9 @@ Follow these steps to install **Docker**, **Minikube**, **Helm**, and **Make**.
 
 ---
 
-## 4. Make <a name="4-make"></a>
+### 4. Make <a name="4-make"></a>
 
-### Windows <a name="make-windows"></a>
+#### Windows <a name="make-windows"></a>
 1. **Download Make**:
    - Go to the [GNU Make for Windows](http://gnuwin32.sourceforge.net/packages/make.htm) page.
 2. **Install Make**:
@@ -134,7 +139,7 @@ Follow these steps to install **Docker**, **Minikube**, **Helm**, and **Make**.
    make --version
    ```
 
-### Linux <a name="make-linux"></a>
+#### Linux <a name="make-linux"></a>
 1. **Install Make**:
    - On Debian-based systems:
      ```bash
@@ -152,7 +157,7 @@ Follow these steps to install **Docker**, **Minikube**, **Helm**, and **Make**.
 
 ---
 
-## Final Verification <a name="final-verification"></a>
+### Final Verification <a name="final-verification"></a>
 
 1. **Docker**:
    ```bash
@@ -170,8 +175,41 @@ Follow these steps to install **Docker**, **Minikube**, **Helm**, and **Make**.
    ```bash
    make --version
    ```
-# Launch the application
 
+## Prepare the application <a name="prepare"></a>
+
+Follow these steps to **build local images** and **setup kubernetes env**.
+
+1. [Build local images](#1-local-images)
+2. [Setup kubernetes env](#2-setup-kube)
+
+---
+
+### 1. Build local images <a name="1-local-images"></a>
+
+**A Makefile is here to automate the process** :
+```bash
+make gen-imgs
+```
+_This command will automatically generate all necessary images for your cluster to run_
+
+Additionnaly, if you want to generate only specific images or specific layer images, go check :
+```bash
+make gen-help
+```
+
+### 2. Setup kubernetes env <a name="2-setup-kube"></a>
+
+**A Makefile is here to automate the process** :
+```bash
+make kube-init
+```
+_This command will automatically generate all necessary parameters for your minikube cluster_
+
+Additionnaly, if you want to look at the specific actions, go check :
+```bash
+make kube-help
+```
 
 
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml

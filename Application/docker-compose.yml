@@ -13,9 +13,9 @@ services:
     depends_on:
       - mysql-master
       - mysql-proxy
-      - broker-1
-      - broker-2
-      - broker-3
+      - kafka-0
+      - kafka-1
+      - kafka-2
     networks:
       - smart-weather-network
 
@@ -29,9 +29,9 @@ services:
     depends_on:
       - mysql-master
       - mysql-proxy
-      - broker-1
-      - broker-2
-      - broker-3
+      - kafka-0
+      - kafka-1
+      - kafka-2
     networks:
       - smart-weather-network
 
@@ -45,9 +45,9 @@ services:
     depends_on:
       - mysql-master
       - mysql-proxy
-      - broker-1
-      - broker-2
-      - broker-3
+      - kafka-0
+      - kafka-1
+      - kafka-2
     networks:
       - smart-weather-network
 

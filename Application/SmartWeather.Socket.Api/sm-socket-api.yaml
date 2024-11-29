@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sm-socket-api-deployment
+  namespace: smartweather-application
+  labels:
+    app: sm-socket-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sm-socket-api
+  template:
+    metadata:
+      labels:
+        app: sm-socket-api
+    spec:
+      containers:
+        - image: smartweather.application.socketapi:latest
+          imagePullPolicy: IfNotPresent
+          name: sm-socket-api-pod
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "500Mi"
+              cpu: "800m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sm-socket-api-service
+spec:
+  selector:
+    app: sm-socket-api
+  ports:
+    - protocol: TCP
+      port: 8093
+      targetPort: 8093

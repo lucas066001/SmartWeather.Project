@@ -29,11 +29,11 @@ public static class DependencyInjection
     private static void ConfigureDbContext(this IServiceCollection services, IConfiguration configuration)
     {
         // Setup database according to appsettings
+        services.AddScoped(typeof(SmartWeatherDocumentsContext));
         services.AddDbContext<SmartWeatherContext>(options =>
             options.UseMySQL(configuration.GetConnectionString("SmartWeatherMaster") ?? string.Empty));
         services.AddDbContext<SmartWeatherReadOnlyContext>(options =>
             options.UseMySQL(configuration.GetConnectionString("SmartWeatherLb") ?? string.Empty));
-        services.AddScoped(typeof(SmartWeatherDocumentsContext));
     }
 
     private static void ConfigureRepositories(this IServiceCollection services)
