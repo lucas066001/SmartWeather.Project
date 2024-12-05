@@ -19,6 +19,11 @@ services:
       - kafka-0
       - kafka-1
       - kafka-2
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 5
     networks:
       - smart-weather-network
 

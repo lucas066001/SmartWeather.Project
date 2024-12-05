@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SmartWeather.Entities.User;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartWeather.Repositories.Context.Configurations
 {
@@ -24,6 +19,16 @@ namespace SmartWeather.Repositories.Context.Configurations
                     .HasForeignKey(e => e.UserId)
                     .IsRequired();
             builder.HasIndex(e => e.Email).IsUnique();
+            
+            builder.HasData(
+                new User(Environment.GetEnvironmentVariable("ADMIN_USERNAME") ?? "admin",
+                         Environment.GetEnvironmentVariable("ADMIN_MAIL") ?? "admin@smartweather.net",
+                         Environment.GetEnvironmentVariable("ADMIN_PASSWORD") ?? "adminpassword",
+                         Role.Admin)
+                {
+                    Id = 1
+                }
+            ); ;
         }
     }
 }

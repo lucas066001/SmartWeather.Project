@@ -57,6 +57,15 @@ public class MeasureDataStreamHandler : IKafkaMessageHandler
                                     Id = measurePointId,
                                     Value = measureDataValue
                                 });
+
+                    _measureDataHub.Clients.Group(Constants.STREAM_MONITORING)
+                           .SendAsync(
+                                ClientMethods.RECEIVED_MP_DATA,
+                                new MeasurePointDataDto()
+                                {
+                                    Id = measurePointId,
+                                    Value = measureDataValue
+                                });
                 }
                 catch
                 {

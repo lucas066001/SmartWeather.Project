@@ -10,12 +10,28 @@ services:
     container_name: smart-weather-api
     ports:
       - "8081:8081"
+    environment:
+      ADMIN_USERNAME : "lucas"
+      ADMIN_MAIL : "chapuis863@gmail.com"
+      ADMIN_PASSWORD : "12345"
     depends_on:
-      - mysql-master
-      - mysql-proxy
-      - kafka-0
-      - kafka-1
-      - kafka-2
+      mysql-master:
+        condition: service_healthy
+      mysql-slave-1:
+        condition: service_healthy
+      mysql-slave-2:
+        condition: service_healthy
+      kafka-0:
+        condition: service_healthy
+      kafka-1:
+        condition: service_healthy
+      kafka-2:
+        condition: service_healthy
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 5
     networks:
       - smart-weather-network
 
@@ -27,11 +43,23 @@ services:
     ports:
       - "8090:8090"
     depends_on:
-      - mysql-master
-      - mysql-proxy
-      - kafka-0
-      - kafka-1
-      - kafka-2
+      mysql-master:
+        condition: service_healthy
+      mysql-slave-1:
+        condition: service_healthy
+      mysql-slave-2:
+        condition: service_healthy
+      kafka-0:
+        condition: service_healthy
+      kafka-1:
+        condition: service_healthy
+      kafka-2:
+        condition: service_healthy
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 5
     networks:
       - smart-weather-network
 
@@ -43,11 +71,23 @@ services:
     ports:
       - "8093:8093"
     depends_on:
-      - mysql-master
-      - mysql-proxy
-      - kafka-0
-      - kafka-1
-      - kafka-2
+      mysql-master:
+        condition: service_healthy
+      mysql-slave-1:
+        condition: service_healthy
+      mysql-slave-2:
+        condition: service_healthy
+      kafka-0:
+        condition: service_healthy
+      kafka-1:
+        condition: service_healthy
+      kafka-2:
+        condition: service_healthy
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 5
     networks:
       - smart-weather-network
 
