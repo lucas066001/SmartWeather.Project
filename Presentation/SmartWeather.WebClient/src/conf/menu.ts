@@ -7,7 +7,7 @@ export default [
   {
     label: "Dashboard",
     icon: Home,
-    href: "/",
+    href: "/dashboard",
   },
   {
     label: "Statistics",

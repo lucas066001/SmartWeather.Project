@@ -18,10 +18,9 @@ await connection.StartAsync();
 
 Console.WriteLine("Connecté au Hub");
 
-await connection.InvokeAsync("InitiateStream", new
+await connection.InvokeAsync("InitiateMonitoring", new
 {
-    Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiZW1haWwiOiJjaGFwdWlzODYzQGdtYWlsLmNvbSIsInJvbGUiOiJVc2VyIiwibmJmIjoxNzMyODkzMDg3LCJleHAiOjE3MzI5MDM4ODcsImlhdCI6MTczMjg5MzA4NywiaXNzIjoiU21hcnRXZWF0aGVyIiwiYXVkIjoiU21hcnRXZWF0aGVyIn0.KGqRYP-J3ppC3Q8sAnhpecb83V9kyrvd04ikxp7EtP0",
-    TargetId = 2
+    Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiZW1haWwiOiJhZG1pbkBzbWFydHdlYXRoZXIubmV0Iiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzMzNDc5MTQ0LCJleHAiOjE3MzM0ODk5NDQsImlhdCI6MTczMzQ3OTE0NCwiaXNzIjoiU21hcnRXZWF0aGVyIiwiYXVkIjoiU21hcnRXZWF0aGVyIn0.ML3M0vqs7Zcwl-FguswuDSbsNMC4WdORTHFLILLy0xY"
 });
 
 Console.WriteLine("Méthode InitiateStream invoquée");

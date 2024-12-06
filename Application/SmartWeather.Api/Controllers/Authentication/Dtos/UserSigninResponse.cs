@@ -1,11 +1,10 @@
 ﻿using SmartWeather.Entities.User;
 
-namespace SmartWeather.Api.Controllers.Authentication.Dtos
+namespace SmartWeather.Api.Controllers.Authentication.Dtos;
+
+public class UserSigninResponse
 {
-    public class UserSigninResponse
-    {
-        public int Id { get; set; }
-        public Role Role { get; set; }
-        public required string Token { get; set; }
-    }
+    public int Id { get; set; }
+    public Role Role { get; set; }
+    public required string Token { get; set; }
 }

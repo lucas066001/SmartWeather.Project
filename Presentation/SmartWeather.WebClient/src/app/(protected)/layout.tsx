@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "@/app/globals.css";
 import SideBarMenu from "@/components/ui/SideBarMenu";
-import outfitFonts from "./fonts/Outfit";
+import outfitFonts from "@/app/fonts/Outfit";
 import Header from "@/components/ui/Header";
 import menu from "@/conf/menu";
 
@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={`${outfitFonts.variable} antialiased flex bg-slate-50`}>
-        <SideBarMenu menu={menu}/>
+        <SideBarMenu menu={menu} />
         <div className="flex-1">
           {children}
         </div>
