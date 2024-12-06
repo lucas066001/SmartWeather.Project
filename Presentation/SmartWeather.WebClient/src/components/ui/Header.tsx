@@ -1,3 +1,5 @@
+"use client"
+import { logout } from "@/actions/auth";
 import React from "react";
 
 export interface IHeaderProps {
@@ -10,6 +12,7 @@ function Header({ title }: IHeaderProps) {
       {title && (
         <h1 className="font-semibold text-titleBrown text-3xl">{title}</h1>
       )}
+        <button onClick={() => logout()}>Submit</button>
     </header>
   );
 }

@@ -1,13 +1,11 @@
-"use client"
-import { login } from "@/actions/user";
+"use client";
+
+import { login } from "@/actions/auth";
 import { useActionState } from "react";
-import { useFormState } from 'react-dom'
 
-const initialState: any = {
-
-}
+const initialState: any = {};
 function DashboardPage() {
-  const [state, formAction] = useActionState(login, initialState)
+  const [state, formAction] = useActionState(login, initialState);
 
   return (
     <>
@@ -19,7 +17,12 @@ function DashboardPage() {
         </div>
         <div className="flex flex-col">
           <label htmlFor="password">Password</label>
-          <input id="password" name="password" type="password" placeholder="password" />
+          <input
+            id="password"
+            name="password"
+            type="password"
+            placeholder="password"
+          />
         </div>
         <button type="submit">Log in</button>
       </form>
@@ -27,4 +30,4 @@ function DashboardPage() {
   );
 }
 
-export default DashboardPage
+export default DashboardPage;
