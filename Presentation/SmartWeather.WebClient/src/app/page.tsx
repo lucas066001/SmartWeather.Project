@@ -1,8 +1,11 @@
+import MainLayout from "@/components/ui/MainLayout";
 
-export default function Home() {
+function DashboardPage() {
   return (
-    <div>
+    <MainLayout title="Dashboard">
       <p className="font-outfit">Initialisation projet</p>
-    </div>
+    </MainLayout>
   );
 }
+
+export default DashboardPage
