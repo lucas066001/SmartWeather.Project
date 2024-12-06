@@ -5,8 +5,7 @@ using static SmartWeather.Services.Mqtt.Dtos.StationConfigRequest;
 using SmartWeather.Entities.Component;
 using SmartWeather.Entities.MeasurePoint;
 using SmartWeather.Services.Mqtt.Dtos;
-using System;
-using SmartWeather.Services.Stations;
+using SmartWeather.StationMocker.Helpers;
 
 namespace SmartWeather.StationMocker.Services;
 
@@ -17,7 +16,12 @@ public class MockerHosted : IHostedService
     private int _dataFreq;
     private int _stationNumber;
     private int _componentNumber;
-    private List<StationConfigResponse> stationConfs = new List<StationConfigResponse>();
+    private record StationMocking
+    {
+        public required StationConfigResponse StationConf;
+        public required List<MeasurePointMocker> MpMocker;
+    }
+    private List<StationMocking> stationMockers = new List<StationMocking>();
     public MockerHosted(MqttSingleton mqttSingleton, IServiceScopeFactory scopeFactory)
     {
         Console.WriteLine("MockerService constructor");
@@ -63,9 +67,9 @@ public class MockerHosted : IHostedService
         Console.WriteLine("_mqttSingleton.SubscribeAsync()");
 
         // Configure all mocking stations
-
         for (int stationId = 0; stationId < _stationNumber; stationId++)
         {
+            var tmpMockers = new List<MeasurePointMocker>();
             string macAdress = "MOCK_STATION_" + stationId;
             Console.WriteLine("looop " + macAdress);
             List<PinConfig> pins = new List<PinConfig>();
@@ -94,6 +98,10 @@ public class MockerHosted : IHostedService
                     }
                 };
 
+                tmpMockers.Add(new MeasurePointMocker(MeasureUnit.Celsius));
+                tmpMockers.Add(new MeasurePointMocker(MeasureUnit.Percentage));
+                tmpMockers.Add(new MeasurePointMocker(MeasureUnit.UvStrength));
+
                 pins.Add(new PinConfig()
                 {
                     ComponentType = (int)ComponentType.Sensor,
@@ -113,7 +121,7 @@ public class MockerHosted : IHostedService
             if (rep != null)
             {
                 Console.WriteLine("Station " + stationId + "configured successfully");
-                stationConfs.Add(rep);
+                stationMockers.Add(new StationMocking() { StationConf = rep, MpMocker = tmpMockers });
             }
             else
             {
@@ -138,24 +146,23 @@ public class MockerHosted : IHostedService
         Random random = new Random();
         while (!cancellationToken.IsCancellationRequested)
         {
-            foreach (var stationConf in stationConfs)
+            var errorRate = random.Next(0, 30);
+            foreach (var stationMock in stationMockers)
             {
-                foreach (var compConf in stationConf.ConfigComponents)
+                var currentMockerIndex = 0;
+                foreach (var compConf in stationMock.StationConf.ConfigComponents)
                 {
                     foreach (var mpConf in compConf.MeasurePointsConfigs)
                     {
-                        switch (mpConf.Id)
+
+                        if (random.Next(0, 100) > errorRate)
                         {
-                            case 1:
-                                await _mqttService.SendSensorSavingRequest(stationConf.StationDatabaseId, mpConf.DatabaseId, (float)random.NextDouble() * (50.0f - 0.0f) + 0.0f);
-                                break;
-                            case 2:
-                                await _mqttService.SendSensorSavingRequest(stationConf.StationDatabaseId, mpConf.DatabaseId, (float)random.NextDouble() * (100.0f - 0.0f) + 0.0f);
-                                break;
-                            case 3:
-                                await _mqttService.SendSensorSavingRequest(stationConf.StationDatabaseId, mpConf.DatabaseId, (float)random.NextDouble() * (12 - 0) + 0);
-                                break;
+                            await _mqttService.SendSensorSavingRequest(stationMock.StationConf.StationDatabaseId,
+                                            mpConf.DatabaseId,
+                                            stationMock.MpMocker[currentMockerIndex].GetSensorData());
                         }
+                        
+                        currentMockerIndex++;
                     }
                 }
             }

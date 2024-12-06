@@ -93,14 +93,6 @@ public class MqttSingleton
         }
     }
 
-    public void CheckIfConnected()
-    {
-        if(_mqttClient.IsConnected)
-        {
-            var test = "connected";
-        }
-    }
-
     public async Task DisconnectAsync()
     {
         if (_mqttClient.IsConnected)
