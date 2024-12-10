@@ -20,7 +20,7 @@ Console.WriteLine("Connecté au Hub");
 
 await connection.InvokeAsync("InitiateMonitoring", new
 {
-    Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiZW1haWwiOiJhZG1pbkBzbWFydHdlYXRoZXIubmV0Iiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzMzNDc5MTQ0LCJleHAiOjE3MzM0ODk5NDQsImlhdCI6MTczMzQ3OTE0NCwiaXNzIjoiU21hcnRXZWF0aGVyIiwiYXVkIjoiU21hcnRXZWF0aGVyIn0.ML3M0vqs7Zcwl-FguswuDSbsNMC4WdORTHFLILLy0xY"
+    Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiZW1haWwiOiJhZG1pbkBzbWFydHdlYXRoZXIubmV0Iiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzMzNTAxNzQ5LCJleHAiOjE3MzM1MTI1NDksImlhdCI6MTczMzUwMTc0OSwiaXNzIjoiU21hcnRXZWF0aGVyIiwiYXVkIjoiU21hcnRXZWF0aGVyIn0.Brs27JdKXR7URmhw5kaIxyF8rynmdwGTG_Ya9sLo808"
 });
 
 Console.WriteLine("Méthode InitiateStream invoquée");

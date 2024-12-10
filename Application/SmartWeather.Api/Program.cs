@@ -19,6 +19,7 @@ builder.Services.AddServices(builder.Configuration);
 var issuer = builder.Configuration.GetSection(nameof(Jwt))[nameof(Jwt.Issuer)];
 var audience = builder.Configuration.GetSection(nameof(Jwt))[nameof(Jwt.Audience)];
 var key = builder.Configuration.GetSection(nameof(Jwt))[nameof(Jwt.Key)];
+
 if (string.IsNullOrEmpty(issuer) ||
     string.IsNullOrEmpty(audience) ||
     string.IsNullOrEmpty(key))
@@ -46,6 +47,18 @@ builder.Services
         };
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000") 
+              .AllowAnyHeader()                   
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
+
 builder.Services.AddControllers();
 builder.Services.AddHostedService<PostStartup>();
 
@@ -64,6 +77,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+app.UseCors("AllowSpecificOrigin");
 
 using (var scope = app.Services.CreateScope())
 {
