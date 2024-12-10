@@ -6,13 +6,22 @@ using SmartWeather.Entities.Component;
 using SmartWeather.Entities.MeasurePoint;
 using SmartWeather.Services.Mqtt.Dtos;
 using SmartWeather.StationMocker.Helpers;
+using System.Text.Json;
+using System.Text;
+using Elastic.Clients.Elasticsearch.Core.TermVectors;
+using Elastic.Clients.Elasticsearch;
 
 namespace SmartWeather.StationMocker.Services;
 
 public class MockerHosted : IHostedService
 {
+    private const double MinLatitude = 41.0;
+    private const double MaxLatitude = 51.0;
+    private const double MinLongitude = -5.0;
+    private const double MaxLongitude = 9.0;
     private readonly MqttSingleton _mqttSingleton;
     private readonly MqttService _mqttService;
+    private string _adminToken = Environment.GetEnvironmentVariable("ADMIN_TOKEN") ?? string.Empty;
     private int _dataFreq;
     private int _stationNumber;
     private int _componentNumber;
@@ -49,6 +58,7 @@ public class MockerHosted : IHostedService
         Console.WriteLine("_dataFreq" + _dataFreq);
         Console.WriteLine("_stationNumber" + _stationNumber);
         Console.WriteLine("_componentNumber" + _componentNumber);
+        Console.WriteLine("_adminToken" + _adminToken);
 
         Console.WriteLine("EXIT MockerService constructor");
     }
@@ -56,6 +66,12 @@ public class MockerHosted : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         Console.WriteLine("StartAsync MockerService");
+
+        var random = new Random();
+        using var httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _adminToken);
+
+        string updateStationUrl = "http://smart-weather-api:8081/api/Station/Update";
 
         // Setup mqtt singleton
         await _mqttSingleton.ConnectAsync();
@@ -122,6 +138,26 @@ public class MockerHosted : IHostedService
             {
                 Console.WriteLine("Station " + stationId + "configured successfully");
                 stationMockers.Add(new StationMocking() { StationConf = rep, MpMocker = tmpMockers });
+                //Generate random coordinates
+                double latitude = random.NextDouble() * (MaxLatitude - MinLatitude) + MinLatitude;
+                double longitude = random.NextDouble() * (MaxLongitude - MinLongitude) + MinLongitude;
+                var updateRequest = new
+                {
+                    Id = rep.StationDatabaseId,
+                    Name = "Mocked Station - " + rep.StationDatabaseId,
+                    MacAddress = macAdress,
+                    Latitude = latitude,
+                    Longitude = longitude,
+                    UserId = 1
+                };
+                
+                var response = await httpClient.PutAsync(
+                    updateStationUrl,
+                    new StringContent(JsonSerializer.Serialize(updateRequest), Encoding.UTF8, "application/json")
+                );
+
+                response.EnsureSuccessStatusCode();
+                Console.WriteLine(response.ToString());
             }
             else
             {
