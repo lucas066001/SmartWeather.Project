@@ -9,6 +9,6 @@ namespace SmartWeather.Services.Authentication
 {
     public interface IAuthenticationRepository
     {
-        public User AreCredentialsCorrect(string hashedPassword, string email);
+        public User GetUserFromCredential(string hashedPassword, string email);
     }
 }

@@ -34,6 +34,6 @@ public class UserService(IRepository<User> userBaseRepository, IUserRepository u
 
     public IEnumerable<User> GetUserList(IEnumerable<int>? idsUser = null)
     {
-        return userRepository.GetAll(idsUser);
+        return idsUser == null ? userBaseRepository.GetAll() : userRepository.GetAll(idsUser);
     }
 }

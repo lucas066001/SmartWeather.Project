@@ -3,5 +3,5 @@ namespace SmartWeather.Services.Users;
 
 public interface IUserRepository
 {
-    public IEnumerable<User> GetAll(IEnumerable<int>? ids);
+    public IEnumerable<User> GetAll(IEnumerable<int> ids);
 }

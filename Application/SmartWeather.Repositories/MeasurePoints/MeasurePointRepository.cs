@@ -1,45 +1,46 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SmartWeather.Entities.ComponentData;
+﻿namespace SmartWeather.Repositories.MeasurePoints;
+
+using Microsoft.EntityFrameworkCore;
 using SmartWeather.Entities.MeasurePoint;
+using SmartWeather.Repositories.BaseRepository.Exceptions;
 using SmartWeather.Repositories.Context;
 using SmartWeather.Services.MeasurePoints;
 
-namespace SmartWeather.Repositories.MeasurePoints;
 
 public class MeasurePointRepository(SmartWeatherReadOnlyContext readOnlyContext) : IMeasurePointRepository
 {
+    /// <summary>
+    /// Retreive all MeasurePoint from Component.
+    /// </summary>
+    /// <param name="idComponent">Int representing Component unique Id that contains desired MeasurePoint.</param>
+    /// <returns>List of MeasurePoint.</returns>
+    /// <exception cref="EntityFetchingException">Thrown if no data is found.</exception>
     public IEnumerable<MeasurePoint> GetFromComponent(int idComponent)
     {
-        IEnumerable<MeasurePoint> measurePointsRetreived = null!;
-
-        try
-        {
-            measurePointsRetreived = readOnlyContext.MeasurePoints.Where(cd => cd.ComponentId == idComponent).ToList();
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Unable to retreive measurePoints from component in database : " + ex.Message);
-        }
-
-
-        return measurePointsRetreived;
+        var measurePointsRetreived = readOnlyContext.MeasurePoints.Where(cd => cd.ComponentId == idComponent).AsEnumerable();
+        return measurePointsRetreived ?? throw new EntityFetchingException();
     }
 
+    /// <summary>
+    /// Check wether or not a User owns a MeasurePoint.
+    /// </summary>
+    /// <param name="userId">Int representing User unique Id.</param>
+    /// <param name="measurePointId">Int representing MeasurePoint unique Id.</param>
+    /// <returns>
+    /// A boolean representing if User own the MeasurePoint.
+    /// (True : Owner | False : Not owner)
+    /// </returns>
+    /// <exception cref="EntityFetchingException">Thrown if no MeasurePoint can be found using given Id.</exception>
     public bool IsOwnerOfMeasurePoint(int userId, int measurePointId)
     {
-        try
-        {
-            var measurePointRetreived = readOnlyContext.MeasurePoints
-                                            .Where(mp => mp.Id == measurePointId)
-                                            .Include(mp => mp.Component)
-                                            .ThenInclude(cp => cp.Station)
-                                            .FirstOrDefault();
+        var measurePointRetreived = readOnlyContext.MeasurePoints
+                                        .Where(mp => mp.Id == measurePointId)
+                                        .Include(mp => mp.Component)
+                                        .ThenInclude(cp => cp.Station)
+                                        .FirstOrDefault();
+        
+        if(measurePointRetreived == null) throw new EntityFetchingException();
 
-            return measurePointRetreived != null && measurePointRetreived.Component.Station.UserId == userId;
-        }
-        catch 
-        {
-            throw new Exception("Unable to retreive measurePoints");
-        }
+        return measurePointRetreived.Component.Station.UserId == userId;
     }
 }

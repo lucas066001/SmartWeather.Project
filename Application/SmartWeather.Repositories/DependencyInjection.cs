@@ -17,6 +17,7 @@ using SmartWeather.Services.ComponentDatas;
 using SmartWeather.Repositories.ComponentDatas;
 using SmartWeather.Services.MeasurePoints;
 using SmartWeather.Repositories.MeasurePoints;
+using SmartWeather.Repositories.BaseRepository;
 
 public static class DependencyInjection
 {

@@ -1,9 +1,6 @@
 ﻿namespace SmartWeather.Repositories.Context;
 
 using Elastic.Clients.Elasticsearch;
-using Elastic.Clients.Elasticsearch.IndexManagement;
-using Elastic.Clients.Elasticsearch.QueryDsl;
-using Elastic.Transport;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SmartWeather.Entities.ComponentData;

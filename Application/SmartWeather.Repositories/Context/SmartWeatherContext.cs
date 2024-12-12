@@ -2,7 +2,6 @@
 
 using Microsoft.EntityFrameworkCore;
 using SmartWeather.Entities.Component;
-using SmartWeather.Entities.ComponentData;
 using SmartWeather.Entities.MeasurePoint;
 using SmartWeather.Entities.Station;
 using SmartWeather.Entities.User;

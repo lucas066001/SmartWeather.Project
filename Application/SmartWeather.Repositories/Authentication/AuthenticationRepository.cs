@@ -1,32 +1,23 @@
-﻿using SmartWeather.Entities.User;
+﻿namespace SmartWeather.Repositories.Authentication;
+
+using SmartWeather.Entities.User;
+using SmartWeather.Repositories.BaseRepository.Exceptions;
 using SmartWeather.Repositories.Context;
 using SmartWeather.Services.Authentication;
 
-namespace SmartWeather.Repositories.Authentication;
-
 public class AuthenticationRepository(SmartWeatherReadOnlyContext readOnlyContext) : IAuthenticationRepository
 {
-    public User AreCredentialsCorrect(string hashedPassword, string email)
+    /// <summary>
+    /// Retreive a User based on given credential.
+    /// (Usefull to authenticate User).
+    /// </summary>
+    /// <param name="hashedPassword">String representing User password.</param>
+    /// <param name="email">String representing User email.</param>
+    /// <returns>User entity matching credentials.</returns>
+    /// <exception cref="EntityFetchingException">Thrown if nothing match. (Credentials incorrect).</exception>
+    public User GetUserFromCredential(string hashedPassword, string email)
     {
-        User connectedUser;
-        try
-        {
-            var tmpUser = readOnlyContext.Users.Where(u => u.Email == email && u.PasswordHash == hashedPassword).FirstOrDefault();
-            
-            if(tmpUser != null)
-            {
-                connectedUser = tmpUser;
-            }
-            else
-            {
-                throw new Exception("Credential incorrect, unable to authenticate user from given infos");
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Authentication error : " + ex.Message);
-        }
-
-        return connectedUser;
+        var user = readOnlyContext.Users.Where(u => u.Email == email && u.PasswordHash == hashedPassword).FirstOrDefault();
+        return user ?? throw new EntityFetchingException();
     }
 }
