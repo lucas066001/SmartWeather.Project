@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿namespace SmartWeather.Services.Authentication;
+
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SmartWeather.Entities.User;
 using SmartWeather.Services.Options;
@@ -8,7 +10,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-namespace SmartWeather.Services.Authentication;
 
 public class AuthenticationService(IConfiguration configuration, IRepository<User> userBaseRepository, IAuthenticationRepository authenticationRepository)
 {
@@ -153,8 +154,6 @@ public class AuthenticationService(IConfiguration configuration, IRepository<Use
             return Role.Unauthorized;
         }
     }
-
-
 
     public Tuple<User, string> Register(string username, string mail, string password)
     {

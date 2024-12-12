@@ -1,7 +1,6 @@
 ﻿namespace SmartWeather.Services.Stations;
 
 using SmartWeather.Entities.Station;
-using SmartWeather.Services.MeasurePoints;
 using SmartWeather.Services.Repositories;
 
 public class StationService(IRepository<Station> stationBaseRepository, IStationRepository stationRepository)
