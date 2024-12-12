@@ -51,9 +51,9 @@ public class StationService(IRepository<Station> stationBaseRepository, IStation
         return stationRepository.IsOwnerOfStation(userId, idStation);
     }
 
-    public IEnumerable<Station> GetAll()
+    public IEnumerable<Station> GetAll(bool includeComponents, bool includeMeasurePoint)
     {
-        return stationBaseRepository.GetAll();
+        return stationRepository.GetAll(includeComponents, includeMeasurePoint);
     }
 
     public IEnumerable<Station> GetFromUser(int userId) {

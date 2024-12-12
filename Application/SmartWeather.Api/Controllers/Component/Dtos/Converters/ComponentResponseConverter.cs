@@ -1,8 +1,7 @@
 ﻿namespace SmartWeather.Api.Controllers.Component.Dtos.Converters;
 
-using SmartWeather.Api.Controllers.Station.Dtos.Converters;
-using SmartWeather.Api.Controllers.Station.Dtos;
 using SmartWeather.Entities.Component;
+using SmartWeather.Api.Controllers.MeasurePoint.Dtos.Converters;
 
 public class ComponentResponseConverter
 {
@@ -14,7 +13,8 @@ public class ComponentResponseConverter
             Color = component.Color,
             Name = component.Name,
             StationId = component.StationId,
-            Type = component.Type,  
+            Type = component.Type,
+            MeasurePoints = component.MeasurePoints.Any() ? MeasurePointConverter.ConvertMeasurePointListToMeasurePointList(component.MeasurePoints) : null
         };
     }
 }

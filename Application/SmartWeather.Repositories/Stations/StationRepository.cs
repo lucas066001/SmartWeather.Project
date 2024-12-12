@@ -1,5 +1,7 @@
 ﻿namespace SmartWeather.Repositories.Stations;
 
+using Microsoft.EntityFrameworkCore;
+using SmartWeather.Entities.MeasurePoint;
 using SmartWeather.Entities.Station;
 using SmartWeather.Entities.User;
 using SmartWeather.Repositories.Context;
@@ -7,9 +9,42 @@ using SmartWeather.Services.Stations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 
 public class StationRepository(SmartWeatherReadOnlyContext readOnlyContext) : IStationRepository
 {
+    public IEnumerable<Station> GetAll(bool includeComponents, bool includeMeasurePoint)
+    {
+        IEnumerable<Station>? stationsRetreived = null;
+
+        try
+        {
+            if (includeMeasurePoint) 
+            {
+                stationsRetreived = readOnlyContext.Stations
+                                    .Include(s => s.Components)
+                                    .ThenInclude(c => c.MeasurePoints)
+                                    .AsEnumerable();
+            }
+            else if (includeComponents)
+            {
+                stationsRetreived = readOnlyContext.Stations
+                                    .Include(s => s.Components)
+                                    .AsEnumerable();
+            }
+            else
+            {
+                stationsRetreived = readOnlyContext.Stations.AsEnumerable();
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Unable to retreive stations in database : " + ex.Message);
+        }
+
+        return stationsRetreived;
+    }
+
     public Station? GetByMacAddress(string macAddress)
     {
         Station? stationsRetreived = null;

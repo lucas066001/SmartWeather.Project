@@ -17,4 +17,15 @@ public class ComponentListResponseConverter
         }
         return result;
     }
+
+    public static List<ComponentResponse> ConvertComponentListToComponentList(IEnumerable<Component> components)
+    {
+        var result = new List<ComponentResponse>();
+
+        foreach (var component in components)
+        {
+            result.Add(ComponentResponseConverter.ConvertComponentToComponentResponse(component));
+        }
+        return result;
+    }
 }

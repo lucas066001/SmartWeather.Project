@@ -296,7 +296,7 @@ public class StationController : ControllerBase
     }
 
     [HttpGet(nameof(GetAll))]
-    public ActionResult<ApiResponse<StationListResponse>> GetAll()
+    public ActionResult<ApiResponse<StationListResponse>> GetAll(bool includeComponents, bool includeMeasurePoints)
     {
         var token = HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
         
@@ -311,7 +311,7 @@ public class StationController : ControllerBase
                 throw new UnauthorizedAccessException("Your are not allowed to get this information");
             }
 
-            IEnumerable<Station> stationsRetreived = _stationService.GetAll();
+            IEnumerable<Station> stationsRetreived = _stationService.GetAll(includeComponents, includeMeasurePoints);
             response = ApiResponse<StationListResponse>.Success(StationListResponseConverter.ConvertStationListToStationListResponse(stationsRetreived));
         
         }

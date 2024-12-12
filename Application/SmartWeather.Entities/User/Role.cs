@@ -1,6 +1,7 @@
 ﻿namespace SmartWeather.Entities.User;
 public enum Role
 {
+    Unauthorized,
     Admin,
     User
 }

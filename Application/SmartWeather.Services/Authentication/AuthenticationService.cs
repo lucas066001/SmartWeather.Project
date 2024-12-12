@@ -5,14 +5,10 @@ using SmartWeather.Entities.User;
 using SmartWeather.Services.Options;
 using SmartWeather.Services.Users;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
-
 
 public class AuthenticationService(IConfiguration configuration, IUserRepository userRepository, IAuthenticationRepository authenticationRepository)
 {
@@ -37,7 +33,7 @@ public class AuthenticationService(IConfiguration configuration, IUserRepository
                 {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role.ToString())
+                new Claim(ClaimTypes.Role, ((int)user.Role).ToString())
             }),
                 Issuer = issuer,
                 Audience = audience,
@@ -153,8 +149,8 @@ public class AuthenticationService(IConfiguration configuration, IUserRepository
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Erreur lors de la validation du token : " + ex.Message);
-            return 0;
+            Console.WriteLine("Error while validating token : " + ex.Message);
+            return Role.Unauthorized;
         }
     }
 

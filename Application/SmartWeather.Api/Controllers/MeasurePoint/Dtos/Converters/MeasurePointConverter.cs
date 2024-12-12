@@ -31,4 +31,15 @@ public class MeasurePointConverter
         }
         return result;
     }
+
+    public static List<MeasurePointResponse> ConvertMeasurePointListToMeasurePointList(IEnumerable<MeasurePoint> measurePoints)
+    {
+        var result = new List<MeasurePointResponse>();
+
+        foreach (var mp in measurePoints)
+        {
+            result.Add(ConvertMeasurePointToMeasurePointResponse(mp));
+        }
+        return result;
+    }
 }
