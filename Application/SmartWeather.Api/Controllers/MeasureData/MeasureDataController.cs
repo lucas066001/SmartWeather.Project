@@ -107,7 +107,7 @@ public class MeasureDataController : ControllerBase
     //}
 
     [HttpGet(nameof(GetFromMeasurePoint))]
-    public ActionResult<ApiResponse<MeasureDataListResponse>> GetFromMeasurePoint(int measurePointId, DateTime? startPeriod = null, DateTime? endPeriod = null)
+    public ActionResult<ApiResponse<MeasureDataListResponse>> GetFromMeasurePoint(int measurePointId, DateTime startPeriod, DateTime endPeriod)
     {
         ApiResponse<MeasureDataListResponse> response;
 

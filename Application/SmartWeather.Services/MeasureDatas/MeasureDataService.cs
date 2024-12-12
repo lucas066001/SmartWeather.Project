@@ -31,7 +31,7 @@ public class MeasureDataService (IMeasureDataRepository measureDataRepository)
     //    return measureDataBaseRepository.Update(ComponentDataToUpdate);
     //}
 
-    public IEnumerable<MeasureData> GetFromMeasurePoint(int idMeasurePoint, DateTime? startPeriod, DateTime? endPeriod)
+    public IEnumerable<MeasureData> GetFromMeasurePoint(int idMeasurePoint, DateTime startPeriod, DateTime endPeriod)
     {
         return measureDataRepository.GetFromMeasurePoint(idMeasurePoint, startPeriod, endPeriod).Result;
     }

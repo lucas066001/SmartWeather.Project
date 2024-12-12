@@ -165,7 +165,7 @@ public class AuthenticationService(IConfiguration configuration, IRepository<Use
 
     public Tuple<User, string> Signin(string email, string password)
     {
-        User connectedUser = authenticationRepository.AreCredentialsCorrect(User.HashPassword(password), email);
+        User connectedUser = authenticationRepository.GetUserFromCredential(User.HashPassword(password), email);
         return new Tuple<User, string>(connectedUser, GenerateToken(connectedUser));
     }
 }
