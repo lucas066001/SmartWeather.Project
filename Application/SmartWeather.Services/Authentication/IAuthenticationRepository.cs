@@ -1,6 +1,7 @@
 ﻿namespace SmartWeather.Services.Authentication;
 
 using SmartWeather.Entities.User;
+using SmartWeather.Entities.Common.Exceptions;
 
 public interface IAuthenticationRepository
 {

@@ -8,11 +8,11 @@ namespace SmartWeather.Repositories.Stations;
 
 public class StationRepository(SmartWeatherReadOnlyContext readOnlyContext) : IStationRepository
 {
-    public IEnumerable<Station> GetAll(bool includeComponents, bool includeMeasurePoint)
+    public IEnumerable<Station> GetAll(bool includeComponents, bool includeMeasurePoints)
     {
         IEnumerable<Station>? stationsRetreived = null;
 
-        if (includeMeasurePoint) 
+        if (includeMeasurePoints) 
         {
             stationsRetreived = readOnlyContext.Stations
                                 .Include(s => s.Components)
@@ -35,21 +35,13 @@ public class StationRepository(SmartWeatherReadOnlyContext readOnlyContext) : IS
 
     public Station GetByMacAddress(string macAddress)
     {
-        var stationsRetreived = readOnlyContext.Stations.Where(s => s.MacAddress == macAddress).FirstOrDefault();
-        return stationsRetreived ?? throw new EntityFetchingException();
+        var stationRetreived = readOnlyContext.Stations.Where(s => s.MacAddress == macAddress).FirstOrDefault();
+        return stationRetreived ?? throw new EntityFetchingException();
     }
 
     public IEnumerable<Station> GetFromUser(int userId)
     {
         var stationsRetreived = readOnlyContext.Stations.Where(s => s.UserId == userId).ToList();
         return stationsRetreived ?? throw new EntityFetchingException();
-    }
-
-    public bool IsOwnerOfStation(int userId, int idStation)
-    {
-
-        var station = readOnlyContext.Stations.Where(s => s.Id == idStation).FirstOrDefault();
-        if (station == null) throw new EntityFetchingException();
-        return station.UserId == userId;
     }
 }

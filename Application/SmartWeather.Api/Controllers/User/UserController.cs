@@ -92,8 +92,7 @@ namespace SmartWeather.Api.Controllers.User
 
             try
             {
-                var userDeleted = _userService.DeleteUser(idUser);
-                if (userDeleted.Id == idUser)
+                if (_userService.DeleteUser(idUser))
                 {
                     response = ApiResponse<EmptyResponse>.Success(null);
                 }

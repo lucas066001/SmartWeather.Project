@@ -28,7 +28,7 @@ public interface IRepository<T> where T : class
     /// (Need proper Type target to act on correct table).
     /// </summary>
     /// <param name="entityId">Int that correspond to entity unique Id.</param>
-    /// <returns>Deleted entity from.</returns>
+    /// <returns>Deleted entity from database.</returns>
     /// <exception cref="EntityFetchingException">Thrown if id do not match any entity.</exception>
     /// <exception cref="EntitySavingException">Thrown if error occurs during entity deletion.</exception>
     public T Delete(int entityId);

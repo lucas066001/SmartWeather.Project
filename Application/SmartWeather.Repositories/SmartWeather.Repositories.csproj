@@ -23,8 +23,4 @@
     <ProjectReference Include="..\SmartWeather.Services\SmartWeather.Services.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="BaseRepository\Exceptions\" />
-  </ItemGroup>
-
 </Project>

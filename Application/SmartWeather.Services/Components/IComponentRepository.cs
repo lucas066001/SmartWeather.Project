@@ -1,5 +1,7 @@
 ﻿namespace SmartWeather.Services.Components;
+
 using SmartWeather.Entities.Component;
+using SmartWeather.Entities.Common.Exceptions;
 
 public interface IComponentRepository
 {
@@ -12,14 +14,12 @@ public interface IComponentRepository
     public IEnumerable<Component> GetFromStation(int stationId);
 
     /// <summary>
-    /// Check wether or not a User owns a Component.
+    /// Retreive Component based on it's unique Id.
+    /// Possibility to include corresponding Station.
     /// </summary>
-    /// <param name="userId">Int representing User unique Id.</param>
-    /// <param name="idComponent">Int representing Component unique Id.</param>
-    /// <returns>
-    /// A boolean representing if User own the Component.
-    /// (True : Owner | False : Not owner)
-    /// </returns>
-    /// <exception cref="Exception"></exception>
-    public bool IsOwnerOfComponent(int userId, int idComponent);
+    /// <param name="componentId">Int representing Component unique Id.</param>
+    /// <param name="includeStation">Bool indicating to include corresponding Station.</param>
+    /// <returns>Component.</returns>
+    /// <exception cref="EntityFetchingException">Thrown if no data is found.</exception>
+    public Component GetById(int componentId, bool includeStation);
 }

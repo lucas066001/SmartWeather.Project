@@ -8,6 +8,34 @@ using SmartWeather.Services.MeasurePoints;
 
 public class MeasurePointRepository(SmartWeatherReadOnlyContext readOnlyContext) : IMeasurePointRepository
 {
+    public MeasurePoint GetById(int measurePointId, bool includeComponent, bool includeStation)
+    {
+        if (includeStation)
+        {
+            var measurePointRetreived = readOnlyContext.MeasurePoints
+                                                        .Include(mp => mp.Component)
+                                                        .ThenInclude(c => c.Station)
+                                                        .Where(mp => mp.Id == measurePointId)
+                                                        .FirstOrDefault();
+            return measurePointRetreived ?? throw new EntityFetchingException();
+        }
+        else if (includeComponent)
+        {
+            var measurePointRetreived = readOnlyContext.MeasurePoints
+                                                       .Include(mp => mp.Component)
+                                                       .Where(mp => mp.Id == measurePointId)
+                                                       .FirstOrDefault();
+            return measurePointRetreived ?? throw new EntityFetchingException();
+        }
+        else
+        {
+            var measurePointRetreived = readOnlyContext.MeasurePoints
+                                                       .Where(mp => mp.Id == measurePointId)
+                                                       .FirstOrDefault();
+            return measurePointRetreived ?? throw new EntityFetchingException();
+        }
+    }
+
     public IEnumerable<MeasurePoint> GetFromComponent(int idComponent)
     {
         var measurePointsRetreived = readOnlyContext.MeasurePoints.Where(cd => cd.ComponentId == idComponent).AsEnumerable();

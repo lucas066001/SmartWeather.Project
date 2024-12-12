@@ -9,6 +9,25 @@ using System.Collections.Generic;
 
 public class ComponentRepository(SmartWeatherReadOnlyContext readOnlyContext) : IComponentRepository
 {
+    public Component GetById(int componentId, bool includeStation)
+    {
+        if (includeStation)
+        {
+            var componentsRetreived = readOnlyContext.Components
+                                                     .Include(c => c.Station)
+                                                     .Where(c => c.Id == componentId).FirstOrDefault();
+
+            return componentsRetreived ?? throw new EntityFetchingException();
+        }
+        else
+        {
+            var componentsRetreived = readOnlyContext.Components
+                                         .Where(c => c.Id == componentId).FirstOrDefault();
+
+            return componentsRetreived ?? throw new EntityFetchingException();
+        }
+    }
+
     public IEnumerable<Component> GetFromStation(int stationId)
     {
         var componentsRetreived = readOnlyContext.Components.Where(s => s.StationId == stationId).ToList();
