@@ -1,16 +1,16 @@
 ﻿using Microsoft.Extensions.Configuration;
-namespace SmartWeather.Services.Authentication;
 using Microsoft.IdentityModel.Tokens;
 using SmartWeather.Entities.User;
 using SmartWeather.Services.Options;
-using SmartWeather.Services.Users;
+using SmartWeather.Services.Repositories;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+namespace SmartWeather.Services.Authentication;
 
-public class AuthenticationService(IConfiguration configuration, IUserRepository userRepository, IAuthenticationRepository authenticationRepository)
+public class AuthenticationService(IConfiguration configuration, IRepository<User> userBaseRepository, IAuthenticationRepository authenticationRepository)
 {
     public string GenerateToken(User user)
     {
@@ -159,7 +159,7 @@ public class AuthenticationService(IConfiguration configuration, IUserRepository
     public Tuple<User, string> Register(string username, string mail, string password)
     {
         User userToCreate = new(username, mail, password);
-        User createdUser = userRepository.Create(userToCreate);
+        User createdUser = userBaseRepository.Create(userToCreate);
         return new Tuple<User, string>(createdUser, GenerateToken(createdUser));
     }
 

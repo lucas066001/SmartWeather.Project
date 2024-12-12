@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using SmartWeather.Entities.Station;
+using SmartWeather.Entities.User.Exceptions;
 
 public class User
 {
@@ -11,49 +12,59 @@ public class User
     public string Email { get; set; }
     public string PasswordHash { get; set; }
     public Role Role { get; set; }
-    public virtual ICollection<Station> Stations { get; set; } = new List<Station>();
+    public virtual ICollection<Station> Stations { get; set; } = [];
 
-    private static readonly Regex EmailRegex = new Regex(
-        @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
+    private static readonly Regex EmailRegex = new (@"^[^@\s]+@[^@\s]+\.[^@\s]+$",
+                                                    RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    /// <summary>
+    /// Take a string and hash it to create an irreversible version of it.
+    /// </summary>
+    /// <param name="password">Original string.</param>
+    /// <returns>Hashed version of string.</returns>
     public static string HashPassword(string password)
     {
         using (SHA256 sha256 = SHA256.Create())
         {
-            // Convertir le mot de passe en bytes
             byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-
-            // Hacher le mot de passe
             byte[] hashBytes = sha256.ComputeHash(passwordBytes);
-
-            // Convertir le résultat du hachage en chaîne hexadécimale
             return Convert.ToHexString(hashBytes);
         }
     }
 
-    public User(string username, string email, string passwordHash, Role role = Role.User) {
+    /// <summary>
+    /// Create a User based on given informations.
+    /// </summary>
+    /// <param name="username">String representing User name.</param>
+    /// <param name="email">String representing User email.</param>
+    /// <param name="passwordHash">String representing User password.</param>
+    /// <param name="role">Optional role to adjust user access.</param>
+    /// <exception cref="InvalidUserEmailException">Thrown if email doesn't match requirements.</exception>
+    /// <exception cref="InvalidUserPasswordException">Thrown if password is empty.</exception>
+    /// <exception cref="InvalidUserNameException">Thrown if username is empty.</exception>
+    /// <returns>Well formatted User object.</returns>
+    public User (string username, 
+                 string email, 
+                 string passwordHash, 
+                 Role role = Role.User) {
 
         if (!EmailRegex.IsMatch(email))
         {
-            throw new Exception("Email format is incorrect");
+            throw new InvalidUserEmailException();
         }
-
         Email = email;
 
-        if(String.IsNullOrWhiteSpace(passwordHash))
+        if(string.IsNullOrWhiteSpace(passwordHash))
         {
-            throw new Exception("Password must be filled");
+            throw new InvalidUserPasswordException();
         }
+        PasswordHash = HashPassword(passwordHash);
 
-        PasswordHash = User.HashPassword(passwordHash);
-
-        if (String.IsNullOrWhiteSpace(username))
+        if (string.IsNullOrWhiteSpace(username))
         {
-            throw new Exception("Username must be filled");
+            throw new InvalidUserNameException();
         }
-
         Username = username;
+
         Role = role;
     }
 

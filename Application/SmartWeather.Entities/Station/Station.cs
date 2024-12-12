@@ -1,9 +1,9 @@
 ﻿namespace SmartWeather.Entities.Station;
 
-using System;
 using SmartWeather.Entities.User;
 using SmartWeather.Entities.Component;
 using System.Text.RegularExpressions;
+using SmartWeather.Entities.Station.Exceptions;
 
 public class Station
 {
@@ -17,11 +17,15 @@ public class Station
     public virtual User? User { get; set; } = null!;
     public virtual ICollection<Component> Components { get; set; } = new List<Component>();
 
-    private static readonly Regex MacAddressRegex = new Regex(
-        @"^([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}$",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-    private bool _checkMacAdress(string MacAddress)
+    private static readonly Regex MacAddressRegex = new Regex(@"^([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}$",
+                                                              RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    /// <summary>
+    /// Methods to check if MacAddress format is correct. 
+    /// (Enable the possibility to create mock station in debug mode with MOCK_STATION contained in MacAdress).
+    /// </summary>
+    /// <param name="MacAddress">Address to check.</param>
+    /// <returns>Boolean whether or not the address match requirements.</returns>
+    private bool _checkMacAddress(string MacAddress)
     {
 #if DEBUG
         return MacAddressRegex.IsMatch(MacAddress) || MacAddress.Contains("MOCK_STATION");
@@ -30,39 +34,57 @@ public class Station
 #endif
     }
 
-    public Station(string name, string macAddress, float latitude, float longitude, int? userId ,StationType type = StationType.Private) {
+    /// <summary>
+    /// Create a Station based on given informations.
+    /// </summary>
+    /// <param name="name">String representing station name.</param>
+    /// <param name="macAddress">String representing station mac address.</param>
+    /// <param name="latitude">Float representing station latitude coordinate.</param>
+    /// <param name="longitude">Float representing station longitude coordinate.</param>
+    /// <param name="userId">Nullable Int representing station owner idn could be null if no current owner.</param>
+    /// <param name="type">Optional type to specify station type.</param>
+    /// <exception cref="InvalidStationNameException">Thrown if station name is empty.</exception>
+    /// <exception cref="InvalidStationMacAddressException">Thrown if station mac address doesn't match requirements.</exception>
+    /// <exception cref="InvalidStationCoordinatesException">Thrown if station lat/lng isn't in [-90;90] range.</exception>
+    /// <exception cref="InvalidStationUserIdException">Thrown if user id is bellow 0.</exception>
+    /// <returns>Well formatted Station object.</returns>
+    public Station (string name, 
+                    string macAddress, 
+                    float latitude, 
+                    float longitude, 
+                    int? userId, 
+                    StationType type = StationType.Private) {
         
-        if (String.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrWhiteSpace(name))
         {
-            throw new Exception("Name must be filled");
+            throw new InvalidStationNameException();
         }
         Name = name;
 
-        if (!_checkMacAdress(macAddress))
+        if (!_checkMacAddress(macAddress))
         {
-            throw new Exception("MacAddress format incorrect");
+            throw new InvalidStationMacAddressException();
         }
         MacAddress = macAddress;
         
         if (!(-90 <= latitude && latitude <= 90))
         {
-            throw new Exception("Latitude value must be contained in [-90;90] range");
+            throw new InvalidStationCoordinatesException();
         }
         Latitude = latitude;
 
         if (!(-90 <= longitude && longitude <= 90))
         {
-            throw new Exception("Latitude value must be contained in [-90;90] range");
+            throw new InvalidStationCoordinatesException();
         }
         Longitude = longitude;
 
         if (userId <= 0)
         {
-            throw new Exception("Invalid UserId");
+            throw new InvalidStationUserIdException();
         }
         UserId = userId;
         
         Type = type;
-
     }
 }
