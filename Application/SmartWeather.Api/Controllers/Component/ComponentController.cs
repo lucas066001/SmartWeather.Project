@@ -46,7 +46,7 @@ public class ComponentController : ControllerBase
                                                                      Status.VALIDATION_ERROR));
         }
 
-        if(_accessManagerHelper.ValidateUserAccess<Station>(this, request.StationId, RoleAccess.ADMINISTRATORS))
+        if(!_accessManagerHelper.ValidateUserAccess<Station>(this, request.StationId, RoleAccess.ADMINISTRATORS))
         {
             response = ApiResponse<ComponentResponse>.Failure(BaseResponses.AUTHORIZATION_ERROR, Status.AUTHORIZATION_ERROR);
             return Unauthorized(response);
@@ -92,7 +92,7 @@ public class ComponentController : ControllerBase
                                                                  Status.VALIDATION_ERROR));
         }
 
-        if (_accessManagerHelper.ValidateUserAccess<Component>(this, idComponent, RoleAccess.ADMINISTRATORS))
+        if (!_accessManagerHelper.ValidateUserAccess<Component>(this, idComponent, RoleAccess.ADMINISTRATORS))
         {
             response = ApiResponse<EmptyResponse>.Failure(BaseResponses.AUTHORIZATION_ERROR, Status.AUTHORIZATION_ERROR);
             return Unauthorized(response);
@@ -134,7 +134,7 @@ public class ComponentController : ControllerBase
             return BadRequest(ApiResponse<ComponentResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        if (_accessManagerHelper.ValidateUserAccess<Component>(this, request.Id, RoleAccess.ADMINISTRATORS))
+        if (!_accessManagerHelper.ValidateUserAccess<Component>(this, request.Id, RoleAccess.ADMINISTRATORS))
         {
             response = ApiResponse<ComponentResponse>.Failure(BaseResponses.AUTHORIZATION_ERROR, Status.AUTHORIZATION_ERROR);
             return Unauthorized(response);
@@ -174,7 +174,7 @@ public class ComponentController : ControllerBase
             return BadRequest(ApiResponse<ComponentListResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        if (_accessManagerHelper.ValidateUserAccess<Station>(this, stationId, RoleAccess.GLOBAL_READING_ACCESS))
+        if (!_accessManagerHelper.ValidateUserAccess<Station>(this, stationId, RoleAccess.GLOBAL_READING_ACCESS))
         {
             response = ApiResponse<ComponentListResponse>.Failure(BaseResponses.AUTHORIZATION_ERROR, Status.AUTHORIZATION_ERROR);
             return Unauthorized(response);
@@ -210,7 +210,7 @@ public class ComponentController : ControllerBase
             return BadRequest(ApiResponse<ComponentResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        if (_accessManagerHelper.ValidateUserAccess<Component>(this, componentId, RoleAccess.GLOBAL_READING_ACCESS))
+        if (!_accessManagerHelper.ValidateUserAccess<Component>(this, componentId, RoleAccess.GLOBAL_READING_ACCESS))
         {
             response = ApiResponse<ComponentResponse>.Failure(BaseResponses.AUTHORIZATION_ERROR, Status.AUTHORIZATION_ERROR);
             return Unauthorized(response);
@@ -247,7 +247,7 @@ public class ComponentController : ControllerBase
             return BadRequest(ApiResponse<EmptyResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        if (_accessManagerHelper.ValidateUserAccess<Station>(this, request.StationId))
+        if (!_accessManagerHelper.ValidateUserAccess<Station>(this, request.StationId))
         {
             response = ApiResponse<EmptyResponse>.Failure(BaseResponses.AUTHORIZATION_ERROR, Status.AUTHORIZATION_ERROR);
             return Unauthorized(response);

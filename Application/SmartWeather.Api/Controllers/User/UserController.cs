@@ -78,7 +78,7 @@ public class UserController : ControllerBase
             return BadRequest(ApiResponse<UserResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        if (_accessManagerHelper.ValidateUserAccess<User>(this, request.Id, RoleAccess.ADMINISTRATORS))
+        if (!_accessManagerHelper.ValidateUserAccess<User>(this, request.Id, RoleAccess.ADMINISTRATORS))
         {
             response = ApiResponse<UserResponse>.Failure();
             return Unauthorized(response);
@@ -118,7 +118,7 @@ public class UserController : ControllerBase
             return BadRequest(ApiResponse<EmptyResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        if (_accessManagerHelper.ValidateUserAccess<User>(this, idUser, RoleAccess.ADMINISTRATORS))
+        if (!_accessManagerHelper.ValidateUserAccess<User>(this, idUser, RoleAccess.ADMINISTRATORS))
         {
             response = ApiResponse<EmptyResponse>.Failure();
             return Unauthorized(response);
@@ -155,7 +155,7 @@ public class UserController : ControllerBase
             return BadRequest(ApiResponse<UserResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        if (_accessManagerHelper.ValidateUserAccess<User>(this, idUser, RoleAccess.GLOBAL_READING_ACCESS))
+        if (!_accessManagerHelper.ValidateUserAccess<User>(this, idUser, RoleAccess.GLOBAL_READING_ACCESS))
         {
             response = ApiResponse<UserResponse>.Failure();
             return Unauthorized(response);

@@ -103,7 +103,7 @@ public class StationController : ControllerBase
         }
         catch (Exception ex) when (ex is EntityFetchingException)
         {
-            response = ApiResponse<StationResponse>.Failure(BaseResponses.INTERNAL_ERROR);
+            response = ApiResponse<StationResponse>.NoContent();
             return BadRequest(response);
         }
         catch (Exception ex) when (ex is EntityCreationException)
@@ -135,7 +135,7 @@ public class StationController : ControllerBase
             return BadRequest(ApiResponse<StationResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        if (_accessManagerHelper.ValidateUserAccess<Station>(this, request.Id, RoleAccess.ADMINISTRATORS))
+        if (!_accessManagerHelper.ValidateUserAccess<Station>(this, request.Id, RoleAccess.ADMINISTRATORS))
         {
             response = ApiResponse<StationResponse>.Failure();
             return Unauthorized(response);
@@ -175,7 +175,7 @@ public class StationController : ControllerBase
             return BadRequest(ApiResponse<EmptyResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        if (_accessManagerHelper.ValidateUserAccess<Station>(this, idStation, RoleAccess.ADMINISTRATORS))
+        if (!_accessManagerHelper.ValidateUserAccess<Station>(this, idStation, RoleAccess.ADMINISTRATORS))
         {
             response = ApiResponse<EmptyResponse>.Failure();
             return Unauthorized(response);
@@ -212,7 +212,7 @@ public class StationController : ControllerBase
             return BadRequest(ApiResponse<StationListResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        if (_accessManagerHelper.ValidateUserAccess<User>(this, userId, RoleAccess.GLOBAL_READING_ACCESS))
+        if (!_accessManagerHelper.ValidateUserAccess<User>(this, userId, RoleAccess.GLOBAL_READING_ACCESS))
         {
             response = ApiResponse<StationListResponse>.Failure();
             return Unauthorized(response);
@@ -248,7 +248,7 @@ public class StationController : ControllerBase
             return BadRequest(ApiResponse<StationResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        if (_accessManagerHelper.ValidateUserAccess<Station>(this, idStation, RoleAccess.GLOBAL_READING_ACCESS))
+        if (!_accessManagerHelper.ValidateUserAccess<Station>(this, idStation, RoleAccess.GLOBAL_READING_ACCESS))
         {
             response = ApiResponse<StationResponse>.Failure();
             return Unauthorized(response);

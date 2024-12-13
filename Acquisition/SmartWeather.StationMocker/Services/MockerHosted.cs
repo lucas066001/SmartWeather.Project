@@ -21,7 +21,7 @@ public class MockerHosted : IHostedService
     private const double MaxLongitude = 9.0;
     private readonly MqttSingleton _mqttSingleton;
     private readonly MqttService _mqttService;
-    private string _adminToken = Environment.GetEnvironmentVariable("ADMIN_TOKEN") ?? string.Empty;
+    private string _adminToken = Environment.GetEnvironmentVariable("ADMIN_TOKEN") ?? "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiZW1haWwiOiJhZG1pbkBzbWFydHdlYXRoZXIubmV0Iiwicm9sZSI6IjEiLCJuYmYiOjE3MzQwOTkzMDIsImV4cCI6MTczNDExMDEwMiwiaWF0IjoxNzM0MDk5MzAyLCJpc3MiOiJTbWFydFdlYXRoZXIiLCJhdWQiOiJTbWFydFdlYXRoZXIifQ.waX_7jetagccM5kMmXJQvtsB3SWCePmS5gJNApmBigE";
     private int _dataFreq;
     private int _stationNumber;
     private int _componentNumber;
@@ -71,7 +71,7 @@ public class MockerHosted : IHostedService
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _adminToken);
 
-        string updateStationUrl = "http://smart-weather-api:8081/api/Station/Update";
+        string updateStationUrl = "http://localhost:8081/api/Station/Update";
 
         // Setup mqtt singleton
         await _mqttSingleton.ConnectAsync();

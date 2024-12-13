@@ -47,7 +47,7 @@ public class MeasurePointController : Controller
             return BadRequest(ApiResponse<MeasurePointResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        if (_accessManagerHelper.ValidateUserAccess<Component>(this, request.ComponentId, RoleAccess.ADMINISTRATORS))
+        if (!_accessManagerHelper.ValidateUserAccess<Component>(this, request.ComponentId, RoleAccess.ADMINISTRATORS))
         {
             response = ApiResponse<MeasurePointResponse>.Failure(BaseResponses.AUTHORIZATION_ERROR, Status.AUTHORIZATION_ERROR);
             return Unauthorized(response);
@@ -87,7 +87,7 @@ public class MeasurePointController : Controller
             return BadRequest(ApiResponse<EmptyResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        if (_accessManagerHelper.ValidateUserAccess<MeasurePoint>(this, idMeasurePoint, RoleAccess.ADMINISTRATORS))
+        if (!_accessManagerHelper.ValidateUserAccess<MeasurePoint>(this, idMeasurePoint, RoleAccess.ADMINISTRATORS))
         {
             response = ApiResponse<EmptyResponse>.Failure(BaseResponses.AUTHORIZATION_ERROR, Status.AUTHORIZATION_ERROR);
             return Unauthorized(response);
@@ -130,7 +130,7 @@ public class MeasurePointController : Controller
             return BadRequest(ApiResponse<MeasurePointResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        if (_accessManagerHelper.ValidateUserAccess<MeasurePoint>(this, request.Id, RoleAccess.ADMINISTRATORS))
+        if (!_accessManagerHelper.ValidateUserAccess<MeasurePoint>(this, request.Id, RoleAccess.ADMINISTRATORS))
         {
             response = ApiResponse<MeasurePointResponse>.Failure(BaseResponses.AUTHORIZATION_ERROR, Status.AUTHORIZATION_ERROR);
             return Unauthorized(response);
@@ -166,7 +166,7 @@ public class MeasurePointController : Controller
             return BadRequest(ApiResponse<MeasurePointListResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        if (_accessManagerHelper.ValidateUserAccess<Component>(this, componentId, RoleAccess.GLOBAL_READING_ACCESS))
+        if (!_accessManagerHelper.ValidateUserAccess<Component>(this, componentId, RoleAccess.GLOBAL_READING_ACCESS))
         {
             response = ApiResponse<MeasurePointListResponse>.Failure(BaseResponses.AUTHORIZATION_ERROR, Status.AUTHORIZATION_ERROR);
             return Unauthorized(response);

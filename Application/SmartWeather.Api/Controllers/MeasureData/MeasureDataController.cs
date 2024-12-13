@@ -36,7 +36,7 @@ public class MeasureDataController : ControllerBase
             return BadRequest(ApiResponse<MeasureDataListResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        if (_accessManagerHelper.ValidateUserAccess<MeasurePoint>(this, measurePointId, RoleAccess.GLOBAL_READING_ACCESS))
+        if (!_accessManagerHelper.ValidateUserAccess<MeasurePoint>(this, measurePointId, RoleAccess.GLOBAL_READING_ACCESS))
         {
             response = ApiResponse<MeasureDataListResponse>.Failure(BaseResponses.AUTHORIZATION_ERROR, Status.AUTHORIZATION_ERROR);
             return Unauthorized(response);

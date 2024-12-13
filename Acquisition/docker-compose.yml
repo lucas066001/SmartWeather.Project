@@ -11,7 +11,7 @@ services:
     environment:
       STATION_NB : 50
       DATA_FREQ : 980
-      ADMIN_TOKEN: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiZW1haWwiOiJhZG1pbkBzbWFydHdlYXRoZXIubmV0Iiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzMzOTkyODgzLCJleHAiOjE3MzQwMDM2ODMsImlhdCI6MTczMzk5Mjg4MywiaXNzIjoiU21hcnRXZWF0aGVyIiwiYXVkIjoiU21hcnRXZWF0aGVyIn0.v3rWWJtreIiS1XJoNftgigq9Tj6izWxVsZWS-dfUjBE"
+      ADMIN_TOKEN: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiZW1haWwiOiJhZG1pbkBzbWFydHdlYXRoZXIubmV0Iiwicm9sZSI6IjEiLCJuYmYiOjE3MzQwOTY5NjEsImV4cCI6MTczNDEwNzc2MSwiaWF0IjoxNzM0MDk2OTYxLCJpc3MiOiJTbWFydFdlYXRoZXIiLCJhdWQiOiJTbWFydFdlYXRoZXIifQ.-V6Sy-nPzX3MwLoQVhF5ZBUmd_HQvHtanyEaq48gfO4"
     depends_on:
       - smart-weather-api
       - mysql-master

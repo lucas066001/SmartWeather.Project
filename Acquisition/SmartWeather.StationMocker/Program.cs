@@ -3,7 +3,6 @@ using SmartWeather.Repositories;
 using SmartWeather.StationMocker.Services;
 
 Thread.Sleep(5000);
-Thread.Sleep(5000);
 
 var builder = WebApplication.CreateBuilder(args);
 

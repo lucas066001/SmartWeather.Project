@@ -9,12 +9,14 @@ using SmartWeather.Repositories;
 using SmartWeather.Services.Options;
 using SmartWeather.Api.Configuration;
 using SmartWeather.Repositories.Context;
+using SmartWeather.Api.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRepositories(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);
+builder.Services.AddScoped<AccessManagerHelper>();
 
 var issuer = builder.Configuration.GetSection(nameof(Jwt))[nameof(Jwt.Issuer)];
 var audience = builder.Configuration.GetSection(nameof(Jwt))[nameof(Jwt.Audience)];
