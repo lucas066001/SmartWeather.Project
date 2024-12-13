@@ -37,8 +37,6 @@ public class UserService(IRepository<User> userBaseRepository, IUserRepository u
     /// </summary>
     /// <param name="idUser">Int representing User unique Id.</param>
     /// <returns>Deleted User from database.</returns>
-    /// <exception cref="EntityFetchingException">Thrown if id do not match any existing User.</exception>
-    /// <exception cref="EntitySavingException">Thrown if error occurs during User deletion.</exception>
     public bool DeleteUser(int idUser)
     {
         try

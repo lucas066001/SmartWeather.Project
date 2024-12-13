@@ -47,8 +47,6 @@ public class MeasurePointService (IRepository<MeasurePoint> measurePointBaseRepo
     /// Bool indicating deletion MeasurePoint success.
     /// (True : Success | False : Failure)
     /// </returns>
-    /// <exception cref="EntityFetchingException">Thrown if id do not match any entity.</exception>
-    /// <exception cref="EntitySavingException">Thrown if error occurs during entity deletion.</exception>
     public bool DeleteMeasurePoint(int idMeasurePoint)
     {
         try

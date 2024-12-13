@@ -1,4 +1,5 @@
 ﻿namespace SmartWeather.Api.Controllers.Authentication;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartWeather.Api.Contract;
@@ -7,6 +8,7 @@ using SmartWeather.Api.Controllers.Authentication.Dtos;
 using SmartWeather.Api.Controllers.Authentication.Dtos.Converters;
 using SmartWeather.Services.Authentication;
 using SmartWeather.Entities.User;
+using SmartWeather.Entities.Common.Exceptions;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -40,14 +42,26 @@ public class AuthenticationController : ControllerBase
             Tuple<User, string> registerResponse = _authenticationService.Register(request.Name, request.Email, request.Password);
             formattedResponse = UserRegisterResponseConverter.ConvertUserToUserRegisterResponse(registerResponse.Item1, registerResponse.Item2);
             response = ApiResponse<UserRegisterResponse>.Success(formattedResponse);
+            return Ok(response);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is EntityCreationException)
         {
-            response = ApiResponse<UserRegisterResponse>.Failure(String.Format(BaseResponses.FORMAT_ERROR, ex.Message));
+            response = ApiResponse<UserRegisterResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, 
+                                                                                "Unable to create User from given informations"), 
+                                                                 Status.VALIDATION_ERROR);
+            return Ok(response);
+        }
+        catch (Exception ex) when (ex is EntitySavingException)
+        {
+            response = ApiResponse<UserRegisterResponse>.Failure(BaseResponses.DATABASE_ERROR,
+                                                                 Status.DATABASE_ERROR);
+            return Ok(response);
+        }
+        catch
+        {
+            response = ApiResponse<UserRegisterResponse>.Failure();
             return BadRequest(response);
         }
-
-        return Ok(response);
     }
 
     [AllowAnonymous]
@@ -68,14 +82,27 @@ public class AuthenticationController : ControllerBase
             Tuple<User, string> signinResponse = _authenticationService.Signin(request.Email, request.Password);
             formattedResponse = UserSigninResponseConverter.ConvertUserToUserSigninResponse(signinResponse.Item1, signinResponse.Item2);
             response = ApiResponse<UserSigninResponse>.Success(formattedResponse);
+            return Ok(response);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is EntityFetchingException)
         {
-            response = ApiResponse<UserSigninResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
+            response = ApiResponse<UserSigninResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, 
+                                                                            "Unable to retreive User from given credentials"),
+                                                               Status.VALIDATION_ERROR);
+            return Ok(response);
+        }
+        catch (Exception ex) when (ex is EntityCreationException)
+        {
+            response = ApiResponse<UserSigninResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR,
+                                                                            "Unable to create token from detected User"),
+                                                               Status.VALIDATION_ERROR);
+            return Ok(response);
+        }
+        catch
+        {
+            response = ApiResponse<UserSigninResponse>.Failure();
             return BadRequest(response);
         }
-
-        return Ok(response);
     }
 
 }

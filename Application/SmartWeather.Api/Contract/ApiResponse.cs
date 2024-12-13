@@ -1,4 +1,6 @@
-﻿namespace SmartWeather.Api.Contract
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+
+namespace SmartWeather.Api.Contract
 {
     public class ApiResponse<T> where T : class
     {
@@ -18,9 +20,13 @@
             return new ApiResponse<T>(Status.OK, BaseResponses.OK, data);
         }
 
-        public static ApiResponse<T> Failure(string customMessage = BaseResponses.INTERNAL_ERROR)
+        public static ApiResponse<T> Failure(string customMessage = BaseResponses.INTERNAL_ERROR, Status status = Status.INTERNAL_ERROR)
         {
-            return new ApiResponse<T>(Status.INTERNAL_ERROR, customMessage, null);
+            return new ApiResponse<T>(status, customMessage, null);
+        }
+        public static ApiResponse<T> NoContent()
+        {
+            return new ApiResponse<T>(Status.NO_CONTENT, BaseResponses.NO_CONTENT, null);
         }
     }
 }

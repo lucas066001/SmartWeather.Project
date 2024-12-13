@@ -1,14 +1,14 @@
-using SmartWeather.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using SmartWeather.Services;
 using Microsoft.IdentityModel.Tokens;
-using SmartWeather.Services.Options;
 using System.Text;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.OpenApi.Models;
-using SmartWeather.Repositories.Context;
 using Microsoft.EntityFrameworkCore;
+using SmartWeather.Services;
+using SmartWeather.Repositories;
+using SmartWeather.Services.Options;
 using SmartWeather.Api.Configuration;
+using SmartWeather.Repositories.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -8,8 +8,8 @@ public class ComponentResponse
 {
     public int Id { get; set; }
     public int GpioPin { get; set; }
-    public required string Name { get; set; }
-    public required string Color { get; set; }
+    public string Name { get; set; } = null!;
+    public string Color { get; set; } = null!;
     public ComponentType Type { get; set; }
     public int StationId { get; set; }
     public List<MeasurePointResponse>? MeasurePoints { get; set; }

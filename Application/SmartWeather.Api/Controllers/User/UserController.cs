@@ -1,167 +1,224 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿namespace SmartWeather.Api.Controllers.User;
+
+using Microsoft.AspNetCore.Mvc;
 using SmartWeather.Api.Contract;
 using SmartWeather.Api.Controllers.User.Dtos;
 using SmartWeather.Services.Authentication;
 using SmartWeather.Services.Users;
 using SmartWeather.Api.Controllers.User.Dtos.Converters;
-using Microsoft.AspNetCore.Authorization;
+using SmartWeather.Api.Helpers;
+using SmartWeather.Api.Controllers.Station.Dtos;
+using SmartWeather.Entities.Common.Exceptions;
 using SmartWeather.Entities.User;
+using Microsoft.IdentityModel.Tokens;
 
-namespace SmartWeather.Api.Controllers.User
+[Route("api/[controller]")]
+[ApiController]
+public class UserController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class UserController : ControllerBase
+    private readonly UserService _userService;
+    private readonly AuthenticationService _authenticationService;
+    private readonly AccessManagerHelper _accessManagerHelper;
+
+    public UserController(UserService userService, AuthenticationService authenticationService, AccessManagerHelper accessManagerHelper)
     {
-        private readonly UserService _userService;
-        private readonly AuthenticationService _authenticationService;
+        _userService = userService;
+        _authenticationService = authenticationService;
+        _accessManagerHelper = accessManagerHelper;
+    }
 
-        public UserController(UserService userService, AuthenticationService authenticationService)
+    [HttpPost(nameof(Create))]
+    public ActionResult<ApiResponse<UserCreateResponse>> Create(UserCreateRequest request)
+    {
+        ApiResponse<UserCreateResponse> response;
+        UserCreateResponse formattedResponse;
+
+        if (string.IsNullOrWhiteSpace(request.Name) ||
+            string.IsNullOrWhiteSpace(request.Email)|| 
+            string.IsNullOrWhiteSpace(request.Password))
         {
-            _userService = userService;
-            _authenticationService = authenticationService;
+            return BadRequest(ApiResponse<UserCreateResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        [HttpPost(nameof(Create))]
-        public ActionResult<ApiResponse<UserCreateResponse>> Create(UserCreateRequest request)
+        try
         {
-            ApiResponse<UserCreateResponse> response;
-            UserCreateResponse formattedResponse;
-
-            if (String.IsNullOrWhiteSpace(request.Name) ||
-                String.IsNullOrWhiteSpace(request.Email)|| 
-                String.IsNullOrWhiteSpace(request.Password))
-            {
-                return BadRequest(ApiResponse<UserCreateResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
-            }
-
-            try
-            {
-                Entities.User.User createdUser = _userService.AddNewUser(request.Name, request.Email, request.Password);
-                formattedResponse = UserCreateResponseConverter.ConvertUserToUserCreateResponse(createdUser, _authenticationService.GenerateToken(createdUser));
-                response = ApiResponse<UserCreateResponse>.Success(formattedResponse);
-            }
-            catch (Exception ex)
-            {
-                response = ApiResponse<UserCreateResponse>.Failure(String.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-                return BadRequest(response);
-            }
-
+            Entities.User.User createdUser = _userService.AddNewUser(request.Name, request.Email, request.Password);
+            formattedResponse = UserCreateResponseConverter.ConvertUserToUserCreateResponse(createdUser, _authenticationService.GenerateToken(createdUser));
+            response = ApiResponse<UserCreateResponse>.Success(formattedResponse);
             return Ok(response);
         }
-
-        [HttpPut(nameof(Update))]
-        public ActionResult<ApiResponse<UserResponse>> Update(UserUpdateRequest request)
+        catch (Exception ex) when (ex is EntityCreationException)
         {
-            ApiResponse<UserResponse> response;
-            UserResponse formattedResponse;
+            response = ApiResponse<UserCreateResponse>.Failure(BaseResponses.VALIDATION_ERROR, Status.VALIDATION_ERROR);
+            return BadRequest(response);
+        }
+        catch (Exception ex) when (ex is EntitySavingException)
+        {
+            response = ApiResponse<UserCreateResponse>.Failure(BaseResponses.DATABASE_ERROR, Status.DATABASE_ERROR);
+            return BadRequest(response);
+        }
+        catch
+        {
+            response = ApiResponse<UserCreateResponse>.Failure();
+            return BadRequest(response);
+        }
+    }
 
-            if (!(request.Id > 0) ||
-                String.IsNullOrWhiteSpace(request.Name) ||
-                String.IsNullOrWhiteSpace(request.Email) ||
-                String.IsNullOrWhiteSpace(request.Password))
-            {
-                return BadRequest(ApiResponse<UserCreateResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
-            }
+    [HttpPut(nameof(Update))]
+    public ActionResult<ApiResponse<UserResponse>> Update(UserUpdateRequest request)
+    {
+        ApiResponse<UserResponse> response;
+        UserResponse formattedResponse;
 
-            try
-            {
-                Entities.User.User updatedUser = _userService.UpdateUser(request.Id, request.Password, request.Email, request.Name);
-                formattedResponse = UserResponseConverter.ConvertUserToUserResponse(updatedUser);
-                response = ApiResponse<UserResponse>.Success(formattedResponse);
-            }
-            catch (Exception ex)
-            {
-                response = ApiResponse<UserResponse>.Failure(String.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-                return BadRequest(response);
-            }
-
-            return Ok(response);
+        if (!(request.Id > 0) ||
+            string.IsNullOrWhiteSpace(request.Name) ||
+            string.IsNullOrWhiteSpace(request.Email) ||
+            string.IsNullOrWhiteSpace(request.Password))
+        {
+            return BadRequest(ApiResponse<UserResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        [HttpDelete(nameof(Delete))]
-        public ActionResult<ApiResponse<EmptyResponse>> Delete(int idUser)
+        if (_accessManagerHelper.ValidateUserAccess<User>(this, request.Id, RoleAccess.ADMINISTRATORS))
         {
-            // Later will need to restrict this to admin or current token user privilege
-            ApiResponse<EmptyResponse> response;
-
-            if (!(idUser > 0))
-            {
-                return BadRequest(ApiResponse<EmptyResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
-            }
-
-            try
-            {
-                if (_userService.DeleteUser(idUser))
-                {
-                    response = ApiResponse<EmptyResponse>.Success(null);
-                }
-                else
-                {
-                    response = ApiResponse<EmptyResponse>.Failure(BaseResponses.INTERNAL_ERROR);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                response = ApiResponse<EmptyResponse>.Failure(String.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-                return BadRequest(response);
-            }
-
-            return Ok(response);
+            response = ApiResponse<UserResponse>.Failure();
+            return Unauthorized(response);
         }
 
-        [HttpGet(nameof(GetById))]
-        public ActionResult<ApiResponse<UserResponse>> GetById(int idUser)
+        try
         {
-            // Later will need to restrict this to admin or current token user privilege
-            ApiResponse<UserResponse> response;
-
-            if (!(idUser > 0))
-            {
-                return BadRequest(ApiResponse<UserResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
-            }
-
-            try
-            {
-                SmartWeather.Entities.User.User userRetreived = _userService.GetUserById(idUser);
-                if (userRetreived != null)
-                {
-                    response = ApiResponse<UserResponse>.Success(UserResponseConverter.ConvertUserToUserResponse(userRetreived));
-                }
-                else
-                {
-                    response = ApiResponse<UserResponse>.Failure(BaseResponses.INTERNAL_ERROR);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                response = ApiResponse<UserResponse>.Failure(String.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-                return BadRequest(response);
-            }
-
+            User updatedUser = _userService.UpdateUser(request.Id, request.Password, request.Email, request.Name);
+            formattedResponse = UserResponseConverter.ConvertUserToUserResponse(updatedUser);
+            response = ApiResponse<UserResponse>.Success(formattedResponse);
             return Ok(response);
         }
-
-        [HttpGet(nameof(GetAll))]
-        public ActionResult<ApiResponse<UserListResponse>> GetAll()
+        catch (Exception ex) when (ex is EntityCreationException)
         {
-            // Later will need to restrict this to admin or current token user privilege
-            ApiResponse<UserListResponse> response;
+            response = ApiResponse<UserResponse>.Failure(BaseResponses.VALIDATION_ERROR, Status.VALIDATION_ERROR);
+            return BadRequest(response);
+        }
+        catch (Exception ex) when (ex is EntitySavingException)
+        {
+            response = ApiResponse<UserResponse>.Failure(BaseResponses.DATABASE_ERROR, Status.DATABASE_ERROR);
+            return BadRequest(response);
+        }
+        catch
+        {
+            response = ApiResponse<UserResponse>.Failure();
+            return BadRequest(response);
+        }
+    }
 
-            try
+    [HttpDelete(nameof(Delete))]
+    public ActionResult<ApiResponse<EmptyResponse>> Delete(int idUser)
+    {
+        ApiResponse<EmptyResponse> response;
+
+        if (!(idUser > 0))
+        {
+            return BadRequest(ApiResponse<EmptyResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
+        }
+
+        if (_accessManagerHelper.ValidateUserAccess<User>(this, idUser, RoleAccess.ADMINISTRATORS))
+        {
+            response = ApiResponse<EmptyResponse>.Failure();
+            return Unauthorized(response);
+        }
+
+        try
+        {
+            if (_userService.DeleteUser(idUser))
             {
-                IEnumerable<SmartWeather.Entities.User.User> usersRetreived = _userService.GetUserList(null);
-                response = ApiResponse<UserListResponse>.Success(UserResponseConverter.ConvertUserListToUserListResponse(usersRetreived));
+                response = ApiResponse<EmptyResponse>.Success(new EmptyResponse());
+                return Ok(response);
             }
-            catch (Exception ex)
+            else
             {
-                response = ApiResponse<UserListResponse>.Failure(String.Format(BaseResponses.FORMAT_ERROR, ex.Message));
+                response = ApiResponse<EmptyResponse>.Failure(BaseResponses.DATABASE_ERROR);
                 return BadRequest(response);
             }
+        }
+        catch
+        {
+            response = ApiResponse<EmptyResponse>.Failure();
+            return BadRequest(response);
+        }
 
+    }
+
+    [HttpGet(nameof(GetById))]
+    public ActionResult<ApiResponse<UserResponse>> GetById(int idUser)
+    {
+        ApiResponse<UserResponse> response;
+
+        if (!(idUser > 0))
+        {
+            return BadRequest(ApiResponse<UserResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
+        }
+
+        if (_accessManagerHelper.ValidateUserAccess<User>(this, idUser, RoleAccess.GLOBAL_READING_ACCESS))
+        {
+            response = ApiResponse<UserResponse>.Failure();
+            return Unauthorized(response);
+        }
+
+        try
+        {
+            User userRetreived = _userService.GetUserById(idUser);
+            response = ApiResponse<UserResponse>.Success(UserResponseConverter.ConvertUserToUserResponse(userRetreived));
             return Ok(response);
         }
+        catch (Exception ex) when (ex is EntityFetchingException)
+        {
+            response = ApiResponse<UserResponse>.NoContent();
+            return Ok(response);
+        }
+        catch
+        {
+            response = ApiResponse<UserResponse>.Failure();
+            return BadRequest(response);
+        }
+
+    }
+
+    [HttpGet(nameof(GetAll))]
+    public ActionResult<ApiResponse<UserListResponse>> GetAll()
+    {
+        ApiResponse<UserListResponse> response;
+
+        var token = HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+
+        try
+        {
+            Role userRole = _authenticationService.GetUserRoleFromToken(token);
+
+            if (!RoleAccess.ADMINISTRATORS.Contains(userRole))
+            {
+                throw new UnauthorizedAccessException();
+            }
+        }
+        catch (Exception ex) when (ex is SecurityTokenException ||
+                                  ex is UnauthorizedAccessException)
+        {
+            response = ApiResponse<UserListResponse>.Failure();
+            return Unauthorized(response);
+        }
+
+        try
+        {
+            IEnumerable<User> usersRetreived = _userService.GetUserList(null);
+            response = ApiResponse<UserListResponse>.Success(UserResponseConverter.ConvertUserListToUserListResponse(usersRetreived));
+            return Ok(response);
+        }
+        catch (Exception ex) when (ex is EntityFetchingException)
+        {
+            response = ApiResponse<UserListResponse>.NoContent();
+            return Ok(response);
+        }
+        catch
+        {
+            response = ApiResponse<UserListResponse>.Failure();
+            return BadRequest(response);
+        }
+
     }
 }

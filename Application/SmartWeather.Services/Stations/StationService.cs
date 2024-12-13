@@ -4,6 +4,7 @@ using SmartWeather.Entities.Station;
 using SmartWeather.Entities.Common.Exceptions;
 using SmartWeather.Services.Repositories;
 using SmartWeather.Entities.Station.Exceptions;
+using SmartWeather.Services.Components;
 
 public class StationService(IRepository<Station> stationBaseRepository, IStationRepository stationRepository)
 {
@@ -55,8 +56,6 @@ public class StationService(IRepository<Station> stationBaseRepository, IStation
     /// Bool indicating deletion MeasurePoint success.
     /// (True : Success | False : Failure)
     /// </returns>
-    /// <exception cref="EntityFetchingException">Thrown if id do not match any Station.</exception>
-    /// <exception cref="EntitySavingException">Thrown if error occurs during Station deletion.</exception>
     public bool DeleteStation(int idStation)
     {
         try
@@ -159,11 +158,17 @@ public class StationService(IRepository<Station> stationBaseRepository, IStation
     /// A boolean representing if User own the Station.
     /// (True : Owner | False : Not owner)
     /// </returns>
-    /// <exception cref="EntityFetchingException">Thrown if no station can be found.</exception>
     public bool IsOwnerOfStation(int userId, int idStation)
     {
-        var station = stationBaseRepository.GetById(idStation);
-        return station.UserId == userId;
+        try
+        {
+            var station = stationBaseRepository.GetById(idStation);
+            return station.UserId == userId;
+        }
+        catch (EntityFetchingException)
+        {
+            return false;
+        }
     }
 
     /// <summary>

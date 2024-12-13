@@ -9,9 +9,9 @@ using SmartWeather.Api.Controllers.Station.Dtos.Converters;
 using SmartWeather.Entities.Station;
 using SmartWeather.Services.Authentication;
 using SmartWeather.Entities.User;
-using SmartWeather.Services.Components;
 using Microsoft.IdentityModel.Tokens;
-using SmartWeather.Api.Controllers.MeasurePoint.Dtos;
+using SmartWeather.Api.Helpers;
+using SmartWeather.Entities.Common.Exceptions;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -20,11 +20,13 @@ public class StationController : ControllerBase
 {
     private readonly StationService _stationService;
     private readonly AuthenticationService _authenticationService;
+    private readonly AccessManagerHelper _accessManagerHelper;
 
-    public StationController(StationService stationService, AuthenticationService authenticationService)
+    public StationController(StationService stationService, AuthenticationService authenticationService, AccessManagerHelper accessManagerHelper)
     {
         _stationService = stationService;
         _authenticationService = authenticationService;
+        _accessManagerHelper = accessManagerHelper;
     }
 
     [HttpPost(nameof(Create))]
@@ -44,14 +46,23 @@ public class StationController : ControllerBase
             Station createdStation = _stationService.AddNewStation(request.Name, request.MacAddress, request.Latitude, request.Longitude, request.UserId);
             formattedResponse = StationResponseConverter.ConvertStationToStationResponse(createdStation);
             response = ApiResponse<StationResponse>.Success(formattedResponse);
+            return Ok(response);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is EntityCreationException)
         {
-            response = ApiResponse<StationResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
+            response = ApiResponse<StationResponse>.Failure(BaseResponses.VALIDATION_ERROR, Status.VALIDATION_ERROR);
             return BadRequest(response);
         }
-
-        return Ok(response);
+        catch (Exception ex) when (ex is EntitySavingException)
+        {
+            response = ApiResponse<StationResponse>.Failure(BaseResponses.DATABASE_ERROR, Status.DATABASE_ERROR);
+            return BadRequest(response);
+        }
+        catch
+        {
+            response = ApiResponse<StationResponse>.Failure();
+            return BadRequest(response);
+        }
     }
 
     [HttpPost(nameof(Claim))]
@@ -62,29 +73,17 @@ public class StationController : ControllerBase
 
         var token = HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
 
-
         if (string.IsNullOrWhiteSpace(request.MacAddress) ||
             string.IsNullOrEmpty(token))
         {
             return BadRequest(ApiResponse<StationResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        Console.WriteLine(token);
-
         try
         {
             int userId = _authenticationService.GetUserIdFromToken(token);
 
-            if (userId <= 0)
-            {
-                throw new Exception("Unable to retreive user info from token");
-            }
-
-            Station? retreivedStation = _stationService.GetStationByMacAddress(request.MacAddress);
-            if (retreivedStation == null)
-            {
-                throw new Exception("MacAdress doesn't correspond to any registered station");
-            }
+            Station retreivedStation = _stationService.GetStationByMacAddress(request.MacAddress);
 
             retreivedStation = _stationService.UpdateStation(retreivedStation.Id,
                                           retreivedStation.Name,
@@ -95,60 +94,80 @@ public class StationController : ControllerBase
 
             formattedResponse = StationResponseConverter.ConvertStationToStationResponse(retreivedStation);
             response = ApiResponse<StationResponse>.Success(formattedResponse);
+            return Ok(response);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is SecurityTokenException)
         {
-            response = ApiResponse<StationResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
+            response = ApiResponse<StationResponse>.Failure();
+            return Unauthorized(response);
+        }
+        catch (Exception ex) when (ex is EntityFetchingException)
+        {
+            response = ApiResponse<StationResponse>.Failure(BaseResponses.INTERNAL_ERROR);
             return BadRequest(response);
         }
-
-        return Ok(response);
+        catch (Exception ex) when (ex is EntityCreationException)
+        {
+            response = ApiResponse<StationResponse>.Failure(BaseResponses.VALIDATION_ERROR, Status.VALIDATION_ERROR);
+            return BadRequest(response);
+        }
+        catch (Exception ex) when (ex is EntitySavingException)
+        {
+            response = ApiResponse<StationResponse>.Failure(BaseResponses.DATABASE_ERROR, Status.DATABASE_ERROR);
+            return BadRequest(response);
+        }
+        catch
+        {
+            response = ApiResponse<StationResponse>.Failure();
+            return BadRequest(response);
+        }
     }
 
     [HttpPut(nameof(Update))]
     public ActionResult<ApiResponse<StationResponse>> Update(StationUpdateRequest request)
     {
-        var token = HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-
         ApiResponse<StationResponse> response;
         StationResponse formattedResponse;
 
         if (!(request.Id > 0) ||
-            string.IsNullOrWhiteSpace(request.Name) ||
-            !(request.Id > 0))
+            string.IsNullOrWhiteSpace(request.Name))
         {
             return BadRequest(ApiResponse<StationResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
+        if (_accessManagerHelper.ValidateUserAccess<Station>(this, request.Id, RoleAccess.ADMINISTRATORS))
+        {
+            response = ApiResponse<StationResponse>.Failure();
+            return Unauthorized(response);
+        }
+
         try
         {
-            int userId = _authenticationService.GetUserIdFromToken(token);
-            Role userRole = _authenticationService.GetUserRoleFromToken(token);
-
-            if (!_stationService.IsOwnerOfStation(userId, request.Id) &&
-                !RoleAccess.ADMINISTRATORS.Contains(userRole))
-            {
-                throw new UnauthorizedAccessException("Your are not allowed to update this information");
-            }
-
             Station updatedStation = _stationService.UpdateStation(request.Id, request.Name, request.MacAddress, request.Latitude, request.Longitude, request.UserId);
             formattedResponse = StationResponseConverter.ConvertStationToStationResponse(updatedStation);
             response = ApiResponse<StationResponse>.Success(formattedResponse);
+            return Ok(response);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is EntityCreationException)
         {
-            response = ApiResponse<StationResponse>.Failure(String.Format(BaseResponses.FORMAT_ERROR, ex.Message));
+            response = ApiResponse<StationResponse>.Failure(BaseResponses.VALIDATION_ERROR, Status.VALIDATION_ERROR);
             return BadRequest(response);
         }
-
-        return Ok(response);
+        catch (Exception ex) when (ex is EntitySavingException)
+        {
+            response = ApiResponse<StationResponse>.Failure(BaseResponses.DATABASE_ERROR, Status.DATABASE_ERROR);
+            return BadRequest(response);
+        }
+        catch
+        {
+            response = ApiResponse<StationResponse>.Failure();
+            return BadRequest(response);
+        }
     }
 
     [HttpDelete(nameof(Delete))]
     public ActionResult<ApiResponse<EmptyResponse>> Delete(int idStation)
     {
-        var token = HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-
         ApiResponse<EmptyResponse> response;
 
         if (!(idStation > 0))
@@ -156,42 +175,36 @@ public class StationController : ControllerBase
             return BadRequest(ApiResponse<EmptyResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
+        if (_accessManagerHelper.ValidateUserAccess<Station>(this, idStation, RoleAccess.ADMINISTRATORS))
+        {
+            response = ApiResponse<EmptyResponse>.Failure();
+            return Unauthorized(response);
+        }
+
         try
         {
-            int userId = _authenticationService.GetUserIdFromToken(token);
-            Role userRole = _authenticationService.GetUserRoleFromToken(token);
-
-            if (!_stationService.IsOwnerOfStation(userId, idStation) &&
-                !RoleAccess.ADMINISTRATORS.Contains(userRole))
-            {
-                throw new UnauthorizedAccessException("Your are not allowed to delete this information");
-            }
-
             bool isStationDeleted = _stationService.DeleteStation(idStation);
             if (isStationDeleted)
             {
                 response = ApiResponse<EmptyResponse>.Success(null);
+                return Ok(response);
             }
             else
             {
-                response = ApiResponse<EmptyResponse>.Failure(BaseResponses.INTERNAL_ERROR);
+                response = ApiResponse<EmptyResponse>.Failure(BaseResponses.DATABASE_ERROR);
+                return BadRequest(response);
             }
-
         }
-        catch (Exception ex)
+        catch
         {
-            response = ApiResponse<EmptyResponse>.Failure(String.Format(BaseResponses.FORMAT_ERROR, ex.Message));
+            response = ApiResponse<EmptyResponse>.Failure();
             return BadRequest(response);
         }
-
-        return Ok(response);
     }
 
     [HttpGet(nameof(GetFromUser))]
     public ActionResult<ApiResponse<StationListResponse>> GetFromUser(int userId)
     {
-        var token = HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-
         ApiResponse<StationListResponse> response;
 
         if (!(userId > 0))
@@ -199,54 +212,35 @@ public class StationController : ControllerBase
             return BadRequest(ApiResponse<StationListResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
+        if (_accessManagerHelper.ValidateUserAccess<User>(this, userId, RoleAccess.GLOBAL_READING_ACCESS))
+        {
+            response = ApiResponse<StationListResponse>.Failure();
+            return Unauthorized(response);
+        }
+
         try
         {
-            int userIdToken = _authenticationService.GetUserIdFromToken(token);
-            Role userRole = _authenticationService.GetUserRoleFromToken(token);
-
-            if (userIdToken != userId &&
-                !RoleAccess.GLOBAL_READING_ACCESS.Contains(userRole))
-            {
-                throw new UnauthorizedAccessException("Your are not allowed to get this information");
-            }
-
             IEnumerable<Station> stationList = _stationService.GetFromUser(userId);
             StationListResponse formattedResponse = StationListResponseConverter.ConvertStationListToStationListResponse(stationList);
-            if (stationList.Any())
-            {
-                response = ApiResponse<StationListResponse>.Success(formattedResponse);
-            }
-            else
-            {
-                response = ApiResponse<StationListResponse>.Failure(BaseResponses.INTERNAL_ERROR);
-            }
-
+            response = ApiResponse<StationListResponse>.Success(formattedResponse);
+            return Ok(response);
         }
-        catch (SecurityTokenException ex)
+        catch (Exception ex) when (ex is EntityFetchingException)
         {
-            response = ApiResponse<StationListResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-            return Unauthorized(response);
+            response = ApiResponse<StationListResponse>.NoContent();
+            return Ok(response);
         }
-        catch (UnauthorizedAccessException ex)
+        catch 
         {
-            response = ApiResponse<StationListResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-            return Unauthorized(response);
-        }
-        catch (Exception ex)
-        {
-            response = ApiResponse<StationListResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
+            response = ApiResponse<StationListResponse>.Failure();
             return BadRequest(response);
         }
-
-        return Ok(response);
     }
 
 
     [HttpGet(nameof(GetById))]
     public ActionResult<ApiResponse<StationResponse>> GetById(int idStation)
     {
-        var token = HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-        
         ApiResponse<StationResponse> response;
 
         if (!(idStation > 0))
@@ -254,53 +248,35 @@ public class StationController : ControllerBase
             return BadRequest(ApiResponse<StationResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
+        if (_accessManagerHelper.ValidateUserAccess<Station>(this, idStation, RoleAccess.GLOBAL_READING_ACCESS))
+        {
+            response = ApiResponse<StationResponse>.Failure();
+            return Unauthorized(response);
+        }
+
         try
         {
-            int userId = _authenticationService.GetUserIdFromToken(token);
-            Role userRole = _authenticationService.GetUserRoleFromToken(token);
-
-            if (!_stationService.IsOwnerOfStation(userId, idStation) &&
-                !RoleAccess.GLOBAL_READING_ACCESS.Contains(userRole))
-            {
-                throw new UnauthorizedAccessException("Your are not allowed to get this information");
-            }
-
             Station stationRetreived = _stationService.GetStationById(idStation);
-            if (stationRetreived != null)
-            {
-                response = ApiResponse<StationResponse>.Success(StationResponseConverter.ConvertStationToStationResponse(stationRetreived));
-            }
-            else
-            {
-                response = ApiResponse<StationResponse>.Failure(BaseResponses.INTERNAL_ERROR);
-            }
-
+            response = ApiResponse<StationResponse>.Success(StationResponseConverter.ConvertStationToStationResponse(stationRetreived));
+            return Ok(response);
         }
-        catch (SecurityTokenException ex)
+        catch (Exception ex) when (ex is EntityFetchingException)
         {
-            response = ApiResponse<StationResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-            return Unauthorized(response);
+            response = ApiResponse<StationResponse>.NoContent();
+            return Ok(response);
         }
-        catch (UnauthorizedAccessException ex)
+        catch
         {
-            response = ApiResponse<StationResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-            return Unauthorized(response);
-        }
-        catch (Exception ex)
-        {
-            response = ApiResponse<StationResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
+            response = ApiResponse<StationResponse>.Failure();
             return BadRequest(response);
         }
-
-        return Ok(response);
     }
 
     [HttpGet(nameof(GetAll))]
     public ActionResult<ApiResponse<StationListResponse>> GetAll(bool includeComponents, bool includeMeasurePoints)
     {
-        var token = HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-        
         ApiResponse<StationListResponse> response;
+        var token = HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
 
         try
         {
@@ -308,30 +284,32 @@ public class StationController : ControllerBase
 
             if (!RoleAccess.ADMINISTRATORS.Contains(userRole))
             {
-                throw new UnauthorizedAccessException("Your are not allowed to get this information");
+                throw new UnauthorizedAccessException();
             }
+        }
+        catch(Exception ex) when (ex is SecurityTokenException ||
+                                  ex is UnauthorizedAccessException)
+        {
+            response = ApiResponse<StationListResponse>.Failure();
+            return Unauthorized(response);
+        }
 
+        try
+        {
             IEnumerable<Station> stationsRetreived = _stationService.GetAll(includeComponents, includeMeasurePoints);
             response = ApiResponse<StationListResponse>.Success(StationListResponseConverter.ConvertStationListToStationListResponse(stationsRetreived));
-        
+            return Ok(response);
         }
-        catch (SecurityTokenException ex)
+        catch (Exception ex) when (ex is EntityFetchingException)
         {
-            response = ApiResponse<StationListResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-            return Unauthorized(response);
+            response = ApiResponse<StationListResponse>.NoContent();
+            return Ok(response);
         }
-        catch (UnauthorizedAccessException ex)
+        catch 
         {
-            response = ApiResponse<StationListResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-            return Unauthorized(response);
-        }
-        catch (Exception ex)
-        {
-            response = ApiResponse<StationListResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
+            response = ApiResponse<StationListResponse>.Failure();
             return BadRequest(response);
         }
-
-        return Ok(response);
     }
 
 }

@@ -47,8 +47,6 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
     /// Bool indicating deletion Component success.
     /// (True : Success | False : Failure)
     /// </returns>
-    /// <exception cref="EntityFetchingException">Thrown if id do not match any Component.</exception>
-    /// <exception cref="EntitySavingException">Thrown if error occurs during Component deletion.</exception>
     public bool DeleteComponent(int idComponent)
     {
         try
@@ -62,13 +60,36 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
         }
     }
 
+    /// <summary>
+    /// Modify Component in database.
+    /// </summary>
+    /// <param name="id">Int representing Component unique Id.</param>
+    /// <param name="name">String representing component name.</param>
+    /// <param name="color">String representing component color.</param>
+    /// <param name="type">Int representing component type.</param>
+    /// <param name="stationId">Int representing station id that hold component.</param>
+    /// <param name="gpioPin">Int representing embded component pin.</param>
+    /// <returns></returns>
+    /// <exception cref="EntitySavingException">Thrown if unable to create Component. Mainly due to format error (e.g: color format not hex).</exception>
+    /// <exception cref="EntityCreationException">Thrown if error occurs during database update.</exception>
     public Component UpdateComponent(int id, string name, string color, int type, int stationId, int gpioPin)
     {
-        Component componentToUpdate = new(name, color, type, stationId, gpioPin)
+        try
         {
-            Id = id
-        };
-        return componentBaseRepository.Update(componentToUpdate);
+            Component componentToUpdate = new(name, color, type, stationId, gpioPin)
+            {
+                Id = id
+            };
+            return componentBaseRepository.Update(componentToUpdate);
+        }
+        catch(Exception ex) when (ex is InvalidComponentGpioPinException ||
+                                  ex is InvalidComponentNameException ||
+                                  ex is InvalidComponentColorException ||
+                                  ex is InvalidComponentTypeException ||
+                                  ex is InvalidComponentStationIdException)
+        {
+            throw new EntityCreationException();
+        }
     }
 
     /// <summary>
@@ -109,7 +130,7 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
             var component = componentRepository.GetById(idComponent, true);
             return component.Station.UserId == userId;
         }
-        catch (EntityFetchingException )
+        catch (EntityFetchingException)
         {
             return false;
         }

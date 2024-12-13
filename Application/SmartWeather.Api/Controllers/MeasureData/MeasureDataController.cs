@@ -1,4 +1,4 @@
-﻿namespace SmartWeather.Api.Controllers.ComponentData;
+﻿namespace SmartWeather.Api.Controllers.MeasureData;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +7,10 @@ using SmartWeather.Services.ComponentDatas;
 using SmartWeather.Entities.ComponentData;
 using SmartWeather.Api.Controllers.ComponentData.Dtos;
 using SmartWeather.Api.Controllers.ComponentData.Dtos.Converters;
+using SmartWeather.Api.Helpers;
+using SmartWeather.Entities.User;
+using SmartWeather.Entities.MeasurePoint;
+using SmartWeather.Entities.Common.Exceptions;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -14,97 +18,13 @@ using SmartWeather.Api.Controllers.ComponentData.Dtos.Converters;
 public class MeasureDataController : ControllerBase
 {
     private readonly MeasureDataService _componentDataService;
+    private readonly AccessManagerHelper _accessManagerHelper;
 
-    public MeasureDataController(MeasureDataService componentDataService)
+    public MeasureDataController(MeasureDataService componentDataService, AccessManagerHelper accessManagerHelper)
     {
         _componentDataService = componentDataService;
+        _accessManagerHelper = accessManagerHelper;
     }
-
-    //[HttpPost(nameof(Create))]
-    //public ActionResult<ApiResponse<MeasureDataResponse>> Create(MeasureDataCreateRequest request)
-    //{
-    //    ApiResponse<MeasureDataResponse> response;
-    //    MeasureDataResponse formattedResponse;
-
-    //    if (!(request.MeasurePointId > 0))
-    //    {
-    //        return BadRequest(ApiResponse<MeasureDataResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
-    //    }
-
-    //    try
-    //    {
-    //        MeasureData createdComponentData = _componentDataService.AddNewMeasureData(request.MeasurePointId, request.Value, request.DateTime);
-    //        formattedResponse = MeasureDataResponseConverter.ConvertComponentDataToComponentDataResponse(createdComponentData);
-    //        response = ApiResponse<MeasureDataResponse>.Success(formattedResponse);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        response = ApiResponse<MeasureDataResponse>.Failure(String.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-    //        return BadRequest(response);
-    //    }
-
-    //    return Ok(response);
-    //}
-
-    //[HttpDelete(nameof(Delete))]
-    //public ActionResult<ApiResponse<EmptyResponse>> Delete(int idComponentData)
-    //{
-    //    // Later will need to restrict this to admin or current token user privilege
-    //    ApiResponse<EmptyResponse> response;
-
-    //    if (!(idComponentData > 0))
-    //    {
-    //        return BadRequest(ApiResponse<EmptyResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
-    //    }
-
-    //    try
-    //    {
-    //        bool isUserDeleted = _componentDataService.DeleteComponentData(idComponentData);
-    //        if (isUserDeleted)
-    //        {
-    //            response = ApiResponse<EmptyResponse>.Success(null);
-    //        }
-    //        else
-    //        {
-    //            response = ApiResponse<EmptyResponse>.Failure(BaseResponses.INTERNAL_ERROR);
-    //        }
-
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        response = ApiResponse<EmptyResponse>.Failure(String.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-    //        return BadRequest(response);
-    //    }
-
-    //    return Ok(response);
-    //}
-
-    //[HttpPut(nameof(Update))]
-    //public ActionResult<ApiResponse<MeasureDataResponse>> Update(MeasureDataUpdateRequest request)
-    //{
-    //    ApiResponse<MeasureDataResponse> response;
-    //    MeasureDataResponse formattedResponse;
-
-    //    if (!(request.Id > 0) ||
-    //        !(request.MeasurePointId > 0))
-    //    {
-    //        return BadRequest(ApiResponse<MeasureDataResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
-    //    }
-
-    //    try
-    //    {
-    //        MeasureData updatedComponentData = _componentDataService.UpdateComponentData(request.Id, request.MeasurePointId, request.Value, request.DateTime);
-    //        formattedResponse = MeasureDataResponseConverter.ConvertComponentDataToComponentDataResponse(updatedComponentData);
-    //        response = ApiResponse<MeasureDataResponse>.Success(formattedResponse);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        response = ApiResponse<MeasureDataResponse>.Failure(String.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-    //        return BadRequest(response);
-    //    }
-
-    //    return Ok(response);
-    //}
 
     [HttpGet(nameof(GetFromMeasurePoint))]
     public ActionResult<ApiResponse<MeasureDataListResponse>> GetFromMeasurePoint(int measurePointId, DateTime startPeriod, DateTime endPeriod)
@@ -116,27 +36,29 @@ public class MeasureDataController : ControllerBase
             return BadRequest(ApiResponse<MeasureDataListResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
+        if (_accessManagerHelper.ValidateUserAccess<MeasurePoint>(this, measurePointId, RoleAccess.GLOBAL_READING_ACCESS))
+        {
+            response = ApiResponse<MeasureDataListResponse>.Failure(BaseResponses.AUTHORIZATION_ERROR, Status.AUTHORIZATION_ERROR);
+            return Unauthorized(response);
+        }
+
         try
         {
             IEnumerable<MeasureData> componentDataList = _componentDataService.GetFromMeasurePoint(measurePointId, startPeriod, endPeriod);
-            if (componentDataList.Any())
-            {
-                MeasureDataListResponse formattedResponse = MeasureDataListResponseConverter.ConvertComponentDataListToComponentDataListResponse(componentDataList);
-                response = ApiResponse<MeasureDataListResponse>.Success(formattedResponse);
-            }
-            else
-            {
-                response = ApiResponse<MeasureDataListResponse>.Success(null);
-            }
-
+            MeasureDataListResponse formattedResponse = MeasureDataListResponseConverter.ConvertComponentDataListToComponentDataListResponse(componentDataList);
+            response = ApiResponse<MeasureDataListResponse>.Success(formattedResponse);
+            return Ok(response);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is EntityFetchingException)
         {
-            response = ApiResponse<MeasureDataListResponse>.Failure(String.Format(BaseResponses.FORMAT_ERROR, ex.Message));
+            response = ApiResponse<MeasureDataListResponse>.NoContent();
+            return Ok(response);
+        }
+        catch
+        {
+            response = ApiResponse<MeasureDataListResponse>.Failure();
             return BadRequest(response);
         }
-
-        return Ok(response);
     }
 
 }

@@ -9,8 +9,10 @@ using SmartWeather.Api.Controllers.MeasurePoint.Dtos;
 using SmartWeather.Api.Controllers.MeasurePoint.Dtos.Converters;
 using SmartWeather.Services.Authentication;
 using SmartWeather.Services.Components;
-using Microsoft.IdentityModel.Tokens;
 using SmartWeather.Entities.User;
+using SmartWeather.Entities.Component;
+using SmartWeather.Api.Helpers;
+using SmartWeather.Entities.Common.Exceptions;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -20,12 +22,14 @@ public class MeasurePointController : Controller
     private readonly MeasurePointService _measurePointService;
     private readonly AuthenticationService _authenticationService;
     private readonly ComponentService _componentService;
+    private readonly AccessManagerHelper _accessManagerHelper;
 
-    public MeasurePointController(MeasurePointService measurePointService, AuthenticationService authenticationService, ComponentService componentService)
+    public MeasurePointController(MeasurePointService measurePointService, AuthenticationService authenticationService, ComponentService componentService, AccessManagerHelper accessManagerHelper)
     {
         _measurePointService = measurePointService;
         _authenticationService = authenticationService;
         _componentService = componentService;
+        _accessManagerHelper = accessManagerHelper;
     }
 
     [HttpPost(nameof(Create))]
@@ -34,8 +38,8 @@ public class MeasurePointController : Controller
         ApiResponse<MeasurePointResponse> response;
         MeasurePointResponse formattedResponse;
 
-        if (String.IsNullOrWhiteSpace(request.Name) ||
-            String.IsNullOrWhiteSpace(request.Color) ||
+        if (string.IsNullOrWhiteSpace(request.Name) ||
+            string.IsNullOrWhiteSpace(request.Color) ||
             !(request.ComponentId > 0) ||
             !(request.LocalId > 0) ||
             !(request.Unit >= 0))
@@ -43,82 +47,82 @@ public class MeasurePointController : Controller
             return BadRequest(ApiResponse<MeasurePointResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
+        if (_accessManagerHelper.ValidateUserAccess<Component>(this, request.ComponentId, RoleAccess.ADMINISTRATORS))
+        {
+            response = ApiResponse<MeasurePointResponse>.Failure(BaseResponses.AUTHORIZATION_ERROR, Status.AUTHORIZATION_ERROR);
+            return Unauthorized(response);
+        }
+
         try
         {
             MeasurePoint createdComponentData = _measurePointService.AddNewMeasurePoint(request.LocalId, request.Name, request.Color, request.Unit, request.ComponentId);
             formattedResponse = MeasurePointConverter.ConvertMeasurePointToMeasurePointResponse(createdComponentData);
             response = ApiResponse<MeasurePointResponse>.Success(formattedResponse);
+            return Ok(response);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is EntityCreationException)
         {
-            response = ApiResponse<MeasurePointResponse>.Failure(String.Format(BaseResponses.FORMAT_ERROR, ex.Message));
+            response = ApiResponse<MeasurePointResponse>.Failure(BaseResponses.VALIDATION_ERROR, Status.VALIDATION_ERROR);
             return BadRequest(response);
         }
-
-        return Ok(response);
+        catch (Exception ex) when (ex is EntitySavingException)
+        {
+            response = ApiResponse<MeasurePointResponse>.Failure(BaseResponses.DATABASE_ERROR, Status.DATABASE_ERROR);
+            return BadRequest(response);
+        }
+        catch
+        {
+            response = ApiResponse<MeasurePointResponse>.Failure();
+            return BadRequest(response);
+        }
     }
 
     [HttpDelete(nameof(Delete))]
     public ActionResult<ApiResponse<EmptyResponse>> Delete(int idMeasurePoint)
     {
-        var token = HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-
         ApiResponse<EmptyResponse> response;
 
-        if (!(idMeasurePoint > 0) ||
-            !string.IsNullOrEmpty(token))
+        if (!(idMeasurePoint > 0))
         {
             return BadRequest(ApiResponse<EmptyResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
+        if (_accessManagerHelper.ValidateUserAccess<MeasurePoint>(this, idMeasurePoint, RoleAccess.ADMINISTRATORS))
+        {
+            response = ApiResponse<EmptyResponse>.Failure(BaseResponses.AUTHORIZATION_ERROR, Status.AUTHORIZATION_ERROR);
+            return Unauthorized(response);
+        }
+
         try
         {
-            int userId = _authenticationService.GetUserIdFromToken(token);
-            Role userRole = _authenticationService.GetUserRoleFromToken(token);
-
-            if (!_measurePointService.IsOwnerOfMeasurePoint(userId, idMeasurePoint) &&
-                !RoleAccess.ADMINISTRATORS.Contains(userRole))
-            {
-                throw new UnauthorizedAccessException("Your are not allowed to delete this element");
-            }
-
             bool isMeasurePointDeleted = _measurePointService.DeleteMeasurePoint(idMeasurePoint);
             if (isMeasurePointDeleted)
             {
-                response = ApiResponse<EmptyResponse>.Success(null);
+                response = ApiResponse<EmptyResponse>.Success(new EmptyResponse());
+                return Ok(response);
             }
             else
             {
-                response = ApiResponse<EmptyResponse>.Failure(BaseResponses.INTERNAL_ERROR);
+                response = ApiResponse<EmptyResponse>.Failure(BaseResponses.DATABASE_ERROR);
+                return BadRequest(response);
             }
-
         }
-        catch (UnauthorizedAccessException ex)
+        catch
         {
-            response = ApiResponse<EmptyResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-            return Unauthorized(response);
-        }
-        catch (Exception ex)
-        {
-            response = ApiResponse<EmptyResponse>.Failure(String.Format(BaseResponses.FORMAT_ERROR, ex.Message));
+            response = ApiResponse<EmptyResponse>.Failure();
             return BadRequest(response);
         }
-
-        return Ok(response);
     }
 
     [HttpPut(nameof(Update))]
     public ActionResult<ApiResponse<MeasurePointResponse>> Update(MeasurePointUpdateRequest request)
     {
-        var token = HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-
         ApiResponse<MeasurePointResponse> response;
         MeasurePointResponse formattedResponse;
 
         if (!(request.Id > 0) ||
             string.IsNullOrWhiteSpace(request.Name) ||
             string.IsNullOrWhiteSpace(request.Color) ||
-            !string.IsNullOrEmpty(token) ||
             !(request.ComponentId > 0) ||
             !(request.LocalId > 0) || 
             !(request.Unit >= 0))
@@ -126,94 +130,64 @@ public class MeasurePointController : Controller
             return BadRequest(ApiResponse<MeasurePointResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
+        if (_accessManagerHelper.ValidateUserAccess<MeasurePoint>(this, request.Id, RoleAccess.ADMINISTRATORS))
+        {
+            response = ApiResponse<MeasurePointResponse>.Failure(BaseResponses.AUTHORIZATION_ERROR, Status.AUTHORIZATION_ERROR);
+            return Unauthorized(response);
+        }
+
         try
         {
-            int userId = _authenticationService.GetUserIdFromToken(token);
-            Role userRole = _authenticationService.GetUserRoleFromToken(token);
-
-            if (!_measurePointService.IsOwnerOfMeasurePoint(userId, request.Id) &&
-                !RoleAccess.GLOBAL_READING_ACCESS.Contains(userRole))
-            {
-                throw new UnauthorizedAccessException("Your are not allowed to modify this element");
-            }
-
             MeasurePoint updatedMeasurePoint = _measurePointService.UpdateMeasurePoint(request.Id, request.LocalId, request.Name, request.Color, request.Unit, request.ComponentId);
             formattedResponse = MeasurePointConverter.ConvertMeasurePointToMeasurePointResponse(updatedMeasurePoint);
             response = ApiResponse<MeasurePointResponse>.Success(formattedResponse);
-
+            return Ok(response);
         }
-        catch (SecurityTokenException ex)
+        catch (Exception ex) when (ex is EntitySavingException || 
+                                   ex is EntityCreationException) 
         {
-            response = ApiResponse<MeasurePointResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-            return Unauthorized(response);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            response = ApiResponse<MeasurePointResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-            return Unauthorized(response);
-        }
-        catch (Exception ex)
-        {
-            response = ApiResponse<MeasurePointResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
+            response = ApiResponse<MeasurePointResponse>.Failure(BaseResponses.DATABASE_ERROR, Status.DATABASE_ERROR);
             return BadRequest(response);
         }
-
-        return Ok(response);
+        catch
+        {
+            response = ApiResponse<MeasurePointResponse>.Failure();
+            return BadRequest(response);
+        }
     }
 
     [HttpGet(nameof(GetFromComponent))]
     public ActionResult<ApiResponse<MeasurePointListResponse>> GetFromComponent(int componentId)
     {
-        var token = HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-
         ApiResponse<MeasurePointListResponse> response;
 
-        if (!(componentId > 0) ||
-            !string.IsNullOrEmpty(token))
+        if (!(componentId > 0))
         {
             return BadRequest(ApiResponse<MeasurePointListResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
+        if (_accessManagerHelper.ValidateUserAccess<Component>(this, componentId, RoleAccess.GLOBAL_READING_ACCESS))
+        {
+            response = ApiResponse<MeasurePointListResponse>.Failure(BaseResponses.AUTHORIZATION_ERROR, Status.AUTHORIZATION_ERROR);
+            return Unauthorized(response);
+        }
+
         try
         {
-            int userId = _authenticationService.GetUserIdFromToken(token);
-            Role userRole = _authenticationService.GetUserRoleFromToken(token);
-
-            if (!_componentService.IsOwnerOfComponent(userId, componentId) &&
-                !RoleAccess.GLOBAL_READING_ACCESS.Contains(userRole))
-            {
-                throw new UnauthorizedAccessException("Your are not allowed to get this information");
-            }
-
             IEnumerable<MeasurePoint> measurePointList = _measurePointService.GetFromComponent(componentId);
-            if (measurePointList.Any())
-            {
-                MeasurePointListResponse formattedResponse = MeasurePointConverter.ConvertMeasurePointListToMeasurePointListResponse(measurePointList);
-                response = ApiResponse<MeasurePointListResponse>.Success(formattedResponse);
-            }
-            else
-            {
-                response = ApiResponse<MeasurePointListResponse>.Success(null);
-            }
-
+            MeasurePointListResponse formattedResponse = MeasurePointConverter.ConvertMeasurePointListToMeasurePointListResponse(measurePointList);
+            response = ApiResponse<MeasurePointListResponse>.Success(formattedResponse);
+            return Ok(response);
         }
-        catch (SecurityTokenException ex)
+        catch (Exception ex) when (ex is EntityFetchingException)
         {
-            response = ApiResponse<MeasurePointListResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-            return Unauthorized(response);
+            response = ApiResponse<MeasurePointListResponse>.NoContent();
+            return Ok(response);
         }
-        catch (UnauthorizedAccessException ex)
+        catch
         {
-            response = ApiResponse<MeasurePointListResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
-            return Unauthorized(response);
-        }
-        catch (Exception ex)
-        {
-            response = ApiResponse<MeasurePointListResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, ex.Message));
+            response = ApiResponse<MeasurePointListResponse>.Failure();
             return BadRequest(response);
         }
-
-        return Ok(response);
     }
-
 }
