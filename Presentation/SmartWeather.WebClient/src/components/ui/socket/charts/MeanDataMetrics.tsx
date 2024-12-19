@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { ISocketHandler } from "@/components/ui/socket/ISocketHandler";
 import { StationMeasurePointsResponse } from "@/services/station/dtos/station_measure_points_response";
 import { StationDto } from "@/services/station/dtos/station_response";
-import { Card, CardContent } from "../../card";
+import { Card, CardContent, CardHeader } from "../../card";
 import Arrow from "@/components/icons/Arrow";
 import { twMerge } from "tailwind-merge";
 
@@ -18,6 +18,7 @@ function MeanDataMetrics({
   const [maxLatency, setMaxLatency] = useState<number>(0); // :number representing the max ping between 2 station emission
   const [meanLatency, setMeanLatency] = useState<number>(0); // :number representing the mean ping between 2 station emission
   const [meanVolume, setMeanVolume] = useState<number>(0); // :number representing the mean volume of message received in msg/sec
+  const [previousMeanVolume, setPreviousMeanVolume] = useState<number>(0); // :number representing the mean volume of message received in msg/sec
   const [newDataArrived, setNewDataArrived] = useState<number>(0); // :number representing the number of message received since last volume check
   const [currentReceived, setCurrentReceived] = useState<number[]>([]); // :[ key => stationId; value => timestamp] representing the n-1 time a station has emitted
   const [previousReceived, setPreviousReceived] = useState<number[]>([]); // :[ key => stationId; value => timestamp] representing the last time a station has emitted
@@ -92,6 +93,7 @@ function MeanDataMetrics({
 
   const updateMeanVolume = () => {
     const timeElapsed = (new Date().getTime() - lastVolumeCheck) / 1000;
+    setPreviousMeanVolume(previousMeanVolume);
     setMeanVolume(Number((refreshFrequency / timeElapsed).toFixed(2)));
     setLastVolumeCheck(new Date().getTime());
   };
@@ -158,6 +160,20 @@ function MeanDataMetrics({
               Max {maxLatency}ms
             </p>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="w-fit p-4 flex items-center justify-center">
+        <CardContent className="p-0 flex gap-4 items-center">
+          <Arrow up={meanVolume > previousMeanVolume} upColorGreen />
+          <p
+            className={twMerge(
+              "text-3xl font-bold ",
+              meanVolume > previousMeanVolume ? "text-primary" : "text-alert"
+            )}
+          >
+            {meanVolume} msg / sec
+          </p>
         </CardContent>
       </Card>
       {/* 
