@@ -14,7 +14,7 @@ function MeanDataMetrics({
   stationMeasurePointsMap,
 }: ISocketHandler) {
   const [minLatency, setMinLatency] = useState<number>(0); // :number representing the min ping between 2 station emission
-  const [previousMeanLatency, setPreviousMeanLatency] = useState<number>(0); 
+  const [previousMeanLatency, setPreviousMeanLatency] = useState<number>(0);
   const [maxLatency, setMaxLatency] = useState<number>(0); // :number representing the max ping between 2 station emission
   const [meanLatency, setMeanLatency] = useState<number>(0); // :number representing the mean ping between 2 station emission
   const [meanVolume, setMeanVolume] = useState<number>(0); // :number representing the mean volume of message received in msg/sec
@@ -80,7 +80,7 @@ function MeanDataMetrics({
       }
     });
     console.log("updateMeanLatency");
-    setPreviousMeanLatency(meanLatency)
+    setPreviousMeanLatency(meanLatency);
     setMeanLatency(Number((sumLatencies / nbStationChecked).toFixed(2)));
     if (minLatency) {
       setMinLatency(minLatency);
@@ -140,17 +140,23 @@ function MeanDataMetrics({
       <Card className="w-fit p-4">
         <CardContent className="p-0 flex gap-4 items-center">
           <Arrow up={meanLatency > previousMeanLatency} />
-          <div className="flex flex-col justify-between">
-            <p className="text-disabled text-sm">Min {minLatency}ms</p>
+          <div className="flex flex-col justify-between w-40">
+            <p className="text-disabled text-sm font-semibold">
+              Min {minLatency}ms
+            </p>
             <p
               className={twMerge(
                 "text-3xl font-bold ",
-                meanLatency > previousMeanLatency ? "text-primary" : "text-alert"
+                meanLatency > previousMeanLatency
+                  ? "text-alert"
+                  : "text-primary"
               )}
             >
               {meanLatency} ms
             </p>
-            <p className="text-disabled text-sm">Max {maxLatency}ms</p>
+            <p className="text-disabled text-sm font-semibold">
+              Max {maxLatency}ms
+            </p>
           </div>
         </CardContent>
       </Card>
