@@ -21,7 +21,7 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
       </head>
-      <body className={`${outfitFonts.variable} antialiased flex bg-slate-50`}>
+      <body className={`${outfitFonts.variable} antialiased flex bg-slate-50 font-outfit`}>
         <SideBarMenu menu={menu} />
         <div className="flex-1">
           {children}

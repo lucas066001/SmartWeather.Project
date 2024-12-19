@@ -7,6 +7,18 @@ import { StationDto } from "@/services/station/dtos/station_response";
 import { Card, CardContent, CardHeader } from "../../card";
 import Arrow from "@/components/icons/Arrow";
 import { twMerge } from "tailwind-merge";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../table";
+import { Input } from "../../input";
+import { Button } from "../../button";
 
 function MeanDataMetrics({
   lastUpdatedMeasurePoints,
@@ -139,8 +151,7 @@ function MeanDataMetrics({
 
   return (
     <div className="flex gap-4">
-      <Card className="w-fit p-4">
-        <CardContent className="p-0 flex gap-4 items-center">
+      <Card className="w-fit p-4 flex gap-4 items-center">
           <Arrow up={meanLatency > previousMeanLatency} />
           <div className="flex flex-col justify-between w-40">
             <p className="text-disabled text-sm font-semibold">
@@ -160,7 +171,6 @@ function MeanDataMetrics({
               Max {maxLatency}ms
             </p>
           </div>
-        </CardContent>
       </Card>
 
       <Card className="w-fit p-4 flex items-center justify-center">
@@ -176,25 +186,37 @@ function MeanDataMetrics({
           </p>
         </CardContent>
       </Card>
-      {/* 
-      <table>
-        <thead>
-          <tr>
-            <td>Station Name</td>
-            <td>Latency</td>
-          </tr>
-        </thead>
-        <tbody>
-          {stationsLatency.map((stationLatency) => (
-            <tr key={stationLatency.station.id}>
-              <td>{stationLatency.station.name}</td>
-              <td>{stationLatency.latency}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
 
-      <h1>{meanVolume}msg/sec</h1> */}
+      <Card className="w-fit p-4">
+        <label htmlFor="search" >Filter by name</label>
+        <div className="flex gap-2 mt-2">
+          <Input
+            id="search"
+            type="search"
+            className="mb-4"
+            placeholder="Research ..."
+          />
+          <Button variant="outline">Search</Button>
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Station name</TableHead>
+              <TableHead>Latency</TableHead>
+              <TableHead>Volume</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {stationsLatency.map((stationLatency) => (
+              <TableRow key={stationLatency.station.id}>
+                <TableCell>{stationLatency.station.name}</TableCell>
+                <TableCell>{stationLatency.latency}</TableCell>
+                <TableCell>{0}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   );
 }
