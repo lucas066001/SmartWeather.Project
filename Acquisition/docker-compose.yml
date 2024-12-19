@@ -9,9 +9,11 @@ services:
       context: ./..
       dockerfile: Acquisition/SmartWeather.StationMocker/Dockerfile
     environment:
+      API_URL: "http://smart-weather-api:8081/api/Station/Update"
+      MAX_ERROR_RATE: 0
       STATION_NB : 50
       DATA_FREQ : 980
-      ADMIN_TOKEN: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiZW1haWwiOiJhZG1pbkBzbWFydHdlYXRoZXIubmV0Iiwicm9sZSI6IjEiLCJuYmYiOjE3MzQwOTY5NjEsImV4cCI6MTczNDEwNzc2MSwiaWF0IjoxNzM0MDk2OTYxLCJpc3MiOiJTbWFydFdlYXRoZXIiLCJhdWQiOiJTbWFydFdlYXRoZXIifQ.-V6Sy-nPzX3MwLoQVhF5ZBUmd_HQvHtanyEaq48gfO4"
+      ADMIN_TOKEN: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiZW1haWwiOiJhZG1pbkBzbWFydHdlYXRoZXIubmV0Iiwicm9sZSI6IjEiLCJuYmYiOjE3MzQ1OTc1NDYsImV4cCI6MTczNDYwODM0NiwiaWF0IjoxNzM0NTk3NTQ2LCJpc3MiOiJTbWFydFdlYXRoZXIiLCJhdWQiOiJTbWFydFdlYXRoZXIifQ.XHUTRdls2sPIh7Dd4OW22Pii7UCDxfqQvo1rBaDtjMg"
     depends_on:
       - smart-weather-api
       - mysql-master

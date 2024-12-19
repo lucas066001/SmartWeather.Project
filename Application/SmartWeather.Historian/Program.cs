@@ -1,14 +1,15 @@
-using SmartWeather.Services;
-using SmartWeather.Repositories;
 using SmartWeather.Historian.Configuration;
+using SmartWeather.Repositories;
+using SmartWeather.Services;
 using SmartWeather.Repositories.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddRepositories(builder.Configuration);
-builder.Services.AddServices(builder.Configuration);
+builder.Services.AddDocumentRepositories(builder.Configuration);
+builder.Services.AddKafkaServices(builder.Configuration);
+builder.Services.AddDocumentDbServices();
 builder.Services.AddHostedService<PostStartup>();
 
 var app = builder.Build();

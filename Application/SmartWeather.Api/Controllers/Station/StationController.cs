@@ -312,4 +312,49 @@ public class StationController : ControllerBase
         }
     }
 
+    [HttpGet(nameof(GetStationsMeasurePoints))]
+    public ActionResult<ApiResponse<List<StationMeasurePointsResponse>>> GetStationsMeasurePoints()
+    {
+        ApiResponse<List<StationMeasurePointsResponse>> response;
+        var token = HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+
+        try
+        {
+            Role userRole = _authenticationService.GetUserRoleFromToken(token);
+
+            if (!RoleAccess.ADMINISTRATORS.Contains(userRole))
+            {
+                throw new UnauthorizedAccessException();
+            }
+        }
+        catch (Exception ex) when (ex is SecurityTokenException ||
+                                  ex is UnauthorizedAccessException)
+        {
+            response = ApiResponse<List<StationMeasurePointsResponse>>.Failure();
+            return Unauthorized(response);
+        }
+
+        try
+        {
+            IEnumerable<Station> stationsRetreived = _stationService.GetAll(true, true);
+            List<StationMeasurePointsResponse> result = new List<StationMeasurePointsResponse>();
+            foreach (Station station in stationsRetreived)
+            {
+                result.Add(StationMeasurePointsResponseConverter.ConvertStationResponseToStationMeasurePointResponse(station));
+            }
+            response = ApiResponse<List<StationMeasurePointsResponse>>.Success(result);
+            return Ok(response);
+        }
+        catch (Exception ex) when (ex is EntityFetchingException)
+        {
+            response = ApiResponse<List<StationMeasurePointsResponse>>.NoContent();
+            return Ok(response);
+        }
+        catch
+        {
+            response = ApiResponse<List<StationMeasurePointsResponse>>.Failure();
+            return BadRequest(response);
+        }
+    }
+
 }

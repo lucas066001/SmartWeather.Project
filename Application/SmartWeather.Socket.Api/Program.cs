@@ -18,8 +18,9 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSignalR();
 
-builder.Services.AddRepositories(builder.Configuration);
-builder.Services.AddServices(builder.Configuration);
+builder.Services.AddRelationalRepositories(builder.Configuration);
+builder.Services.AddRelationalDbServices();
+builder.Services.AddKafkaServices(builder.Configuration);
 builder.Services.AddConsumer();
 
 var app = builder.Build();

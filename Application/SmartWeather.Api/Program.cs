@@ -14,8 +14,12 @@ using SmartWeather.Api.Helpers;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRepositories(builder.Configuration);
-builder.Services.AddServices(builder.Configuration);
+builder.Services.AddRelationalRepositories(builder.Configuration);
+builder.Services.AddDocumentRepositories(builder.Configuration);
+builder.Services.AddMqttServices(builder.Configuration);
+builder.Services.AddRelationalDbServices();
+builder.Services.AddDocumentDbServices();
+
 builder.Services.AddScoped<AccessManagerHelper>();
 
 var issuer = builder.Configuration.GetSection(nameof(Jwt))[nameof(Jwt.Issuer)];

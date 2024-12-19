@@ -21,17 +21,12 @@ public class Station
                                                               RegexOptions.Compiled | RegexOptions.IgnoreCase);
     /// <summary>
     /// Methods to check if MacAddress format is correct. 
-    /// (Enable the possibility to create mock station in debug mode with MOCK_STATION contained in MacAdress).
     /// </summary>
     /// <param name="MacAddress">Address to check.</param>
     /// <returns>Boolean whether or not the address match requirements.</returns>
     private bool _checkMacAddress(string MacAddress)
     {
-#if DEBUG
         return MacAddressRegex.IsMatch(MacAddress) || MacAddress.Contains("MOCK_STATION");
-#elif RELEASE
-        return MacAddressRegex.IsMatch(MacAddress);
-#endif
     }
 
     /// <summary>

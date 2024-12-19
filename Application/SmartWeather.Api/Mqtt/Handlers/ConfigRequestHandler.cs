@@ -1,4 +1,4 @@
-﻿namespace SmartWeather.Services.Mqtt.Handlers;
+﻿namespace SmartWeather.Api.Mqtt.Handlers;
 
 using SmartWeather.Entities.Station;
 using SmartWeather.Services.Components;
@@ -10,6 +10,7 @@ using SmartWeather.Services.MeasurePoints;
 using SmartWeather.Entities.Component;
 using SmartWeather.Entities.MeasurePoint;
 using SmartWeather.Entities.Common.Exceptions;
+using SmartWeather.Services.Mqtt;
 
 public class ConfigRequestHandler : IMqttRequestHandler
 {

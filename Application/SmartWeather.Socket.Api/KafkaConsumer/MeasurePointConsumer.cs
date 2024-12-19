@@ -1,11 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using SmartWeather.Services.ComponentDatas;
-using SmartWeather.Services.Components;
 using SmartWeather.Services.Kafka;
-using SmartWeather.Services.Kafka.Handlers;
-using SmartWeather.Services.MeasurePoints;
-using SmartWeather.Services.Stations;
 using SmartWeather.Socket.Api.Hubs.MeasurePoint;
 using SmartWeather.Socket.Api.Kafka.Handlers;
 

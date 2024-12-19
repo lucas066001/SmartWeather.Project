@@ -8,29 +8,33 @@ using SmartWeather.Services.Components;
 using SmartWeather.Services.Kafka;
 using SmartWeather.Services.MeasurePoints;
 using SmartWeather.Services.Mqtt;
-using SmartWeather.Services.Mqtt.Handlers;
 using SmartWeather.Services.Stations;
 using SmartWeather.Services.Users;
 
 public static class DependencyInjection
 {
-    public static void AddServices(this IServiceCollection services, IConfiguration configuration)
+    public static void AddKafkaServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.ConfigureServices();
+        services.AddSingleton<KafkaConsumerSingleton>();
     }
 
-    private static void ConfigureServices(this IServiceCollection services)
+    public static void AddMqttServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddScoped<MqttService>();
+        services.AddSingleton<MqttSingleton>();
+    }
+
+    public static void AddRelationalDbServices(this IServiceCollection services)
     {
         services.AddScoped<UserService>();
         services.AddScoped<AuthenticationService>();
         services.AddScoped<StationService>();
         services.AddScoped<ComponentService>();
         services.AddScoped<MeasurePointService>();
+    }
+
+    public static void AddDocumentDbServices(this IServiceCollection services)
+    {
         services.AddScoped<MeasureDataService>();
-        services.AddScoped<ConfigRequestHandler>();
-        services.AddScoped<MeasureDataMessageHandler>();
-        services.AddScoped<MqttService>();
-        services.AddSingleton<MqttSingleton>();
-        services.AddSingleton<KafkaConsumerSingleton>();
     }
 }

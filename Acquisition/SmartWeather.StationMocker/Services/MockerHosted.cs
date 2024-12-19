@@ -23,6 +23,7 @@ public class MockerHosted : IHostedService
     private readonly MqttService _mqttService;
     private string _adminToken = Environment.GetEnvironmentVariable("ADMIN_TOKEN") ?? "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiZW1haWwiOiJhZG1pbkBzbWFydHdlYXRoZXIubmV0Iiwicm9sZSI6IjEiLCJuYmYiOjE3MzQwOTkzMDIsImV4cCI6MTczNDExMDEwMiwiaWF0IjoxNzM0MDk5MzAyLCJpc3MiOiJTbWFydFdlYXRoZXIiLCJhdWQiOiJTbWFydFdlYXRoZXIifQ.waX_7jetagccM5kMmXJQvtsB3SWCePmS5gJNApmBigE";
     private int _dataFreq;
+    private int _maxErrorRate;
     private int _stationNumber;
     private int _componentNumber;
     private record StationMocking
@@ -55,9 +56,16 @@ public class MockerHosted : IHostedService
             _componentNumber = 5;
         }
 
+        if (!int.TryParse(Environment.GetEnvironmentVariable(Configuration.ERROR_RATE), out _maxErrorRate))
+        {
+            Console.WriteLine("Unable to retreive ERROR_RATE value, defaulting to 0");
+            _maxErrorRate = 0;
+        }
+
         Console.WriteLine("_dataFreq" + _dataFreq);
         Console.WriteLine("_stationNumber" + _stationNumber);
         Console.WriteLine("_componentNumber" + _componentNumber);
+        Console.WriteLine("_maxErrorRate" + _maxErrorRate);
         Console.WriteLine("_adminToken" + _adminToken);
 
         Console.WriteLine("EXIT MockerService constructor");
@@ -71,7 +79,7 @@ public class MockerHosted : IHostedService
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _adminToken);
 
-        string updateStationUrl = "http://localhost:8081/api/Station/Update";
+        string updateStationUrl = Environment.GetEnvironmentVariable(Configuration.API_URL) ?? "http://smart-weather-api:8081/api/Station/Update";
 
         // Setup mqtt singleton
         await _mqttSingleton.ConnectAsync();
@@ -182,7 +190,6 @@ public class MockerHosted : IHostedService
         Random random = new Random();
         while (!cancellationToken.IsCancellationRequested)
         {
-            var errorRate = random.Next(0, 30);
             foreach (var stationMock in stationMockers)
             {
                 var currentMockerIndex = 0;
@@ -191,13 +198,13 @@ public class MockerHosted : IHostedService
                     foreach (var mpConf in compConf.MeasurePointsConfigs)
                     {
 
-                        if (random.Next(0, 100) > errorRate)
+                        if (random.Next(0, 100) > _maxErrorRate)
                         {
                             await _mqttService.SendSensorSavingRequest(stationMock.StationConf.StationDatabaseId,
                                             mpConf.DatabaseId,
                                             stationMock.MpMocker[currentMockerIndex].GetSensorData());
                         }
-                        
+
                         currentMockerIndex++;
                     }
                 }

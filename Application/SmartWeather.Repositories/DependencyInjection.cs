@@ -21,30 +21,42 @@ using SmartWeather.Repositories.BaseRepository;
 
 public static class DependencyInjection
 {
-    public static void AddRepositories(this IServiceCollection services, IConfiguration configuration)
+    public static void AddRelationalRepositories(this IServiceCollection services, IConfiguration configuration)
     {
-        services.ConfigureDbContext(configuration);
-        services.ConfigureRepositories();
+        services.ConfigureRelationalDbContext(configuration);
+        services.ConfigureRelationalRepositories();
+    }
+    public static void AddDocumentRepositories(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.ConfigureDocumentDbContext(configuration);
+        services.ConfigureDocumentRepositories();
     }
 
-    private static void ConfigureDbContext(this IServiceCollection services, IConfiguration configuration)
+    private static void ConfigureRelationalDbContext(this IServiceCollection services, IConfiguration configuration)
     {
-        // Setup database according to appsettings
-        services.AddScoped(typeof(SmartWeatherDocumentsContext));
         services.AddDbContext<SmartWeatherContext>(options =>
             options.UseMySQL(configuration.GetConnectionString("SmartWeatherMaster") ?? string.Empty));
         services.AddDbContext<SmartWeatherReadOnlyContext>(options =>
             options.UseMySQL(configuration.GetConnectionString("SmartWeatherLb") ?? string.Empty));
     }
 
-    private static void ConfigureRepositories(this IServiceCollection services)
+    private static void ConfigureRelationalRepositories(this IServiceCollection services)
     {
         services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
         services.AddScoped(typeof(IAuthenticationRepository), typeof(AuthenticationRepository));
         services.AddScoped(typeof(IStationRepository), typeof(StationRepository));
         services.AddScoped(typeof(IComponentRepository), typeof(ComponentRepository));
         services.AddScoped(typeof(IMeasurePointRepository), typeof(MeasurePointRepository));
-        services.AddScoped(typeof(IMeasureDataRepository), typeof(MeasureDataRepository));
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+    }
+
+    private static void ConfigureDocumentDbContext(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddScoped(typeof(SmartWeatherDocumentsContext));
+    }
+
+    private static void ConfigureDocumentRepositories(this IServiceCollection services)
+    {
+        services.AddScoped(typeof(IMeasureDataRepository), typeof(MeasureDataRepository));
     }
 }
