@@ -20,7 +20,6 @@ function MeanDataMetrics({ lastUpdatedMeasurePoints, stations, stationMeasurePoi
     interface StationLatencyDetails {
         station: StationDto
         latency: number
-        volume: number
     }
 
     const refreshFrequency: number = 30;
