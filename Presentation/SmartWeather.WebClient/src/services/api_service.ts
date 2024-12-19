@@ -24,7 +24,7 @@ export async function post<T extends object>(endpoint: string, content: object |
     return await res.json()
 }
 
-export async function get<T extends object>(endpoint: string, params: object | undefined): Promise<ApiResponse<T>> {
+export async function get<T extends object>(endpoint: string, params: object | undefined = undefined): Promise<ApiResponse<T>> {
     const token = await getToken();
 
     const queryString = params

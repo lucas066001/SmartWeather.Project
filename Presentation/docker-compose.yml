@@ -3,7 +3,7 @@ name: smartweather-project
 
 include:
   - "./Kafka-ui/kafka-ui.yml"
-  - "./Kibana/kibana.yml"
+  # - "./Kibana/kibana.yml"
 
 networks:
   smart-weather-network:

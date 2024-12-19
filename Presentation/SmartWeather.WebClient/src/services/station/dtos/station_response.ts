@@ -1,3 +1,5 @@
+import { ComponentResponse } from "@/services/component/dtos/component_response"
+
 export interface StationDto {
     id: number
     name: string
@@ -5,6 +7,7 @@ export interface StationDto {
     longitude: number
     type: StationType
     userId: number
+    components: ComponentResponse[] | undefined
 }
 
 export enum StationType {
