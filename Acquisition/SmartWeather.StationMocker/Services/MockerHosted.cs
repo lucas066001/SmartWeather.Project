@@ -21,7 +21,7 @@ public class MockerHosted : IHostedService
     private const double MaxLongitude = 9.0;
     private readonly MqttSingleton _mqttSingleton;
     private readonly MqttService _mqttService;
-    private string _adminToken = Environment.GetEnvironmentVariable("ADMIN_TOKEN") ?? "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiZW1haWwiOiJhZG1pbkBzbWFydHdlYXRoZXIubmV0Iiwicm9sZSI6IjEiLCJuYmYiOjE3MzQwOTkzMDIsImV4cCI6MTczNDExMDEwMiwiaWF0IjoxNzM0MDk5MzAyLCJpc3MiOiJTbWFydFdlYXRoZXIiLCJhdWQiOiJTbWFydFdlYXRoZXIifQ.waX_7jetagccM5kMmXJQvtsB3SWCePmS5gJNApmBigE";
+    private string _adminToken = Environment.GetEnvironmentVariable("ADMIN_TOKEN") ?? "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiZW1haWwiOiJhZG1pbkBzbWFydHdlYXRoZXIubmV0Iiwicm9sZSI6IjEiLCJuYmYiOjE3MzQ1OTc1NDYsImV4cCI6MTczNDYwODM0NiwiaWF0IjoxNzM0NTk3NTQ2LCJpc3MiOiJTbWFydFdlYXRoZXIiLCJhdWQiOiJTbWFydFdlYXRoZXIifQ.XHUTRdls2sPIh7Dd4OW22Pii7UCDxfqQvo1rBaDtjMg";
     private int _dataFreq;
     private int _maxErrorRate;
     private int _stationNumber;
@@ -47,12 +47,12 @@ public class MockerHosted : IHostedService
         if (!int.TryParse(Environment.GetEnvironmentVariable(Configuration.STATION_NUMBER), out _stationNumber))
         {
             Console.WriteLine("Unable to retreive STATION_NUMBER value, defaulting to 20");
-            _stationNumber = 20;
+            _stationNumber = 10;
         }
 
         if (!int.TryParse(Environment.GetEnvironmentVariable(Configuration.COMPONENT_NUMBER), out _componentNumber))
         {
-            Console.WriteLine("Unable to retreive STATION_NUMBER value, defaulting to 5");
+            Console.WriteLine("Unable to retreive COMPONENT_NUMBER value, defaulting to 5");
             _componentNumber = 5;
         }
 
@@ -79,7 +79,7 @@ public class MockerHosted : IHostedService
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _adminToken);
 
-        string updateStationUrl = Environment.GetEnvironmentVariable(Configuration.API_URL) ?? "http://smart-weather-api:8081/api/Station/Update";
+        string updateStationUrl = Environment.GetEnvironmentVariable(Configuration.API_URL) ?? "http://localhost:8081/api/Station/Update";
 
         // Setup mqtt singleton
         await _mqttSingleton.ConnectAsync();
@@ -175,44 +175,53 @@ public class MockerHosted : IHostedService
 
         // Launch mocking loop
 
-        _mockingLoop(cancellationToken);
+        await _mockingLoop(cancellationToken);
 
         Console.WriteLine("EXIT StartAsync MockerService");
     }
 
-    private async void _mockingLoop(CancellationToken cancellationToken)
+    private async Task _mockingLoop(CancellationToken cancellationToken)
     {
 
         DateTime lastSend = DateTime.Now;
 
         Console.WriteLine("_mockingLoop");
-
         Random random = new Random();
         while (!cancellationToken.IsCancellationRequested)
         {
+            int nbIter = 0;
+            List<Task> tasks = new List<Task>();
             foreach (var stationMock in stationMockers)
             {
-                var currentMockerIndex = 0;
-                foreach (var compConf in stationMock.StationConf.ConfigComponents)
-                {
-                    foreach (var mpConf in compConf.MeasurePointsConfigs)
-                    {
-
-                        if (random.Next(0, 100) > _maxErrorRate)
-                        {
-                            await _mqttService.SendSensorSavingRequest(stationMock.StationConf.StationDatabaseId,
-                                            mpConf.DatabaseId,
-                                            stationMock.MpMocker[currentMockerIndex].GetSensorData());
-                        }
-
-                        currentMockerIndex++;
-                    }
-                }
+                Task task = Task.Run(() => _sendAllDataFromStationAsync(stationMock));
+                tasks.Add(task);
             }
+
+            foreach (var task in tasks)
+            {
+                task.Wait();
+            }
+
             DateTime tmpNow = DateTime.Now;
             Console.WriteLine($"All data send in {lastSend.Subtract(tmpNow).TotalMilliseconds}ms, should be around {_dataFreq}ms, +/-10ms");
+            Console.WriteLine($"Nb update {nbIter}");
             lastSend = tmpNow;
             Thread.Sleep(_dataFreq);
+        }
+    }
+
+    private async Task _sendAllDataFromStationAsync(StationMocking stationMock)
+    {
+        var currentMockerIndex = 0;
+        foreach (var compConf in stationMock.StationConf.ConfigComponents)
+        {
+            foreach (var mpConf in compConf.MeasurePointsConfigs)
+            {
+                await _mqttService.SendSensorSavingRequest(stationMock.StationConf.StationDatabaseId,
+                                mpConf.DatabaseId,
+                                stationMock.MpMocker[currentMockerIndex].GetSensorData());
+                currentMockerIndex++;
+            }
         }
     }
 

@@ -103,15 +103,13 @@ public class MqttService(MqttSingleton mqttSingleton)
         }
     }
 
-    public Task SendSensorSavingRequest(int stationId, int measurePointId, float value)
+    public async Task SendSensorSavingRequest(int stationId, int measurePointId, float value)
     {
         var targetTopic = string.Format(CommunicationConstants.MQTT_SENSOR_TOPIC_FORMAT,
                                         stationId,
                                         measurePointId,
                                         CommunicationConstants.MQTT_SERVER_TARGET);
 
-        _ = mqttSingleton.PublishAsync(targetTopic, value.ToString());
-        
-        return Task.CompletedTask;
+        await mqttSingleton.PublishAsync(targetTopic, value.ToString());
     }
 }
