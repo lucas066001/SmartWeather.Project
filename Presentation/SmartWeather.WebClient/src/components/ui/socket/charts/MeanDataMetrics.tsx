@@ -122,7 +122,7 @@ function MeanDataMetrics({
 
     const updateMeanVolume = () => {
         const timeElapsed = (new Date().getTime() - lastVolumeCheck) / 1000;
-        setPreviousMeanVolume(previousMeanVolume);
+        setPreviousMeanVolume(meanVolume);
         const currentVolume = Number((refreshFrequency / timeElapsed).toFixed(2));
         setMeanDatas([...meanDatas, { time: new Date(), volume: currentVolume, latency: meanLatency }])
         setMeanVolume(currentVolume);
