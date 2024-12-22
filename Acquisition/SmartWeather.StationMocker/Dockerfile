@@ -8,18 +8,16 @@ EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /Application
-COPY "./Application/SmartWeather.Entities" ./SmartWeather.Entities
-COPY "./Application/SmartWeather.Repositories" ./SmartWeather.Repositories
-COPY "./Application/SmartWeather.Services" ./SmartWeather.Services
-WORKDIR /src/Acquisition
-COPY "./Acquisition/SmartWeather.StationMocker" .
-RUN dotnet restore "./SmartWeather.StationMocker.csproj"
-RUN dotnet build "./SmartWeather.StationMocker.csproj" -c $BUILD_CONFIGURATION -o /app/build
+COPY "./libs/SmartWeather.Entities" ./libs/SmartWeather.Entities
+COPY "./libs/SmartWeather.Repositories" ./libs/SmartWeather.Repositories
+COPY "./libs/SmartWeather.Services" ./libs/SmartWeather.Services
+COPY "./Acquisition/SmartWeather.StationMocker" ./Acquisition/SmartWeather.StationMocker
+RUN dotnet restore "./Acquisition/SmartWeather.StationMocker/SmartWeather.StationMocker.csproj"
+RUN dotnet build "./Acquisition/SmartWeather.StationMocker/SmartWeather.StationMocker.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./SmartWeather.StationMocker.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Acquisition/SmartWeather.StationMocker/SmartWeather.StationMocker.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

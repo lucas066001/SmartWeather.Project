@@ -5,8 +5,8 @@ services:
 
   smart-weather-api:
     build:
-      context: .
-      dockerfile: SmartWeather.Api/Dockerfile
+      context: ./..
+      dockerfile: ./Application/SmartWeather.Api/Dockerfile
     container_name: smart-weather-api
     ports:
       - "8081:8081"
@@ -38,8 +38,8 @@ services:
   smart-weather-historian:
     container_name: smart-weather-historian
     build:
-      context: .
-      dockerfile: SmartWeather.Historian/Dockerfile
+      context: ./..
+      dockerfile: ./Application/SmartWeather.Historian/Dockerfile
     ports:
       - "8090:8090"
     depends_on:
@@ -66,8 +66,8 @@ services:
   smart-weather-socket-api:
     container_name: smart-weather-socket-api
     build:
-      context: .
-      dockerfile: SmartWeather.Socket.Api/Dockerfile
+      context: ./..
+      dockerfile: ./Application/SmartWeather.Socket.Api/Dockerfile
     ports:
       - "8093:8093"
     depends_on:

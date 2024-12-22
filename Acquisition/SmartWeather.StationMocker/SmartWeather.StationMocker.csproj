@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Application\SmartWeather.Repositories\SmartWeather.Repositories.csproj" />
+    <ProjectReference Include="..\..\libs\SmartWeather.Repositories\SmartWeather.Repositories.csproj" />
   </ItemGroup>
 
   <Target Name="SetAppSettingsConfig" BeforeTargets="Compile">
