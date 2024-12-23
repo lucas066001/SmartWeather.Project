@@ -1,215 +1,118 @@
-# SmartWeather
-Personal project that aims to create a complete IOT environment for my own gardening system
+# SmartWeather 🌦️
 
-## Table of content
-
-1. [Install the pre-requisites](#installation)
-2. [Prepare the application](#prepare)
-3. [Helm](#3-helm)
-5. [Final Verification](#final-verification)
+SmartWeather is a microservices-based weather data acquisition system. It is designed to collect, process, and display weather data without relying on any existing weather stations. Instead, it integrates its own custom-built acquisition modules, a robust backend, and an interactive web interface.
 
 ---
 
-## Install the pre-requisites <a name="installation"></a>
+## Table of Contents 📚
 
-Follow these steps to install **Docker**, **Minikube**, **Helm**, and **Make**.
-
-1. [Docker](#1-docker)
-   - [Windows](#docker-windows)
-   - [Linux](#docker-linux)
-2. [Minikube](#2-minikube)
-   - [Windows](#minikube-windows)
-   - [Linux](#minikube-linux)
-3. [Helm](#3-helm)
-   - [Windows](#helm-windows)
-   - [Linux](#helm-linux)
-4. [Make](#4-make)
-   - [Windows](#make-windows)
-   - [Linux](#make-linux)
-5. [Final Verification](#final-verification)
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Quick Start](#quick-start)
+- [Directory Structure](#directory-structure)
+- [Technologies](#technologies)
+- [Contributors](#contributors)
+- [License](#license)
 
 ---
 
-### 1. Docker <a name="1-docker"></a>
+## Overview 📝
 
-#### Windows <a name="docker-windows"></a>
-1. **Download Docker Desktop**: [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/).
-2. **Install Docker Desktop**:
-   - Run the installer.
-   - Follow the on-screen instructions.
-   - Enable **WSL2** if prompted.
-3. **Test the installation**:
-   ```bash
-   docker --version
-   ```
+SmartWeather is built as a **monorepo** with multiple layers to handle data acquisition, processing, storage, and presentation. The application supports **containerization** using Docker Compose.Kubernetes orchestration will maybe appear in the future but not immediatly.
 
-#### Linux <a name="docker-linux"></a>
-1. **Install Docker**:
-   - Update your packages:
-     ```bash
-     sudo apt update && sudo apt upgrade -y
-     ```
-   - Install Docker:
-     ```bash
-     sudo apt install -y docker.io
-     ```
-2. **Enable Docker on startup**:
-   ```bash
-   sudo systemctl enable docker
-   sudo systemctl start docker
-   ```
-3. **Test the installation**:
-   ```bash
-   docker --version
-   ```
+Key Features:
+- **Embedded Systems Support**: C++ code runs on ESP32 microcontrollers for data acquisition.
+- **Microservices Architecture**: Each layer is modular to enable scaling and features additions.
+- **Real-Time Data Processing**: Kafka and MQTT enable seamless streaming and communication.
+- **Flexible Storage Solutions**: MySQL clusters for structured data and Elasticsearch for document-oriented data.
+- **Interactive Visualization**: Kibana, Kafka-ui and a web client for monitoring and administration.
 
 ---
 
-### 2. Minikube <a name="2-minikube"></a>
+## Architecture 🏗️
 
-#### Windows <a name="minikube-windows"></a>
-1. **Download Minikube**:
-   - Using **choco** (if Chocolatey is installed):
-     ```bash
-     choco install minikube
-     ```
-   - Or download from: [Minikube Releases](https://github.com/kubernetes/minikube/releases).
-2. **Test the installation**:
-   ```bash
-   minikube version
-   ```
+Most of SmartWeather services adopts an **n-tier architecture** with the following layers, for C# apps you will find theses layers in the [/libs](./libs/README.md) folder:
 
-#### Linux <a name="minikube-linux"></a>
-1. **Install Minikube**:
-   - Download the binary:
-     ```bash
-     curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-     ```
-   - Make it executable and move it to `/usr/local/bin`:
-     ```bash
-     chmod +x minikube-linux-amd64
-     sudo mv minikube-linux-amd64 /usr/local/bin/minikube
-     ```
-2. **Test the installation**:
-   ```bash
-   minikube version
-   ```
+1. **Entities** - Definition for the base entities that will structure application logic.
+2. **Repositories** - Persistence layer interface to abstract from databases implementation.
+3. **Services** - Main entrypoint for app integration, provides main functionalities to again abstract from repositories handling.
+
+Each layer represent a library, it also exist for C++ application but it is not currently delocalized in the [/libs](./libs/README.md) folder.
 
 ---
 
-### 3. Helm <a name="3-helm"></a>
+## Quick Start 🚀
 
-#### Windows <a name="helm-windows"></a>
-1. **Install Helm**:
-   - Using **choco**:
-     ```bash
-     choco install kubernetes-helm
-     ```
-   - Or download from: [Helm Releases](https://github.com/helm/helm/releases).
-2. **Test the installation**:
-   ```bash
-   helm version
-   ```
+SmartWeather.Project is made to be ultra portable, regardless of the complexity the project embded. Basically you will only need docker to run it, and a single command. If it's not the case, don't hesitate to open an Issue.
 
-#### Linux <a name="helm-linux"></a>
-1. **Install Helm**:
-   - Download the installation script:
-     ```bash
-     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-     ```
-2. **Test the installation**:
-   ```bash
-   helm version
-   ```
+### Prerequisites 🛠️
+- **Docker** and **Docker Compose** installed.
+- **.NET SDK** and **Node.js** (for development).
 
----
-
-### 4. Make <a name="4-make"></a>
-
-#### Windows <a name="make-windows"></a>
-1. **Download Make**:
-   - Go to the [GNU Make for Windows](http://gnuwin32.sourceforge.net/packages/make.htm) page.
-2. **Install Make**:
-   - Download the setup or zip file and extract it to a folder like `C:\Program Files\make`.
-3. **Add Make to PATH**:
-   - Open **Advanced System Settings** > **Environment Variables**.
-   - In `Path`, add the path to the `bin` folder inside the extracted directory (e.g., `C:\Program Files\make\bin`).
-4. **Test the installation**:
-   ```bash
-   make --version
-   ```
-
-#### Linux <a name="make-linux"></a>
-1. **Install Make**:
-   - On Debian-based systems:
-     ```bash
-     sudo apt update
-     sudo apt install -y make
-     ```
-   - On Red Hat-based systems:
-     ```bash
-     sudo yum install -y make
-     ```
-2. **Test the installation**:
-   ```bash
-   make --version
-   ```
-
----
-
-### Final Verification <a name="final-verification"></a>
-
-1. **Docker**:
-   ```bash
-   docker --version
-   ```
-2. **Minikube**:
-   ```bash
-   minikube version
-   ```
-3. **Helm**:
-   ```bash
-   helm version
-   ```
-4. **Make**:
-   ```bash
-   make --version
-   ```
-
-## Prepare the application <a name="prepare"></a>
-
-Follow these steps to **build local images** and **setup kubernetes env**.
-
-1. [Build local images](#1-local-images)
-2. [Setup kubernetes env](#2-setup-kube)
-
----
-
-### 1. Build local images <a name="1-local-images"></a>
-
-**A Makefile is here to automate the process** :
+### Deployment ⚡
 ```bash
-make gen-imgs
-```
-_This command will automatically generate all necessary images for your cluster to run_
+# Clone the repository
+git clone https://github.com/your-repo/SmartWeather.git
+cd SmartWeather.Project
 
-Additionnaly, if you want to generate only specific images or specific layer images, go check :
-```bash
-make gen-help
+# Start the entire application
+docker compose -f ./app.yml up -d
 ```
 
-### 2. Setup kubernetes env <a name="2-setup-kube"></a>
+### Accessing Services 🌐
+- Web Client: [http://localhost:3000](http://localhost:3000)
+- Kafka UI: [http://localhost:8080](http://localhost:8080)
+- Kibana: [http://localhost:5601](http://localhost:5601)
 
-**A Makefile is here to automate the process** :
-```bash
-make kube-init
-```
-_This command will automatically generate all necessary parameters for your minikube cluster_
+---
 
-Additionnaly, if you want to look at the specific actions, go check :
-```bash
-make kube-help
-```
+## Directory Structure 🗂️
 
+| Folder                   | Description                                                                                           |
+|--------------------------|-------------------------------------------------------------------------------------------------------|
+| `/Acquisition`           | Embedded software in C++ and mock station in C# for data collection.                                 |
+| `/Communication`         | MQTT brokers (HiveMQ, Mosquitto) and Kafka clusters for message handling.                            |
+| `/Application`           | C# applications including HTTP APIs, WebSocket APIs, and data historian services.                    |
+| `/Persistence`           | Databases: MySQL clusters and Elasticsearch for data storage.                                        |
+| `/Presentation`          | Visualization tools (Kibana, Kafka UI) and a web client built with React/Next.js.                    |
+| `/libs`                  | Shared C# libraries for entities, repositories, and services.                                        |
 
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+---
+
+## Technologies 🧰
+
+- **Programming Languages**: C++ (embedded), C# (backend), TypeScript (frontend).
+- **Databases**: MySQL (clustered), Elasticsearch.
+- **Messaging Systems**: Kafka, MQTT.
+- **Containerization**: Docker, Docker Compose.
+- **Frontend Framework**: React.js (Next.js).
+- **Monitoring Tools**: Kibana, Kafka UI.
+- **Orchestration**: Kubernetes (planned).
+
+---
+
+## Contributors 👥
+
+- **[lucas066001]** - Project Lead
+- **[matthias-goupil]** - Front-end developer
+
+---
+
+## License 📜
+
+SmartWeather is currently not made to be open-source nor public, see the [License](LICENSE) for details.
+
+---
+
+## Next Steps 🔧
+
+Explore each subdirectory for more detailed documentation:
+
+- [Acquisition](./Acquisition/README.md)
+- [Communication](./Communication/README.md)
+- [Application](./Application/README.md)
+- [Persistence](./Persistence/README.md)
+- [Presentation](./Presentation/README.md)
+- [Libraries](./libs/README.md)
+
+Happy coding! 😊
