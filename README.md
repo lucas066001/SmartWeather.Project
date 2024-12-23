@@ -6,7 +6,7 @@ SmartWeather is a microservices-based weather data acquisition system. It is des
 
 ## Table of Contents 📚
 
-- [Overview](#overview)
+- [Overview](#Overview)
 - [Architecture](#architecture)
 - [Quick Start](#quick-start)
 - [Directory Structure](#directory-structure)
