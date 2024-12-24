@@ -1,4 +1,4 @@
-# Application Layer 🖥️
+# SmartWeather.Application Layer 🖥️
 
 Welcome to the **Application Layer** of SmartWeather! This layer implements the business logic, exposes APIs, and provides real-time data streaming capabilities. It is written entirely in **C#** and follows an **n-tier architecture** with **exception-based programming**.
 

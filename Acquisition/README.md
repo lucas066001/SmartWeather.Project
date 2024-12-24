@@ -1,4 +1,4 @@
-# SmartWeather.Acquisition Layer 📡
+# SmartWeather.Acquisition Layer 🎛️
 
 Welcome to the **Acquisition Layer** of SmartWeather! This layer is responsible for collecting weather data directly from custom-built stations or mock environments. It includes both **embedded software** for ESP32 microcontrollers and a **mock station simulator** for testing purposes.
 
