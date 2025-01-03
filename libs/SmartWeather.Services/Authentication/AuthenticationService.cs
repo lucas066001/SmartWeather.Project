@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using SmartWeather.Entities.Common;
 using SmartWeather.Entities.Common.Exceptions;
 using SmartWeather.Entities.User;
 using SmartWeather.Entities.User.Exceptions;
@@ -46,10 +47,8 @@ public class AuthenticationService(IConfiguration configuration, IRepository<Use
     /// Generate a token based on app config and given User object.
     /// </summary>
     /// <param name="user">User to create access to.</param>
-    /// <returns>String representing token</returns>
-    /// <exception cref="FieldAccessException">Thrown if unable to access structural JWT configuration infos.</exception>
-    /// <exception cref="EntityCreationException">Thrown if unable to create token.</exception>
-    public string GenerateToken(User user)
+    /// <returns>Result containing string representing token</returns>
+    public Result<string> GenerateToken(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var issuer = configuration.GetSection(nameof(Jwt))[nameof(Jwt.Issuer)];
@@ -59,7 +58,7 @@ public class AuthenticationService(IConfiguration configuration, IRepository<Use
             string.IsNullOrEmpty(audience) ||
             string.IsNullOrEmpty(key))
         {
-            throw new FieldAccessException("Unable to retreive structural jwt infos");
+            return Result<string>.Failure(ExceptionsBaseMessages.SECURITY);
         }
 
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -81,13 +80,13 @@ public class AuthenticationService(IConfiguration configuration, IRepository<Use
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 
-            return tokenString;
+            return Result<string>.Success(tokenString);
         }
         catch (Exception ex) when (ex is ArgumentNullException ||
                                    ex is ArgumentException ||
                                    ex is SecurityTokenEncryptionFailedException)
         {
-            throw new EntityCreationException();
+            return Result<string>.Failure(ExceptionsBaseMessages.SECURITY);
         }
     }
 
@@ -95,35 +94,31 @@ public class AuthenticationService(IConfiguration configuration, IRepository<Use
     /// Retreive User unique Id from given token.
     /// </summary>
     /// <param name="token">String representing token.</param>
-    /// <returns>Retreived User unique Id from token.</returns>
-    /// <exception cref="SecurityTokenException">Thrown if unable to read token.</exception>
+    /// <returns>Result containing retreived User unique Id from token.</returns>
     public int GetUserIdFromToken(string token)
     {
-        var validationParameters = _getTokenValidationParameters();
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-        SecurityToken validatedToken;
-
         try
         {
+            var validationParameters = _getTokenValidationParameters();
+            var tokenHandler = new JwtSecurityTokenHandler();
+            SecurityToken validatedToken;
             tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
-        }
-        catch (Exception)
-        {
-            throw new SecurityTokenException("Unable to validate token");
-        }
+            var jwtToken = validatedToken as JwtSecurityToken ?? throw new SecurityTokenException("Invalid token");
 
-        var jwtToken = validatedToken as JwtSecurityToken ?? throw new SecurityTokenException("Invalid token");
+            var claimsUserId = jwtToken.Claims.FirstOrDefault(c => c.Type == "nameid")?.Value;
 
-        var claimsUserId = jwtToken.Claims.FirstOrDefault(c => c.Type == "nameid")?.Value;
-            
-        if(int.TryParse(claimsUserId, out int userId))
-        {
-            return userId;
+            if (int.TryParse(claimsUserId, out int userId))
+            {
+                return userId;
+            }
+            else
+            {
+                throw new SecurityTokenException("Unable to retreive UserId from token");
+            }
         }
-        else
+        catch
         {
-            throw new SecurityTokenException("Unable to retreive UserId from token");
+            return -1;
         }
     }
 
@@ -131,34 +126,32 @@ public class AuthenticationService(IConfiguration configuration, IRepository<Use
     /// Retreive User Role from given token.
     /// </summary>
     /// <param name="token">String representing token.</param>
-    /// <returns>Retreived User unique Id from token.</returns>
-    /// <exception cref="SecurityTokenException">Thrown if unable to read token.</exception>
+    /// <returns>Result containing retreived User Role from token.</returns>
     public Role GetUserRoleFromToken(string token)
     {
-        var validationParameters = _getTokenValidationParameters();
-        var tokenHandler = new JwtSecurityTokenHandler();
-        SecurityToken validatedToken;
-
         try
         {
+            var validationParameters = _getTokenValidationParameters();
+            var tokenHandler = new JwtSecurityTokenHandler();
+            SecurityToken validatedToken;
             tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
-        }
-        catch (Exception)
-        {
-            throw new SecurityTokenException("Unable to validate token");
-        }
 
-        var jwtToken = validatedToken as JwtSecurityToken ?? throw new SecurityTokenException("Invalid token");
+            var jwtToken = validatedToken as JwtSecurityToken ?? throw new SecurityTokenException("Invalid token");
 
-        var claimsUserRole = jwtToken.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
+            var claimsUserRole = jwtToken.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
 
-        if (int.TryParse(claimsUserRole, out int role))
-        {
-            return (Role)role;
+            if (int.TryParse(claimsUserRole, out int role))
+            {
+                return (Role)role;
+            }
+            else
+            {
+                throw new SecurityTokenException("Unable to retreive Role from token");
+            }
         }
-        else
+        catch
         {
-            throw new SecurityTokenException("Unable to retreive Role from token");
+            return Role.Unauthorized;
         }
     }
 
@@ -168,23 +161,36 @@ public class AuthenticationService(IConfiguration configuration, IRepository<Use
     /// <param name="username">String representing User username.</param>
     /// <param name="mail">String representing User mail.</param>
     /// <param name="password">String representing User password.</param>
-    /// <returns>A Tuple formed with User entity and it's corresponding token.</returns>
-    /// <exception cref="EntityCreationException">Thrown if Unable to create User or Token.</exception>
-    /// <exception cref="EntitySavingException">Thrown if error occurs during saving User in database.</exception>
-    public Tuple<User, string> Register(string username, string mail, string password)
+    /// <returns>Result containing a Tuple formed with User entity and it's corresponding token.</returns>
+    public Result<Tuple<User, string>> Register(string username, string mail, string password)
     {
         try
         {
             User userToCreate = new(username, mail, password);
-            User createdUser = userBaseRepository.Create(userToCreate);
-            return new Tuple<User, string>(createdUser, GenerateToken(createdUser));
+            Result<User> createdUser = userBaseRepository.Create(userToCreate);
+            if (createdUser.IsSuccess)
+            {
+                Result<string> tokenResult = GenerateToken(createdUser.Value);
+                return tokenResult.IsSuccess ? 
+                                Result<Tuple<User, string>>.Success(
+                                                                new(createdUser.Value, tokenResult.Value)) :
+                                Result<Tuple<User, string>>.Failure(tokenResult.ErrorMessage);
+
+            }
+            else
+            {
+                return Result<Tuple<User, string>>.Failure(createdUser.ErrorMessage);
+            }
         }
         catch (Exception ex) when (ex is InvalidUserEmailException ||
                                    ex is InvalidUserPasswordException ||
                                    ex is InvalidUserNameException || 
                                    ex is FieldAccessException)
         {
-            throw new EntityCreationException();
+            return Result<Tuple<User, string>>.Failure(string.Format(
+                                                                ExceptionsBaseMessages.ENTITY_FORMAT,
+                                                                nameof(User),
+                                                                ex.Message));
         }
     }
 
@@ -193,19 +199,21 @@ public class AuthenticationService(IConfiguration configuration, IRepository<Use
     /// </summary>
     /// <param name="email">String representing User email to check.</param>
     /// <param name="password">String representing User password to check.</param>
-    /// <returns>A Tuple formed with User entity and it's corresponding token.</returns>
-    /// <exception cref="EntityFetchingException">Thrown if credentials are incorrects.</exception>
-    /// <exception cref="EntityCreationException">Thrown if errors occurs during token creation.</exception>
-    public Tuple<User, string> Signin(string email, string password)
+    /// <returns>Result conatining a Tuple formed with User entity and it's corresponding token.</returns>
+    public Result<Tuple<User, string>> Signin(string email, string password)
     {
-        try
+        Result<User> connectedUser = authenticationRepository.GetUserFromCredential(User.HashPassword(password), email);
+        if (connectedUser.IsSuccess)
         {
-            User connectedUser = authenticationRepository.GetUserFromCredential(User.HashPassword(password), email);
-            return new Tuple<User, string>(connectedUser, GenerateToken(connectedUser));
+            Result<string> tokenResult = GenerateToken(connectedUser.Value);
+            return tokenResult.IsSuccess ?
+                            Result<Tuple<User, string>>.Success(
+                                                            new(connectedUser.Value, tokenResult.Value)) :
+                            Result<Tuple<User, string>>.Failure(tokenResult.ErrorMessage);
         }
-        catch(FieldAccessException)
+        else
         {
-            throw new EntityCreationException();
+            return Result<Tuple<User, string>>.Failure(connectedUser.ErrorMessage);
         }
     }
 }

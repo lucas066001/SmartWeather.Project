@@ -1,6 +1,7 @@
 ﻿namespace SmartWeather.Repositories.BaseRepository;
 
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using SmartWeather.Entities.Common;
 using SmartWeather.Entities.Common.Exceptions;
 using SmartWeather.Repositories.Context;
 using SmartWeather.Services.Repositories;
@@ -9,68 +10,83 @@ public class Repository<T>(SmartWeatherContext masterContext,
                            SmartWeatherReadOnlyContext readOnlyContext)
                            : IRepository<T> where T : class
 {
-    public T Create(T entity)
+    public Result<T> Create(T entity)
     {
         try
         {
             var create = masterContext.Set<T>().Add(entity);
             masterContext.SaveChanges();
 
-            return create.Entity;
+            return Result<T>.Success(create.Entity);
         }
         catch
         {
-            throw new EntitySavingException();
+            return Result<T>.Failure(string.Format(
+                                        ExceptionsBaseMessages.ENTITY_SAVE,
+                                        typeof(T).Name));
         }
     }
 
-    public T Update(T entity)
+    public Result<T> Update(T entity)
     {
         try
         {
             var update = masterContext.Set<T>().Update(entity);
             masterContext.SaveChanges();
 
-            return update.Entity;
+            return Result<T>.Success(update.Entity);
         }
         catch
         {
-            throw new EntitySavingException();
-
+            return Result<T>.Failure(string.Format(
+                                            ExceptionsBaseMessages.ENTITY_SAVE,
+                                            typeof(T).Name));
         }
     }
 
-    public T Delete(int entityId)
+    public Result<T> Delete(int entityId)
     {
         var found = masterContext.Set<T>().Find([entityId]);
         EntityEntry<T> trackedDeletion;
 
         if (found == null)
         {
-            throw new EntityFetchingException();
+            return Result<T>.Failure(string.Format(
+                                ExceptionsBaseMessages.ENTITY_FETCH,
+                                typeof(T).Name));
         }
 
         try
         {
             trackedDeletion = masterContext.Set<T>().Remove(found);
             masterContext.SaveChanges();
-            return trackedDeletion.Entity;
+            return Result<T>.Success(trackedDeletion.Entity);
         }
         catch
         {
-            throw new EntitySavingException();
+            return Result<T>.Failure(string.Format(
+                                ExceptionsBaseMessages.ENTITY_SAVE,
+                                typeof(T).Name));
         }
     }
 
-    public T GetById(int id)
+    public Result<T> GetById(int id)
     {
         var entity = readOnlyContext.Set<T>().Find([id]);
-        return entity ?? throw new EntityFetchingException();
+        return entity != null ?
+            Result<T>.Success(entity) : 
+            Result<T>.Failure(string.Format(
+                                ExceptionsBaseMessages.ENTITY_FETCH,
+                                typeof(T).Name));
     }
 
-    public IEnumerable<T> GetAll()
+    public Result<IEnumerable<T>> GetAll()
     {
         var entities = readOnlyContext.Set<T>().AsEnumerable();
-        return entities ?? throw new EntityFetchingException();
+        return entities != null ?
+            Result<IEnumerable<T>>.Success(entities) :
+            Result<IEnumerable<T>>.Failure(string.Format(
+                                    ExceptionsBaseMessages.ENTITY_FETCH,
+                                    typeof(T).Name));
     }
 }

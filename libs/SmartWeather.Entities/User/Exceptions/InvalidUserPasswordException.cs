@@ -1,3 +1,12 @@
-﻿namespace SmartWeather.Entities.User.Exceptions;
+﻿using SmartWeather.Entities.Common.Exceptions;
 
-public class InvalidUserPasswordException : Exception;
+namespace SmartWeather.Entities.User.Exceptions;
+
+public class InvalidUserPasswordException : Exception
+{
+    public InvalidUserPasswordException() : base(string
+                                                .Format(ExceptionsBaseMessages.ENTITY_FORMAT,
+                                                nameof(User),
+                                                "Wrong Password, value must be not empty"))
+    { }
+}

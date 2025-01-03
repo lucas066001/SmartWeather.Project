@@ -5,53 +5,50 @@ using SmartWeather.Entities.MeasurePoint;
 using SmartWeather.Entities.Common.Exceptions;
 using SmartWeather.Repositories.Context;
 using SmartWeather.Services.MeasurePoints;
+using SmartWeather.Entities.Common;
 
 public class MeasurePointRepository(SmartWeatherReadOnlyContext readOnlyContext) : IMeasurePointRepository
 {
-    public MeasurePoint GetById(int measurePointId, bool includeComponent, bool includeStation)
+    public Result<MeasurePoint> GetById(int measurePointId, bool includeComponent, bool includeStation)
     {
+        MeasurePoint? measurePointRetreived = null;
         if (includeStation)
         {
-            var measurePointRetreived = readOnlyContext.MeasurePoints
+            measurePointRetreived = readOnlyContext.MeasurePoints
                                                         .Include(mp => mp.Component)
                                                         .ThenInclude(c => c.Station)
                                                         .Where(mp => mp.Id == measurePointId)
                                                         .FirstOrDefault();
-            return measurePointRetreived ?? throw new EntityFetchingException();
         }
         else if (includeComponent)
         {
-            var measurePointRetreived = readOnlyContext.MeasurePoints
+            measurePointRetreived = readOnlyContext.MeasurePoints
                                                        .Include(mp => mp.Component)
                                                        .Where(mp => mp.Id == measurePointId)
                                                        .FirstOrDefault();
-            return measurePointRetreived ?? throw new EntityFetchingException();
         }
         else
         {
-            var measurePointRetreived = readOnlyContext.MeasurePoints
+            measurePointRetreived = readOnlyContext.MeasurePoints
                                                        .Where(mp => mp.Id == measurePointId)
                                                        .FirstOrDefault();
-            return measurePointRetreived ?? throw new EntityFetchingException();
         }
+        return measurePointRetreived != null ? 
+                    Result<MeasurePoint>.Success(measurePointRetreived) : 
+                    Result<MeasurePoint>.Failure(string.Format(
+                                                            ExceptionsBaseMessages.ENTITY_FETCH,
+                                                            nameof(MeasurePoint)));
     }
 
-    public IEnumerable<MeasurePoint> GetFromComponent(int idComponent)
+    public Result<IEnumerable<MeasurePoint>> GetFromComponent(int idComponent)
     {
-        var measurePointsRetreived = readOnlyContext.MeasurePoints.Where(cd => cd.ComponentId == idComponent).AsEnumerable();
-        return measurePointsRetreived ?? throw new EntityFetchingException();
-    }
-
-    public bool IsOwnerOfMeasurePoint(int userId, int measurePointId)
-    {
-        var measurePointRetreived = readOnlyContext.MeasurePoints
-                                        .Where(mp => mp.Id == measurePointId)
-                                        .Include(mp => mp.Component)
-                                        .ThenInclude(cp => cp.Station)
-                                        .FirstOrDefault();
-        
-        if(measurePointRetreived == null) throw new EntityFetchingException();
-
-        return measurePointRetreived.Component.Station.UserId == userId;
+        var measurePointsRetreived = readOnlyContext.MeasurePoints
+                                                    .Where(cd => cd.ComponentId == idComponent)
+                                                    .AsEnumerable();
+        return measurePointsRetreived != null ?
+            Result<IEnumerable<MeasurePoint>>.Success(measurePointsRetreived) :
+            Result<IEnumerable<MeasurePoint>>.Failure(string.Format(
+                                                        ExceptionsBaseMessages.ENTITY_FETCH,
+                                                        nameof(MeasurePoint)));
     }
 }

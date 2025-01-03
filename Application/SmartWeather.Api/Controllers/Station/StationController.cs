@@ -9,7 +9,6 @@ using SmartWeather.Api.Controllers.Station.Dtos.Converters;
 using SmartWeather.Entities.Station;
 using SmartWeather.Services.Authentication;
 using SmartWeather.Entities.User;
-using Microsoft.IdentityModel.Tokens;
 using SmartWeather.Api.Helpers;
 using SmartWeather.Entities.Common.Exceptions;
 
@@ -41,28 +40,18 @@ public class StationController : ControllerBase
             return BadRequest(ApiResponse<StationResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        try
+        var createdStation = _stationService.AddNewStation(request.Name, request.MacAddress, request.Latitude, request.Longitude, request.UserId);
+
+        if (createdStation.IsFailure)
         {
-            Station createdStation = _stationService.AddNewStation(request.Name, request.MacAddress, request.Latitude, request.Longitude, request.UserId);
-            formattedResponse = StationResponseConverter.ConvertStationToStationResponse(createdStation);
-            response = ApiResponse<StationResponse>.Success(formattedResponse);
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntityCreationException)
-        {
-            response = ApiResponse<StationResponse>.Failure(BaseResponses.VALIDATION_ERROR, Status.VALIDATION_ERROR);
+            response = ApiResponse<StationResponse>.Failure(createdStation.ErrorMessage);
             return BadRequest(response);
         }
-        catch (Exception ex) when (ex is EntitySavingException)
-        {
-            response = ApiResponse<StationResponse>.Failure(BaseResponses.DATABASE_ERROR, Status.DATABASE_ERROR);
-            return BadRequest(response);
-        }
-        catch
-        {
-            response = ApiResponse<StationResponse>.Failure();
-            return BadRequest(response);
-        }
+
+        formattedResponse = StationResponseConverter.ConvertStationToStationResponse(createdStation.Value);
+        response = ApiResponse<StationResponse>.Success(formattedResponse);
+        
+        return Ok(response);
     }
 
     [HttpPost(nameof(Claim))]
@@ -79,48 +68,39 @@ public class StationController : ControllerBase
             return BadRequest(ApiResponse<StationResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        try
-        {
-            int userId = _authenticationService.GetUserIdFromToken(token);
+        var userId = _authenticationService.GetUserIdFromToken(token);
 
-            Station retreivedStation = _stationService.GetStationByMacAddress(request.MacAddress);
-
-            retreivedStation = _stationService.UpdateStation(retreivedStation.Id,
-                                          retreivedStation.Name,
-                                          retreivedStation.MacAddress,
-                                          retreivedStation.Latitude,
-                                          retreivedStation.Longitude,
-                                          userId);
-
-            formattedResponse = StationResponseConverter.ConvertStationToStationResponse(retreivedStation);
-            response = ApiResponse<StationResponse>.Success(formattedResponse);
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is SecurityTokenException)
+        if (userId == -1)
         {
             response = ApiResponse<StationResponse>.Failure();
             return Unauthorized(response);
         }
-        catch (Exception ex) when (ex is EntityFetchingException)
+
+        var retreivedStation = _stationService.GetStationByMacAddress(request.MacAddress);
+
+        if (retreivedStation.IsFailure)
         {
-            response = ApiResponse<StationResponse>.NoContent();
+            response = ApiResponse<StationResponse>.Failure(retreivedStation.ErrorMessage);
             return BadRequest(response);
         }
-        catch (Exception ex) when (ex is EntityCreationException)
+
+        var updatedStation = _stationService.UpdateStation(retreivedStation.Value.Id,
+                                        retreivedStation.Value.Name,
+                                        retreivedStation.Value.MacAddress,
+                                        retreivedStation.Value.Latitude,
+                                        retreivedStation.Value.Longitude,
+                                        userId);
+
+        if (updatedStation.IsFailure)
         {
-            response = ApiResponse<StationResponse>.Failure(BaseResponses.VALIDATION_ERROR, Status.VALIDATION_ERROR);
+            response = ApiResponse<StationResponse>.Failure(updatedStation.ErrorMessage);
             return BadRequest(response);
         }
-        catch (Exception ex) when (ex is EntitySavingException)
-        {
-            response = ApiResponse<StationResponse>.Failure(BaseResponses.DATABASE_ERROR, Status.DATABASE_ERROR);
-            return BadRequest(response);
-        }
-        catch
-        {
-            response = ApiResponse<StationResponse>.Failure();
-            return BadRequest(response);
-        }
+
+        formattedResponse = StationResponseConverter.ConvertStationToStationResponse(updatedStation.Value);
+        response = ApiResponse<StationResponse>.Success(formattedResponse);
+        
+        return Ok(response);
     }
 
     [HttpPut(nameof(Update))]
@@ -141,28 +121,19 @@ public class StationController : ControllerBase
             return Unauthorized(response);
         }
 
-        try
+
+        var updatedStation = _stationService.UpdateStation(request.Id, request.Name, request.MacAddress, request.Latitude, request.Longitude, request.UserId);
+
+        if (updatedStation.IsFailure)
         {
-            Station updatedStation = _stationService.UpdateStation(request.Id, request.Name, request.MacAddress, request.Latitude, request.Longitude, request.UserId);
-            formattedResponse = StationResponseConverter.ConvertStationToStationResponse(updatedStation);
-            response = ApiResponse<StationResponse>.Success(formattedResponse);
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntityCreationException)
-        {
-            response = ApiResponse<StationResponse>.Failure(BaseResponses.VALIDATION_ERROR, Status.VALIDATION_ERROR);
+            response = ApiResponse<StationResponse>.Failure(updatedStation.ErrorMessage);
             return BadRequest(response);
         }
-        catch (Exception ex) when (ex is EntitySavingException)
-        {
-            response = ApiResponse<StationResponse>.Failure(BaseResponses.DATABASE_ERROR, Status.DATABASE_ERROR);
-            return BadRequest(response);
-        }
-        catch
-        {
-            response = ApiResponse<StationResponse>.Failure();
-            return BadRequest(response);
-        }
+
+        formattedResponse = StationResponseConverter.ConvertStationToStationResponse(updatedStation.Value);
+        response = ApiResponse<StationResponse>.Success(formattedResponse);
+        
+        return Ok(response);
     }
 
     [HttpDelete(nameof(Delete))]
@@ -181,23 +152,15 @@ public class StationController : ControllerBase
             return Unauthorized(response);
         }
 
-        try
+        bool isStationDeleted = _stationService.DeleteStation(idStation);
+        if (isStationDeleted)
         {
-            bool isStationDeleted = _stationService.DeleteStation(idStation);
-            if (isStationDeleted)
-            {
-                response = ApiResponse<EmptyResponse>.Success(null);
-                return Ok(response);
-            }
-            else
-            {
-                response = ApiResponse<EmptyResponse>.Failure(BaseResponses.DATABASE_ERROR);
-                return BadRequest(response);
-            }
+            response = ApiResponse<EmptyResponse>.Success(null);
+            return Ok(response);
         }
-        catch
+        else
         {
-            response = ApiResponse<EmptyResponse>.Failure();
+            response = ApiResponse<EmptyResponse>.Failure(BaseResponses.DATABASE_ERROR);
             return BadRequest(response);
         }
     }
@@ -218,23 +181,19 @@ public class StationController : ControllerBase
             return Unauthorized(response);
         }
 
-        try
+        var stationList = _stationService.GetFromUser(userId);
+
+
+        if (stationList.IsFailure)
         {
-            IEnumerable<Station> stationList = _stationService.GetFromUser(userId);
-            StationListResponse formattedResponse = StationListResponseConverter.ConvertStationListToStationListResponse(stationList);
-            response = ApiResponse<StationListResponse>.Success(formattedResponse);
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntityFetchingException)
-        {
-            response = ApiResponse<StationListResponse>.NoContent();
-            return Ok(response);
-        }
-        catch 
-        {
-            response = ApiResponse<StationListResponse>.Failure();
+            response = ApiResponse<StationListResponse>.Failure(stationList.ErrorMessage);
             return BadRequest(response);
         }
+
+        StationListResponse formattedResponse = StationListResponseConverter.ConvertStationListToStationListResponse(stationList.Value);
+        response = ApiResponse<StationListResponse>.Success(formattedResponse);
+        
+        return Ok(response);
     }
 
 
@@ -254,22 +213,18 @@ public class StationController : ControllerBase
             return Unauthorized(response);
         }
 
-        try
+
+        var stationRetreived = _stationService.GetStationById(idStation);
+
+        if (stationRetreived.IsFailure)
         {
-            Station stationRetreived = _stationService.GetStationById(idStation);
-            response = ApiResponse<StationResponse>.Success(StationResponseConverter.ConvertStationToStationResponse(stationRetreived));
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntityFetchingException)
-        {
-            response = ApiResponse<StationResponse>.NoContent();
-            return Ok(response);
-        }
-        catch
-        {
-            response = ApiResponse<StationResponse>.Failure();
+            response = ApiResponse<StationResponse>.Failure(stationRetreived.ErrorMessage);
             return BadRequest(response);
         }
+
+        response = ApiResponse<StationResponse>.Success(StationResponseConverter.ConvertStationToStationResponse(stationRetreived.Value));
+        
+        return Ok(response);
     }
 
     [HttpGet(nameof(GetAll))]
@@ -278,38 +233,26 @@ public class StationController : ControllerBase
         ApiResponse<StationListResponse> response;
         var token = HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
 
-        try
-        {
-            Role userRole = _authenticationService.GetUserRoleFromToken(token);
 
-            if (!RoleAccess.ADMINISTRATORS.Contains(userRole))
-            {
-                throw new UnauthorizedAccessException();
-            }
-        }
-        catch(Exception ex) when (ex is SecurityTokenException ||
-                                  ex is UnauthorizedAccessException)
+        var userRole = _authenticationService.GetUserRoleFromToken(token);
+
+        if (userRole == Role.Unauthorized || !RoleAccess.ADMINISTRATORS.Contains(userRole))
         {
-            response = ApiResponse<StationListResponse>.Failure();
+            response = ApiResponse<StationListResponse>.Failure(ExceptionsBaseMessages.SECURITY);
             return Unauthorized(response);
         }
 
-        try
+        var stationsRetreived = _stationService.GetAll(includeComponents, includeMeasurePoints);
+
+        if (stationsRetreived.IsFailure)
         {
-            IEnumerable<Station> stationsRetreived = _stationService.GetAll(includeComponents, includeMeasurePoints);
-            response = ApiResponse<StationListResponse>.Success(StationListResponseConverter.ConvertStationListToStationListResponse(stationsRetreived));
-            return Ok(response);
+            response = ApiResponse<StationListResponse>.Failure(stationsRetreived.ErrorMessage);
+            return Unauthorized(response);
         }
-        catch (Exception ex) when (ex is EntityFetchingException)
-        {
-            response = ApiResponse<StationListResponse>.NoContent();
-            return Ok(response);
-        }
-        catch 
-        {
-            response = ApiResponse<StationListResponse>.Failure();
-            return BadRequest(response);
-        }
+
+        response = ApiResponse<StationListResponse>.Success(StationListResponseConverter.ConvertStationListToStationListResponse(stationsRetreived.Value));
+        
+        return Ok(response);
     }
 
     [HttpGet(nameof(GetStationsMeasurePoints))]
@@ -318,43 +261,29 @@ public class StationController : ControllerBase
         ApiResponse<List<StationMeasurePointsResponse>> response;
         var token = HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
 
-        try
-        {
-            Role userRole = _authenticationService.GetUserRoleFromToken(token);
+        var userRole = _authenticationService.GetUserRoleFromToken(token);
 
-            if (!RoleAccess.ADMINISTRATORS.Contains(userRole))
-            {
-                throw new UnauthorizedAccessException();
-            }
-        }
-        catch (Exception ex) when (ex is SecurityTokenException ||
-                                  ex is UnauthorizedAccessException)
+        if (userRole == Role.Unauthorized || !RoleAccess.ADMINISTRATORS.Contains(userRole))
         {
-            response = ApiResponse<List<StationMeasurePointsResponse>>.Failure();
+            response = ApiResponse<List<StationMeasurePointsResponse>>.Failure(ExceptionsBaseMessages.SECURITY);
             return Unauthorized(response);
         }
 
-        try
+        var stationsRetreived = _stationService.GetAll(true, true);
+
+        if (stationsRetreived.IsFailure)
         {
-            IEnumerable<Station> stationsRetreived = _stationService.GetAll(true, true);
-            List<StationMeasurePointsResponse> result = new List<StationMeasurePointsResponse>();
-            foreach (Station station in stationsRetreived)
-            {
-                result.Add(StationMeasurePointsResponseConverter.ConvertStationResponseToStationMeasurePointResponse(station));
-            }
-            response = ApiResponse<List<StationMeasurePointsResponse>>.Success(result);
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntityFetchingException)
-        {
-            response = ApiResponse<List<StationMeasurePointsResponse>>.NoContent();
-            return Ok(response);
-        }
-        catch
-        {
-            response = ApiResponse<List<StationMeasurePointsResponse>>.Failure();
+            response = ApiResponse<List<StationMeasurePointsResponse>>.Failure(stationsRetreived.ErrorMessage);
             return BadRequest(response);
         }
-    }
 
+        List<StationMeasurePointsResponse> result = new List<StationMeasurePointsResponse>();
+        foreach (Station station in stationsRetreived.Value)
+        {
+            result.Add(StationMeasurePointsResponseConverter.ConvertStationResponseToStationMeasurePointResponse(station));
+        }
+        response = ApiResponse<List<StationMeasurePointsResponse>>.Success(result);
+            
+        return Ok(response);
+    }
 }

@@ -6,43 +6,43 @@ using SmartWeather.Entities.Common.Exceptions;
 using SmartWeather.Repositories.Context;
 using SmartWeather.Services.Components;
 using System.Collections.Generic;
+using SmartWeather.Entities.Common;
 
 public class ComponentRepository(SmartWeatherReadOnlyContext readOnlyContext) : IComponentRepository
 {
-    public Component GetById(int componentId, bool includeStation)
+    public Result<Component> GetById(int componentId, bool includeStation)
     {
+        Component? componentRetreived = null;
+
         if (includeStation)
         {
-            var componentsRetreived = readOnlyContext.Components
+            componentRetreived = readOnlyContext.Components
                                                      .Include(c => c.Station)
-                                                     .Where(c => c.Id == componentId).FirstOrDefault();
-
-            return componentsRetreived ?? throw new EntityFetchingException();
+                                                     .Where(c => c.Id == componentId)
+                                                     .FirstOrDefault();
         }
         else
         {
-            var componentsRetreived = readOnlyContext.Components
-                                         .Where(c => c.Id == componentId).FirstOrDefault();
-
-            return componentsRetreived ?? throw new EntityFetchingException();
+            componentRetreived = readOnlyContext.Components
+                                                     .Where(c => c.Id == componentId)
+                                                     .FirstOrDefault();
         }
+
+        return componentRetreived != null ?
+                                        Result<Component>.Success(componentRetreived) :
+                                        Result<Component>.Failure(string.Format(
+                                                                        ExceptionsBaseMessages.ENTITY_FETCH,
+                                                                        nameof(Component)));
     }
 
-    public IEnumerable<Component> GetFromStation(int stationId)
+    public Result<IEnumerable<Component>> GetFromStation(int stationId)
     {
         var componentsRetreived = readOnlyContext.Components.Where(s => s.StationId == stationId).ToList();
 
-        return componentsRetreived ?? throw new EntityFetchingException();
-    }
-
-    public bool IsOwnerOfComponent(int userId, int idComponent)
-    {
-        var component = readOnlyContext.Components.Where(s => s.Id == idComponent)
-            .Include(c => c.Station)
-            .FirstOrDefault();
-
-        if(component == null) throw new EntityFetchingException();
-
-        return component.Station.UserId == userId;
+        return componentsRetreived != null ?
+                    Result<IEnumerable<Component>>.Success(componentsRetreived) :
+                    Result<IEnumerable<Component>>.Failure(string.Format(
+                                                            ExceptionsBaseMessages.ENTITY_FETCH,
+                                                            nameof(Component)));
     }
 }

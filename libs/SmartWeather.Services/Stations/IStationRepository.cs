@@ -1,8 +1,8 @@
 ﻿namespace SmartWeather.Services.Stations;
 
 using SmartWeather.Entities.Station;
-using SmartWeather.Entities.Common.Exceptions;
 using System.Collections.Generic;
+using SmartWeather.Entities.Common;
 
 public interface IStationRepository
 {
@@ -10,17 +10,15 @@ public interface IStationRepository
     /// Retreive all Stations owned by a User.
     /// </summary>
     /// <param name="userId">Int representing unique Id of Station owner.</param>
-    /// <returns>A list of Station.</returns>
-    /// <exception cref="EntityFetchingException">Thrown if no data is found.</exception>
-    public IEnumerable<Station> GetFromUser(int userId);
+    /// <returns>Result containing a list of Station.</returns>
+    public Result<IEnumerable<Station>> GetFromUser(int userId);
 
     /// <summary>
     /// Retreive a Station based on given mac address.
     /// </summary>
     /// <param name="macAddress">Mac address owned by desired station.</param>
-    /// <returns>A Station.</returns>
-    /// <exception cref="EntityFetchingException">Thrown if no data is found.</exception>
-    public Station GetByMacAddress(string macAddress);
+    /// <returns>Result containing a Station.</returns>
+    public Result<Station> GetByMacAddress(string macAddress);
 
     /// <summary>
     /// Retreive all Stations from table.
@@ -28,7 +26,6 @@ public interface IStationRepository
     /// </summary>
     /// <param name="includeComponents">Bool indicating to include or not station's components.</param>
     /// <param name="includeMeasurePoints">Bool indicating to include or not station's measure points.</param>
-    /// <returns>List of Station.</returns>
-    /// <exception cref="EntityFetchingException">Thrown if no data is found.</exception>
-    public IEnumerable<Station> GetAll(bool includeComponents, bool includeMeasurePoints);
+    /// <returns>Result containing a list of Station.</returns>
+    public Result<IEnumerable<Station>> GetAll(bool includeComponents, bool includeMeasurePoints);
 }

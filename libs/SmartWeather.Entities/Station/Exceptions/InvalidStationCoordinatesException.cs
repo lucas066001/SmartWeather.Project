@@ -1,3 +1,13 @@
-﻿namespace SmartWeather.Entities.Station.Exceptions;
+﻿using SmartWeather.Entities.Common.Exceptions;
 
-public class InvalidStationCoordinatesException : Exception;
+namespace SmartWeather.Entities.Station.Exceptions;
+
+public class InvalidStationCoordinatesException : Exception
+{
+    public InvalidStationCoordinatesException() : base(string
+                                                        .Format(ExceptionsBaseMessages.ENTITY_FORMAT,
+                                                        nameof(Station),
+                                                        "Wrong coordinates, value must be in [-90:90] range")){ }
+}
+
+

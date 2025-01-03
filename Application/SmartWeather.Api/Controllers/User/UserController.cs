@@ -7,7 +7,6 @@ using SmartWeather.Services.Authentication;
 using SmartWeather.Services.Users;
 using SmartWeather.Api.Controllers.User.Dtos.Converters;
 using SmartWeather.Api.Helpers;
-using SmartWeather.Api.Controllers.Station.Dtos;
 using SmartWeather.Entities.Common.Exceptions;
 using SmartWeather.Entities.User;
 using Microsoft.IdentityModel.Tokens;
@@ -40,28 +39,26 @@ public class UserController : ControllerBase
             return BadRequest(ApiResponse<UserCreateResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
         }
 
-        try
+        var createdUser = _userService.AddNewUser(request.Name, request.Email, request.Password);
+
+        if (createdUser.IsFailure)
         {
-            Entities.User.User createdUser = _userService.AddNewUser(request.Name, request.Email, request.Password);
-            formattedResponse = UserCreateResponseConverter.ConvertUserToUserCreateResponse(createdUser, _authenticationService.GenerateToken(createdUser));
-            response = ApiResponse<UserCreateResponse>.Success(formattedResponse);
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntityCreationException)
-        {
-            response = ApiResponse<UserCreateResponse>.Failure(BaseResponses.VALIDATION_ERROR, Status.VALIDATION_ERROR);
+            response = ApiResponse<UserCreateResponse>.Failure(createdUser.ErrorMessage);
             return BadRequest(response);
         }
-        catch (Exception ex) when (ex is EntitySavingException)
+
+        var generatedToken = _authenticationService.GenerateToken(createdUser.Value);
+
+        if(generatedToken.IsFailure)
         {
-            response = ApiResponse<UserCreateResponse>.Failure(BaseResponses.DATABASE_ERROR, Status.DATABASE_ERROR);
+            response = ApiResponse<UserCreateResponse>.Failure(generatedToken.ErrorMessage);
             return BadRequest(response);
         }
-        catch
-        {
-            response = ApiResponse<UserCreateResponse>.Failure();
-            return BadRequest(response);
-        }
+
+        formattedResponse = UserCreateResponseConverter.ConvertUserToUserCreateResponse(createdUser.Value, generatedToken.Value);
+        response = ApiResponse<UserCreateResponse>.Success(formattedResponse);
+        
+        return Ok(response);
     }
 
     [HttpPut(nameof(Update))]
@@ -84,28 +81,18 @@ public class UserController : ControllerBase
             return Unauthorized(response);
         }
 
-        try
+        var updatedUser = _userService.UpdateUser(request.Id, request.Password, request.Email, request.Name);
+
+        if (updatedUser.IsFailure)
         {
-            User updatedUser = _userService.UpdateUser(request.Id, request.Password, request.Email, request.Name);
-            formattedResponse = UserResponseConverter.ConvertUserToUserResponse(updatedUser);
-            response = ApiResponse<UserResponse>.Success(formattedResponse);
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntityCreationException)
-        {
-            response = ApiResponse<UserResponse>.Failure(BaseResponses.VALIDATION_ERROR, Status.VALIDATION_ERROR);
+            response = ApiResponse<UserResponse>.Failure(updatedUser.ErrorMessage);
             return BadRequest(response);
         }
-        catch (Exception ex) when (ex is EntitySavingException)
-        {
-            response = ApiResponse<UserResponse>.Failure(BaseResponses.DATABASE_ERROR, Status.DATABASE_ERROR);
-            return BadRequest(response);
-        }
-        catch
-        {
-            response = ApiResponse<UserResponse>.Failure();
-            return BadRequest(response);
-        }
+
+        formattedResponse = UserResponseConverter.ConvertUserToUserResponse(updatedUser.Value);
+        response = ApiResponse<UserResponse>.Success(formattedResponse);
+        
+        return Ok(response);
     }
 
     [HttpDelete(nameof(Delete))]
@@ -124,25 +111,16 @@ public class UserController : ControllerBase
             return Unauthorized(response);
         }
 
-        try
+        if (_userService.DeleteUser(idUser))
         {
-            if (_userService.DeleteUser(idUser))
-            {
-                response = ApiResponse<EmptyResponse>.Success(new EmptyResponse());
-                return Ok(response);
-            }
-            else
-            {
-                response = ApiResponse<EmptyResponse>.Failure(BaseResponses.DATABASE_ERROR);
-                return BadRequest(response);
-            }
+            response = ApiResponse<EmptyResponse>.Success(new EmptyResponse());
+            return Ok(response);
         }
-        catch
+        else
         {
-            response = ApiResponse<EmptyResponse>.Failure();
+            response = ApiResponse<EmptyResponse>.Failure(BaseResponses.DATABASE_ERROR);
             return BadRequest(response);
         }
-
     }
 
     [HttpGet(nameof(GetById))]
@@ -161,23 +139,17 @@ public class UserController : ControllerBase
             return Unauthorized(response);
         }
 
-        try
+        var userRetreived = _userService.GetUserById(idUser);
+
+        if (userRetreived.IsFailure)
         {
-            User userRetreived = _userService.GetUserById(idUser);
-            response = ApiResponse<UserResponse>.Success(UserResponseConverter.ConvertUserToUserResponse(userRetreived));
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntityFetchingException)
-        {
-            response = ApiResponse<UserResponse>.NoContent();
-            return Ok(response);
-        }
-        catch
-        {
-            response = ApiResponse<UserResponse>.Failure();
+            response = ApiResponse<UserResponse>.Failure(userRetreived.ErrorMessage);
             return BadRequest(response);
         }
 
+        response = ApiResponse<UserResponse>.Success(UserResponseConverter.ConvertUserToUserResponse(userRetreived.Value));
+        
+        return Ok(response);
     }
 
     [HttpGet(nameof(GetAll))]
@@ -187,38 +159,24 @@ public class UserController : ControllerBase
 
         var token = HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
 
-        try
-        {
-            Role userRole = _authenticationService.GetUserRoleFromToken(token);
+        var userRole = _authenticationService.GetUserRoleFromToken(token);
 
-            if (!RoleAccess.ADMINISTRATORS.Contains(userRole))
-            {
-                throw new UnauthorizedAccessException();
-            }
-        }
-        catch (Exception ex) when (ex is SecurityTokenException ||
-                                  ex is UnauthorizedAccessException)
+        if(userRole == Role.Unauthorized || !RoleAccess.ADMINISTRATORS.Contains(userRole))
         {
             response = ApiResponse<UserListResponse>.Failure();
             return Unauthorized(response);
         }
 
-        try
+        var usersRetreived = _userService.GetUserList(null);
+
+        if (usersRetreived.IsFailure)
         {
-            IEnumerable<User> usersRetreived = _userService.GetUserList(null);
-            response = ApiResponse<UserListResponse>.Success(UserResponseConverter.ConvertUserListToUserListResponse(usersRetreived));
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntityFetchingException)
-        {
-            response = ApiResponse<UserListResponse>.NoContent();
-            return Ok(response);
-        }
-        catch
-        {
-            response = ApiResponse<UserListResponse>.Failure();
+            response = ApiResponse<UserListResponse>.Failure(usersRetreived.ErrorMessage);
             return BadRequest(response);
         }
 
+        response = ApiResponse<UserListResponse>.Success(UserResponseConverter.ConvertUserListToUserListResponse(usersRetreived.Value));
+        
+        return Ok(response);
     }
 }

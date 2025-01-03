@@ -5,16 +5,16 @@ using SmartWeather.Entities.ComponentData;
 using SmartWeather.Entities.Common.Exceptions;
 using SmartWeather.Repositories.Context;
 using SmartWeather.Services.ComponentDatas;
+using SmartWeather.Entities.Common;
 
 public class MeasureDataRepository(SmartWeatherDocumentsContext elasticContext) : IMeasureDataRepository
 {
     public async void Create(MeasureData data)
     {
         var response = await elasticContext.Client.IndexAsync(data, idx => idx.Index(elasticContext.MeasureDataIndex));
-        if(!response.IsSuccess()) throw new EntitySavingException();
     }
 
-    public async Task<IEnumerable<MeasureData>> GetFromMeasurePoint(int idMeasurePoint, DateTime startPeriod, DateTime endPeriod)
+    public async Task<Result<IEnumerable<MeasureData>>> GetFromMeasurePoint(int idMeasurePoint, DateTime startPeriod, DateTime endPeriod)
     {
         List<MeasureData> allResults = new List<MeasureData>();
         string scrollTimeout = "2m";
@@ -42,7 +42,9 @@ public class MeasureDataRepository(SmartWeatherDocumentsContext elasticContext) 
             )
         );
 
-        if (!response.IsValidResponse) throw new EntityFetchingException();
+        if (!response.IsValidResponse) return Result<IEnumerable<MeasureData>>.Failure(string.Format(
+                                                                    ExceptionsBaseMessages.ENTITY_FETCH,
+                                                                    nameof(MeasureData)));
 
         try
         {
@@ -52,16 +54,17 @@ public class MeasureDataRepository(SmartWeatherDocumentsContext elasticContext) 
                 var scrollRequest = new ScrollRequest();
                 var scrollResponse = await elasticContext.Client.ScrollAsync<MeasureData>(scrollRequest);
 
-                // Scrolling finished
                 if (!scrollResponse.IsValidResponse) break;
             }
 
             await elasticContext.Client.ClearScrollAsync(new ClearScrollRequest());
-            return allResults;
+            return Result<IEnumerable<MeasureData>>.Success(allResults);
         }
         catch
         {
-            throw new EntityFetchingException();
+            return Result<IEnumerable<MeasureData>>.Failure(string.Format(
+                                                                    ExceptionsBaseMessages.ENTITY_FETCH,
+                                                                    nameof(MeasureData)));
         }
     }
 }

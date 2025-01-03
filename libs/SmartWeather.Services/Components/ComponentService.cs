@@ -1,5 +1,6 @@
 ﻿namespace SmartWeather.Services.Components;
 
+using SmartWeather.Entities.Common;
 using SmartWeather.Entities.Common.Exceptions;
 using SmartWeather.Entities.Component;
 using SmartWeather.Entities.Component.Exceptions;
@@ -15,10 +16,8 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
     /// <param name="type">Int representing component type.</param>
     /// <param name="stationId">Int representing station id that hold component.</param>
     /// <param name="gpioPin">Int representing embded component pin.</param>
-    /// <returns></returns>
-    /// <exception cref="EntityCreationException">Thrown if Component informations doesn't meet requirements. (eg:color format)</exception>
-    /// <exception cref="EntitySavingException">Thrown if creation doesn't execute properly.</exception>
-    public Component AddNewComponent (string name,
+    /// <returns>Result containing newly created entity.</returns>
+    public Result<Component> AddNewComponent (string name,
                                       string color, 
                                       int type, 
                                       int stationId, 
@@ -35,7 +34,10 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
                                    ex is InvalidComponentStationIdException ||
                                    ex is InvalidComponentGpioPinException)
         {
-            throw new EntityCreationException();
+            return Result<Component>.Failure(string.Format(
+                                                    ExceptionsBaseMessages.ENTITY_FORMAT,
+                                                    nameof(Component),
+                                                    ex.Message));
         }
     }
 
@@ -49,15 +51,7 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
     /// </returns>
     public bool DeleteComponent(int idComponent)
     {
-        try
-        {
-            return componentBaseRepository.Delete(idComponent) != null;
-        }
-        catch (Exception ex) when (ex is EntityFetchingException ||
-                                   ex is EntitySavingException)
-        {
-            return false;
-        }
+        return componentBaseRepository.Delete(idComponent).IsSuccess;
     }
 
     /// <summary>
@@ -69,10 +63,8 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
     /// <param name="type">Int representing component type.</param>
     /// <param name="stationId">Int representing station id that hold component.</param>
     /// <param name="gpioPin">Int representing embded component pin.</param>
-    /// <returns></returns>
-    /// <exception cref="EntitySavingException">Thrown if unable to create Component. Mainly due to format error (e.g: color format not hex).</exception>
-    /// <exception cref="EntityCreationException">Thrown if error occurs during database update.</exception>
-    public Component UpdateComponent(int id, string name, string color, int type, int stationId, int gpioPin)
+    /// <returns>Result containing modified component in database.</returns>
+    public Result<Component> UpdateComponent(int id, string name, string color, int type, int stationId, int gpioPin)
     {
         try
         {
@@ -88,7 +80,10 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
                                   ex is InvalidComponentTypeException ||
                                   ex is InvalidComponentStationIdException)
         {
-            throw new EntityCreationException();
+            return Result<Component>.Failure(string.Format(
+                                        ExceptionsBaseMessages.ENTITY_FORMAT,
+                                        nameof(Component),
+                                        ex.Message));
         }
     }
 
@@ -96,9 +91,8 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
     /// Retreive Components from a given Station.
     /// </summary>
     /// <param name="idStation">Int representing Station unique Id.</param>
-    /// <returns>List of Component.</returns>
-    /// <exception cref="EntityFetchingException">Thrown if no data is found.</exception>
-    public IEnumerable<Component> GetFromStation(int idStation)
+    /// <returns>Result containing list of Component.</returns>
+    public Result<IEnumerable<Component>> GetFromStation(int idStation)
     {
         return componentRepository.GetFromStation(idStation);
     }
@@ -107,9 +101,8 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
     /// Retreive Component based on it's Id.
     /// </summary>
     /// <param name="componentId">Int corresponding to Component unique Id.</param>
-    /// <returns>A Component object.</returns>
-    /// <exception cref="EntityFetchingException">Thrown if no data is found.</exception>
-    public Component GetById(int componentId)
+    /// <returns>Result containing desired Component.</returns>
+    public Result<Component> GetById(int componentId)
     {
         return componentBaseRepository.GetById(componentId);
     }
@@ -125,14 +118,7 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
     /// </returns>
     public bool IsOwnerOfComponent(int userId, int idComponent)
     {
-        try
-        {
-            var component = componentRepository.GetById(idComponent, true);
-            return component.Station.UserId == userId;
-        }
-        catch (EntityFetchingException)
-        {
-            return false;
-        }
+        var component = componentRepository.GetById(idComponent, true);
+        return component.IsSuccess && component.Value.Station.UserId == userId;
     }
 }

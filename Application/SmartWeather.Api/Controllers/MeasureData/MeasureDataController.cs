@@ -4,13 +4,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartWeather.Api.Contract;
 using SmartWeather.Services.ComponentDatas;
-using SmartWeather.Entities.ComponentData;
 using SmartWeather.Api.Controllers.ComponentData.Dtos;
 using SmartWeather.Api.Controllers.ComponentData.Dtos.Converters;
 using SmartWeather.Api.Helpers;
 using SmartWeather.Entities.User;
 using SmartWeather.Entities.MeasurePoint;
-using SmartWeather.Entities.Common.Exceptions;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -42,23 +40,18 @@ public class MeasureDataController : ControllerBase
             return Unauthorized(response);
         }
 
-        try
+        var componentDataList = _componentDataService.GetFromMeasurePoint(measurePointId, startPeriod, endPeriod);
+
+        if (componentDataList.IsFailure)
         {
-            IEnumerable<MeasureData> componentDataList = _componentDataService.GetFromMeasurePoint(measurePointId, startPeriod, endPeriod);
-            MeasureDataListResponse formattedResponse = MeasureDataListResponseConverter.ConvertComponentDataListToComponentDataListResponse(componentDataList);
-            response = ApiResponse<MeasureDataListResponse>.Success(formattedResponse);
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntityFetchingException)
-        {
-            response = ApiResponse<MeasureDataListResponse>.NoContent();
-            return Ok(response);
-        }
-        catch
-        {
-            response = ApiResponse<MeasureDataListResponse>.Failure();
+            response = ApiResponse<MeasureDataListResponse>.Failure(componentDataList.ErrorMessage);
             return BadRequest(response);
         }
+        
+        MeasureDataListResponse formattedResponse = MeasureDataListResponseConverter.ConvertComponentDataListToComponentDataListResponse(componentDataList.Value);
+        response = ApiResponse<MeasureDataListResponse>.Success(formattedResponse);
+        
+        return Ok(response);
     }
 
 }

@@ -12,6 +12,8 @@ using SmartWeather.Services.Mqtt;
 using SmartWeather.Entities.Common.Exceptions;
 using SmartWeather.Entities.User;
 using SmartWeather.Api.Helpers;
+using Microsoft.AspNetCore.Identity;
+using SmartWeather.Api.Controllers.Authentication.Dtos;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -35,7 +37,6 @@ public class ComponentController : ControllerBase
     public ActionResult<ApiResponse<ComponentResponse>> Create(ComponentCreateRequest request)
     {
         ApiResponse<ComponentResponse> response;
-        ComponentResponse formattedResponse;
 
         if (string.IsNullOrWhiteSpace(request.Name) ||
             string.IsNullOrWhiteSpace(request.Color) ||
@@ -52,32 +53,18 @@ public class ComponentController : ControllerBase
             return Unauthorized(response);
         }
 
-        try
+        var createdComponent = _componentService.AddNewComponent(request.Name, request.Color, request.Type, request.StationId, request.GpioPin);
+
+        if (createdComponent.IsFailure)
         {
-            Component createdComponent = _componentService.AddNewComponent(request.Name, request.Color, request.Type, request.StationId, request.GpioPin);
-            formattedResponse = ComponentResponseConverter.ConvertComponentToComponentResponse(createdComponent);
-            response = ApiResponse<ComponentResponse>.Success(formattedResponse);
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntityCreationException)
-        {
-            response = ApiResponse<ComponentResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR, 
-                                                                            "Unable to create Component based on given data"),
-                                                              Status.VALIDATION_ERROR);
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntitySavingException)
-        {
-            response = ApiResponse<ComponentResponse>.Failure(string.Format(BaseResponses.FORMAT_ERROR,
-                                                                            "Unable to save Component in database"),
-                                                              Status.DATABASE_ERROR);
-            return Ok(response);
-        }
-        catch
-        {
-            response = ApiResponse<ComponentResponse>.Failure();
+            response = ApiResponse<ComponentResponse>.Failure(createdComponent.ErrorMessage);
             return BadRequest(response);
         }
+        
+        var formattedResponse = ComponentResponseConverter.ConvertComponentToComponentResponse(createdComponent.Value);
+        response = ApiResponse<ComponentResponse>.Success(formattedResponse);
+
+        return Ok(response);
 
     }
 
@@ -98,21 +85,13 @@ public class ComponentController : ControllerBase
             return Unauthorized(response);
         }
 
-        try
+        bool isUserDeleted = _componentService.DeleteComponent(idComponent);
+        if (isUserDeleted)
         {
-            bool isUserDeleted = _componentService.DeleteComponent(idComponent);
-            if (isUserDeleted)
-            {
-                response = ApiResponse<EmptyResponse>.Success(null);
-                return Ok(response);
-            }
-            else
-            {
-                response = ApiResponse<EmptyResponse>.Failure(BaseResponses.DATABASE_ERROR);
-                return BadRequest(response);
-            }
+            response = ApiResponse<EmptyResponse>.Success(null);
+            return Ok(response);
         }
-        catch
+        else
         {
             response = ApiResponse<EmptyResponse>.Failure();
             return BadRequest(response);
@@ -123,7 +102,6 @@ public class ComponentController : ControllerBase
     public ActionResult<ApiResponse<ComponentResponse>> Update(ComponentUpdateRequest request)
     {
         ApiResponse<ComponentResponse> response;
-        ComponentResponse formattedResponse;
 
         if (string.IsNullOrWhiteSpace(request.Name) ||
             string.IsNullOrWhiteSpace(request.Color) ||
@@ -140,28 +118,18 @@ public class ComponentController : ControllerBase
             return Unauthorized(response);
         }
 
-        try
+        var updatedComponent = _componentService.UpdateComponent(request.Id, request.Name, request.Color, request.Type, request.StationId, request.GpioPin);
+        
+        if (updatedComponent.IsFailure) 
         {
-            Component updatedComponent = _componentService.UpdateComponent(request.Id, request.Name, request.Color, request.Type, request.StationId, request.GpioPin);
-            formattedResponse = ComponentResponseConverter.ConvertComponentToComponentResponse(updatedComponent);
-            response = ApiResponse<ComponentResponse>.Success(formattedResponse);
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntitySavingException)
-        {
-            response = ApiResponse<ComponentResponse>.Failure(BaseResponses.VALIDATION_ERROR, Status.VALIDATION_ERROR);
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntityCreationException)
-        {
-            response = ApiResponse<ComponentResponse>.Failure(BaseResponses.DATABASE_ERROR, Status.DATABASE_ERROR);
-            return Ok(response);
-        }
-        catch
-        {
-            response = ApiResponse<ComponentResponse>.Failure();
+            response = ApiResponse<ComponentResponse>.Failure(updatedComponent.ErrorMessage);
             return BadRequest(response);
         }
+        
+        var formattedResponse = ComponentResponseConverter.ConvertComponentToComponentResponse(updatedComponent.Value);
+        response = ApiResponse<ComponentResponse>.Success(formattedResponse);
+
+        return Ok(response);
     }
 
     [HttpGet(nameof(GetFromStation))]
@@ -180,24 +148,18 @@ public class ComponentController : ControllerBase
             return Unauthorized(response);
         }
 
-        try
+        var componentList = _componentService.GetFromStation(stationId);
+
+        if (componentList.IsFailure)
         {
-            IEnumerable<Component> componentList = _componentService.GetFromStation(stationId);
-            ComponentListResponse formattedResponse = ComponentListResponseConverter.ConvertComponentListToComponentListResponse(componentList);
-            response = ApiResponse<ComponentListResponse>.Success(formattedResponse);
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntityFetchingException)
-        {
-            response = ApiResponse<ComponentListResponse>.NoContent();
-            return Ok(response);
-        }
-        catch
-        {
-            response = ApiResponse<ComponentListResponse>.Failure();
+            response = ApiResponse<ComponentListResponse>.Failure(componentList.ErrorMessage);
             return BadRequest(response);
         }
 
+        ComponentListResponse formattedResponse = ComponentListResponseConverter.ConvertComponentListToComponentListResponse(componentList.Value);
+        response = ApiResponse<ComponentListResponse>.Success(formattedResponse);
+            
+        return Ok(response);
     }
 
     [HttpGet(nameof(GetById))]
@@ -216,24 +178,18 @@ public class ComponentController : ControllerBase
             return Unauthorized(response);
         }
 
-        try
+        var component = _componentService.GetById(componentId);
+
+        if(component.IsFailure)
         {
-            Component component = _componentService.GetById(componentId);
-            ComponentResponse formattedResponse = ComponentResponseConverter.ConvertComponentToComponentResponse(component);
-            response = ApiResponse<ComponentResponse>.Success(formattedResponse);
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntityFetchingException)
-        {
-            response = ApiResponse<ComponentResponse>.NoContent();
-            return Ok(response);
-        }
-        catch
-        {
-            response = ApiResponse<ComponentResponse>.Failure();
+            response = ApiResponse<ComponentResponse>.Failure(component.ErrorMessage);
             return BadRequest(response);
         }
 
+        var formattedResponse = ComponentResponseConverter.ConvertComponentToComponentResponse(component.Value);
+        response = ApiResponse<ComponentResponse>.Success(formattedResponse);
+       
+        return Ok(response);
     }
 
     [HttpPut(nameof(ActuatorCommand))]

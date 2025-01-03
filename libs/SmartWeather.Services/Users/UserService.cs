@@ -5,6 +5,7 @@ using SmartWeather.Entities.Common.Exceptions;
 using SmartWeather.Services.Repositories;
 using System.Collections.Generic;
 using SmartWeather.Entities.User.Exceptions;
+using SmartWeather.Entities.Common;
 
 public class UserService(IRepository<User> userBaseRepository, IUserRepository userRepository)
 {
@@ -14,10 +15,8 @@ public class UserService(IRepository<User> userBaseRepository, IUserRepository u
     /// <param name="username">String representing User username.</param>
     /// <param name="mail">String representing User mail.</param>
     /// <param name="password">String representing User password.</param>
-    /// <returns>Created User from database.</returns>
-    /// <exception cref="EntityCreationException">Thrown if User informations doesn't meet requirements. (eg:email format)</exception>
-    /// <exception cref="EntitySavingException">Thrown if updating doesn't execute properly.</exception>
-    public User AddNewUser(string username, string mail, string password)
+    /// <returns>Result containing created User from database, including auto-generated fields (e.g: id).</returns>
+    public Result<User> AddNewUser(string username, string mail, string password)
     {
         try
         {
@@ -28,7 +27,10 @@ public class UserService(IRepository<User> userBaseRepository, IUserRepository u
                                  ex is InvalidUserPasswordException ||
                                  ex is InvalidUserNameException)
         {
-            throw new EntityCreationException();
+            return Result<User>.Failure(string.Format(
+                                            ExceptionsBaseMessages.ENTITY_FORMAT,
+                                            nameof(User),
+                                            ex.Message));
         }
     }
 
@@ -36,18 +38,10 @@ public class UserService(IRepository<User> userBaseRepository, IUserRepository u
     /// Delete User based on given unique Id.
     /// </summary>
     /// <param name="idUser">Int representing User unique Id.</param>
-    /// <returns>Deleted User from database.</returns>
+    /// <returns>Boolean indicating if User has been successfully deleted.</returns>
     public bool DeleteUser(int idUser)
     {
-        try
-        {
-            return userBaseRepository.Delete(idUser) != null;
-        }
-        catch (Exception ex) when (ex is EntityFetchingException ||
-                                   ex is EntitySavingException)
-        {
-            return false;
-        }
+        return userBaseRepository.Delete(idUser).IsSuccess;
     }
 
     /// <summary>
@@ -58,10 +52,8 @@ public class UserService(IRepository<User> userBaseRepository, IUserRepository u
     /// <param name="mail">String repesenting User email.</param>
     /// <param name="username">String repesenting User username.</param>
     /// <param name="role">Int representing User role.</param>
-    /// <returns>Updated User from Database.</returns>
-    /// <exception cref="EntityCreationException">Thrown if User informations doesn't meet requirements. (eg:email format)</exception>
-    /// <exception cref="EntitySavingException">Thrown if updating doesn't execute properly.</exception>
-    public User UpdateUser (int idUser,
+    /// <returns>Result containing updated User from Database.</returns>
+    public Result<User> UpdateUser (int idUser,
                             string password, 
                             string mail, 
                             string username, 
@@ -80,7 +72,10 @@ public class UserService(IRepository<User> userBaseRepository, IUserRepository u
                                  ex is InvalidUserPasswordException ||
                                  ex is InvalidUserNameException)
         {
-            throw new EntityCreationException();
+            return Result<User>.Failure(string.Format(
+                                            ExceptionsBaseMessages.ENTITY_FORMAT,
+                                            nameof(User),
+                                            ex.Message));
         }
     }
 
@@ -88,9 +83,8 @@ public class UserService(IRepository<User> userBaseRepository, IUserRepository u
     /// Retreive User based on given unique Id.
     /// </summary>
     /// <param name="idUser">User unique Id.</param>
-    /// <exception cref="EntityFetchingException">Thrown if no data is found.</exception>
-    /// <returns>Retreived User from database.</returns>
-    public User GetUserById(int idUser)
+    /// <returns>Result containing retreived User from database.</returns>
+    public Result<User> GetUserById(int idUser)
     {
         return userBaseRepository.GetById(idUser);
     }
@@ -100,10 +94,11 @@ public class UserService(IRepository<User> userBaseRepository, IUserRepository u
     /// If null, no filter applied, all user will be retreived.
     /// </summary>
     /// <param name="idsUser">Optional list of unique User Ids to use as filter.</param>
-    /// <exception cref="EntityFetchingException">Thrown if no data is found.</exception>
-    /// <returns>Retreived List of User.</returns>
-    public IEnumerable<User> GetUserList(IEnumerable<int>? idsUser = null)
+    /// <returns>Result containing retreived List of User.</returns>
+    public Result<IEnumerable<User>> GetUserList(IEnumerable<int>? idsUser = null)
     {
-        return idsUser == null ? userBaseRepository.GetAll() : userRepository.GetAll(idsUser);
+        return idsUser == null ? 
+                    userBaseRepository.GetAll() : 
+                    userRepository.GetAll(idsUser);
     }
 }

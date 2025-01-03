@@ -1,5 +1,6 @@
 ﻿namespace SmartWeather.Services.MeasurePoints;
 
+using SmartWeather.Entities.Common;
 using SmartWeather.Entities.Common.Exceptions;
 using SmartWeather.Entities.MeasurePoint;
 using SmartWeather.Entities.MeasurePoint.Exceptions;
@@ -15,10 +16,8 @@ public class MeasurePointService (IRepository<MeasurePoint> measurePointBaseRepo
     /// <param name="color">String representing measure point color.</param>
     /// <param name="unit">Int representing measure point unit.</param>
     /// <param name="componentId">Int representing measure point component holder id.</param>
-    /// <returns>Created MeasurePoint from database.</returns>
-    /// <exception cref="EntityCreationException">Thrown if MeasurePoint informations doesn't meet requirements. (eg:color format)</exception>
-    /// <exception cref="EntitySavingException">Thrown if creation doesn't execute properly.</exception>
-    public MeasurePoint AddNewMeasurePoint (int localId,
+    /// <returns>Result containing created MeasurePoint from database.</returns>
+    public Result<MeasurePoint> AddNewMeasurePoint (int localId,
                                             string name, 
                                             string color, 
                                             int unit, 
@@ -35,7 +34,10 @@ public class MeasurePointService (IRepository<MeasurePoint> measurePointBaseRepo
                            ex is InvalidMeasurePointUnitException ||
                            ex is InvalidMeasurePointComponentIdException)
         {
-            throw new EntityCreationException();
+            return Result<MeasurePoint>.Failure(string.Format(
+                                                        ExceptionsBaseMessages.ENTITY_FORMAT,
+                                                        nameof(MeasurePoint),
+                                                        ex.Message));
         }
     }
 
@@ -49,15 +51,7 @@ public class MeasurePointService (IRepository<MeasurePoint> measurePointBaseRepo
     /// </returns>
     public bool DeleteMeasurePoint(int idMeasurePoint)
     {
-        try
-        {
-            return measurePointBaseRepository.Delete(idMeasurePoint) != null;
-        }
-        catch (Exception ex) when (ex is EntityFetchingException ||
-                                   ex is EntitySavingException)
-        {
-            return false;
-        }
+        return measurePointBaseRepository.Delete(idMeasurePoint).IsSuccess;
     }
 
     /// <summary>
@@ -69,10 +63,8 @@ public class MeasurePointService (IRepository<MeasurePoint> measurePointBaseRepo
     /// <param name="color">String representing MeasurePoint color.</param>
     /// <param name="unit">Int representing MeasurePoint unit.</param>
     /// <param name="componentId">Int representing measure point component holder id.</param>
-    /// <returns></returns>
-    /// <exception cref="EntityCreationException">Thrown if MeasurePoint informations doesn't meet requirements. (eg:color format)</exception>
-    /// <exception cref="EntitySavingException">Thrown if updating doesn't execute properly.</exception>
-    public MeasurePoint UpdateMeasurePoint (int id, 
+    /// <returns>Result containing updated MeasurePoint</returns>
+    public Result<MeasurePoint> UpdateMeasurePoint (int id, 
                                             int localId, 
                                             string name, 
                                             string color, 
@@ -93,7 +85,10 @@ public class MeasurePointService (IRepository<MeasurePoint> measurePointBaseRepo
                                    ex is InvalidMeasurePointUnitException ||
                                    ex is InvalidMeasurePointComponentIdException)
         {
-            throw new EntityCreationException();
+            return Result<MeasurePoint>.Failure(string.Format(
+                                                        ExceptionsBaseMessages.ENTITY_FORMAT,
+                                                        nameof(MeasurePoint),
+                                                        ex.Message));
         }
     }
 
@@ -101,9 +96,8 @@ public class MeasurePointService (IRepository<MeasurePoint> measurePointBaseRepo
     /// Retreive all MeasurePoint from Component.
     /// </summary>
     /// <param name="idComponent">Int representing Component unique Id that contains desired MeasurePoint.</param>
-    /// <returns>List of MeasurePoint.</returns>
-    /// <exception cref="EntityFetchingException">Thrown if no data is found.</exception>
-    public IEnumerable<MeasurePoint> GetFromComponent(int idComponent)
+    /// <returns>Result containing list of MeasurePoint.</returns>
+    public Result<IEnumerable<MeasurePoint>> GetFromComponent(int idComponent)
     {
         return measurePointRepository.GetFromComponent(idComponent);
     }
@@ -119,15 +113,7 @@ public class MeasurePointService (IRepository<MeasurePoint> measurePointBaseRepo
     /// </returns>
     public bool IsOwnerOfMeasurePoint(int userId, int idMeasurePoint)
     {
-        try
-        {
-            var measurePoint = measurePointRepository.GetById(idMeasurePoint, true, true);
-            return measurePoint.Component.Station.UserId == userId;
-        }
-        catch (EntityFetchingException)
-        {
-            return false;
-        }
-        
+        var measurePoint = measurePointRepository.GetById(idMeasurePoint, true, true);
+        return measurePoint.IsSuccess && measurePoint.Value.Component.Station.UserId == userId;
     }
 }

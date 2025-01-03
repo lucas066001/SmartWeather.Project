@@ -48,20 +48,27 @@ public class ConfigRequestHandler : IMqttRequestHandler
 
         var macAdress = configRequest.MacAddress;
 
-        try
+        var retrievedStation = _stationService.GetStationByMacAddress(macAdress);
+
+        if (retrievedStation.IsSuccess)
         {
-            Station retrievedStation = _stationService.GetStationByMacAddress(macAdress);
-            _handleExistingStationConfigRequest(retrievedStation, configRequest, request, originTopic);
+            _handleExistingStationConfigRequest(retrievedStation.Value, configRequest, request, originTopic);
         }
-        catch(Exception ex) when (ex is EntityFetchingException)
+        else
         {
             _handleNewStationConfigRequest(macAdress, configRequest, request, originTopic);
         }
+        
     }
 
     private async void _handleExistingStationConfigRequest(Station retrievedStation, StationConfigRequest configRequest, MqttRequest request, string originTopic)
     {
-        retrievedStation.Components = _componentService.GetFromStation(retrievedStation.Id).ToList();
+        var componentResult = _componentService.GetFromStation(retrievedStation.Id);
+
+        if (componentResult.IsSuccess)
+        {
+            retrievedStation.Components = componentResult.Value.ToList();
+        }
 
         var componentsToAdd = configRequest.ComponentsConfigs
                                             .Where(cc =>
@@ -80,7 +87,7 @@ public class ConfigRequestHandler : IMqttRequestHandler
 
         foreach (var component in retrievedStation.Components)
         {
-            component.MeasurePoints = _measurePointService.GetFromComponent(component.Id).ToList();
+            component.MeasurePoints = _measurePointService.GetFromComponent(component.Id).Value.ToList();
         }
         var formattedData = StationConfigResponseConverter.ConvertStationToStationConfigResponse(retrievedStation);
         await _mqttSingleton.SendSuccessResponse(request, originTopic, ObjectTypes.CONFIG_RESPONSE, formattedData);
@@ -88,15 +95,11 @@ public class ConfigRequestHandler : IMqttRequestHandler
 
     private async void _handleNewStationConfigRequest(string macAdress, StationConfigRequest configRequest, MqttRequest request, string originTopic)
     {
-        Station newStation;
-        try
+        var newStation = _stationService.AddGenericStation(macAdress);
+
+        if(newStation.IsFailure)
         {
-            newStation = _stationService.AddGenericStation(macAdress);
-        }
-        catch (Exception ex) when (ex is EntityCreationException ||
-                                   ex is EntitySavingException)
-        {
-            await _mqttSingleton.SendErrorResponse(request, originTopic, "Unable to create a station : " + ex.Message, Status.DATABASE_ERROR);
+            await _mqttSingleton.SendErrorResponse(request, originTopic, "Unable to create a station", Status.DATABASE_ERROR);
             return;
         }
 
@@ -104,8 +107,8 @@ public class ConfigRequestHandler : IMqttRequestHandler
         {
             try
             {
-                newStation.Components = _createComponentsFromConfig(configRequest.ComponentsConfigs, newStation.Id);
-                var formattedData = StationConfigResponseConverter.ConvertStationToStationConfigResponse(newStation);
+                newStation.Value.Components = _createComponentsFromConfig(configRequest.ComponentsConfigs, newStation.Value.Id);
+                var formattedData = StationConfigResponseConverter.ConvertStationToStationConfigResponse(newStation.Value);
                 await _mqttSingleton.SendSuccessResponse(request, originTopic, ObjectTypes.CONFIG_RESPONSE, formattedData);
             }
             catch (Exception ex)
@@ -121,30 +124,31 @@ public class ConfigRequestHandler : IMqttRequestHandler
         var result = new List<Component>();
         foreach (var compConf in componentsToAdd)
         {
-            try
+            var createdComponent = _componentService.AddNewComponent(compConf.DefaultName,
+                                                                        "#000000",
+                                                                        compConf.ComponentType,
+                                                                        stationId,
+                                                                        compConf.GpioPin);
+            if (createdComponent.IsFailure)
             {
-                var createdComponent = _componentService.AddNewComponent(compConf.DefaultName,
-                                                                         "#000000",
-                                                                         compConf.ComponentType,
-                                                                         stationId,
-                                                                         compConf.GpioPin);
-                createdComponent.MeasurePoints = new List<MeasurePoint>();
-                foreach (var mpConf in compConf.MeasurePoints)
+                return result;
+            }
+
+            createdComponent.Value.MeasurePoints = new List<MeasurePoint>();
+            foreach (var mpConf in compConf.MeasurePoints)
+            {
+                var createdMeasurePoint = _measurePointService.AddNewMeasurePoint(mpConf.LocalId,
+                                                                                    mpConf.DefaultName,
+                                                                                    "#000000",
+                                                                                    mpConf.Unit,
+                                                                                    createdComponent.Value.Id);
+                if (createdMeasurePoint.IsSuccess)
                 {
-                    var createdMeasurePoint = _measurePointService.AddNewMeasurePoint(mpConf.LocalId,
-                                                                                        mpConf.DefaultName,
-                                                                                        "#000000",
-                                                                                        mpConf.Unit,
-                                                                                        createdComponent.Id);
-                    _ = createdComponent.MeasurePoints.Append(createdMeasurePoint);
+                    _ = createdComponent.Value.MeasurePoints.Append(createdMeasurePoint.Value);
                 }
-                result.Add(createdComponent);
             }
-            catch(Exception ex) when (ex is EntityCreationException ||
-                                       ex is EntitySavingException)
-            {
-                continue;
-            }
+            result.Add(createdComponent.Value);
+            
         }
         return result;
     }

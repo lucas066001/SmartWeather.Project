@@ -12,7 +12,6 @@ using SmartWeather.Services.Components;
 using SmartWeather.Entities.User;
 using SmartWeather.Entities.Component;
 using SmartWeather.Api.Helpers;
-using SmartWeather.Entities.Common.Exceptions;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -53,28 +52,19 @@ public class MeasurePointController : Controller
             return Unauthorized(response);
         }
 
-        try
+        var createdComponentData = _measurePointService.AddNewMeasurePoint(request.LocalId, request.Name, request.Color, request.Unit, request.ComponentId);
+
+        if (createdComponentData.IsFailure)
         {
-            MeasurePoint createdComponentData = _measurePointService.AddNewMeasurePoint(request.LocalId, request.Name, request.Color, request.Unit, request.ComponentId);
-            formattedResponse = MeasurePointConverter.ConvertMeasurePointToMeasurePointResponse(createdComponentData);
-            response = ApiResponse<MeasurePointResponse>.Success(formattedResponse);
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntityCreationException)
-        {
-            response = ApiResponse<MeasurePointResponse>.Failure(BaseResponses.VALIDATION_ERROR, Status.VALIDATION_ERROR);
+            response = ApiResponse<MeasurePointResponse>.Failure(createdComponentData.ErrorMessage);
             return BadRequest(response);
         }
-        catch (Exception ex) when (ex is EntitySavingException)
-        {
-            response = ApiResponse<MeasurePointResponse>.Failure(BaseResponses.DATABASE_ERROR, Status.DATABASE_ERROR);
-            return BadRequest(response);
-        }
-        catch
-        {
-            response = ApiResponse<MeasurePointResponse>.Failure();
-            return BadRequest(response);
-        }
+
+        formattedResponse = MeasurePointConverter.ConvertMeasurePointToMeasurePointResponse(createdComponentData.Value);
+        response = ApiResponse<MeasurePointResponse>.Success(formattedResponse);
+        
+        return Ok(response);
+        
     }
 
     [HttpDelete(nameof(Delete))]
@@ -93,23 +83,15 @@ public class MeasurePointController : Controller
             return Unauthorized(response);
         }
 
-        try
+        bool isMeasurePointDeleted = _measurePointService.DeleteMeasurePoint(idMeasurePoint);
+        if (isMeasurePointDeleted)
         {
-            bool isMeasurePointDeleted = _measurePointService.DeleteMeasurePoint(idMeasurePoint);
-            if (isMeasurePointDeleted)
-            {
-                response = ApiResponse<EmptyResponse>.Success(new EmptyResponse());
-                return Ok(response);
-            }
-            else
-            {
-                response = ApiResponse<EmptyResponse>.Failure(BaseResponses.DATABASE_ERROR);
-                return BadRequest(response);
-            }
+            response = ApiResponse<EmptyResponse>.Success(new EmptyResponse());
+            return Ok(response);
         }
-        catch
+        else
         {
-            response = ApiResponse<EmptyResponse>.Failure();
+            response = ApiResponse<EmptyResponse>.Failure(BaseResponses.DATABASE_ERROR);
             return BadRequest(response);
         }
     }
@@ -136,24 +118,18 @@ public class MeasurePointController : Controller
             return Unauthorized(response);
         }
 
-        try
+        var updatedMeasurePoint = _measurePointService.UpdateMeasurePoint(request.Id, request.LocalId, request.Name, request.Color, request.Unit, request.ComponentId);
+
+        if (updatedMeasurePoint.IsFailure)
         {
-            MeasurePoint updatedMeasurePoint = _measurePointService.UpdateMeasurePoint(request.Id, request.LocalId, request.Name, request.Color, request.Unit, request.ComponentId);
-            formattedResponse = MeasurePointConverter.ConvertMeasurePointToMeasurePointResponse(updatedMeasurePoint);
-            response = ApiResponse<MeasurePointResponse>.Success(formattedResponse);
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntitySavingException || 
-                                   ex is EntityCreationException) 
-        {
-            response = ApiResponse<MeasurePointResponse>.Failure(BaseResponses.DATABASE_ERROR, Status.DATABASE_ERROR);
+            response = ApiResponse<MeasurePointResponse>.Failure(updatedMeasurePoint.ErrorMessage);
             return BadRequest(response);
         }
-        catch
-        {
-            response = ApiResponse<MeasurePointResponse>.Failure();
-            return BadRequest(response);
-        }
+        
+        formattedResponse = MeasurePointConverter.ConvertMeasurePointToMeasurePointResponse(updatedMeasurePoint.Value);
+        response = ApiResponse<MeasurePointResponse>.Success(formattedResponse);
+        
+        return Ok(response);
     }
 
     [HttpGet(nameof(GetFromComponent))]
@@ -172,22 +148,17 @@ public class MeasurePointController : Controller
             return Unauthorized(response);
         }
 
-        try
+        var measurePointList = _measurePointService.GetFromComponent(componentId);
+
+        if (measurePointList.IsFailure)
         {
-            IEnumerable<MeasurePoint> measurePointList = _measurePointService.GetFromComponent(componentId);
-            MeasurePointListResponse formattedResponse = MeasurePointConverter.ConvertMeasurePointListToMeasurePointListResponse(measurePointList);
-            response = ApiResponse<MeasurePointListResponse>.Success(formattedResponse);
-            return Ok(response);
-        }
-        catch (Exception ex) when (ex is EntityFetchingException)
-        {
-            response = ApiResponse<MeasurePointListResponse>.NoContent();
-            return Ok(response);
-        }
-        catch
-        {
-            response = ApiResponse<MeasurePointListResponse>.Failure();
+            response = ApiResponse<MeasurePointListResponse>.Failure(measurePointList.ErrorMessage);
             return BadRequest(response);
         }
+
+        MeasurePointListResponse formattedResponse = MeasurePointConverter.ConvertMeasurePointListToMeasurePointListResponse(measurePointList.Value);
+        response = ApiResponse<MeasurePointListResponse>.Success(formattedResponse);
+        
+        return Ok(response);
     }
 }

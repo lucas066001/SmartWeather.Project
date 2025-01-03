@@ -4,7 +4,7 @@ using SmartWeather.Entities.Station;
 using SmartWeather.Entities.Common.Exceptions;
 using SmartWeather.Services.Repositories;
 using SmartWeather.Entities.Station.Exceptions;
-using SmartWeather.Services.Components;
+using SmartWeather.Entities.Common;
 
 public class StationService(IRepository<Station> stationBaseRepository, IStationRepository stationRepository)
 {
@@ -16,10 +16,8 @@ public class StationService(IRepository<Station> stationBaseRepository, IStation
     /// <param name="latitude">Float representing station latitude coordinate.</param>
     /// <param name="longitude">Float representing station longitude coordinate.</param>
     /// <param name="userId">Nullable Int representing station owner idn could be null if no current owner.</param>
-    /// <returns>Created Station from database.</returns>
-    /// <exception cref="EntityCreationException">Thrown if Station informations doesn't meet requirements. (eg:mac address format)</exception>
-    /// <exception cref="EntitySavingException">Thrown if updating doesn't execute properly.</exception>
-    public Station AddNewStation(string name, string macAddress, float latitude, float longitude, int? userId)
+    /// <returns>Result containing created Station from database, including auto-generated fields (e.g: id).</returns>
+    public Result<Station> AddNewStation(string name, string macAddress, float latitude, float longitude, int? userId)
     {
         try
         {
@@ -31,7 +29,10 @@ public class StationService(IRepository<Station> stationBaseRepository, IStation
                                    ex is InvalidStationCoordinatesException ||
                                    ex is InvalidStationUserIdException)
         {
-            throw new EntityCreationException();
+            return Result<Station>.Failure(string.Format(
+                                                    ExceptionsBaseMessages.ENTITY_FORMAT,
+                                                    nameof(Station), 
+                                                    ex.Message));    
         }
     }
 
@@ -40,10 +41,8 @@ public class StationService(IRepository<Station> stationBaseRepository, IStation
     /// Mainly used by Station configuration automatic process.
     /// </summary>
     /// <param name="macAddress">String representing station mac address.</param>
-    /// <returns>Created Station from database.</returns>
-    /// <exception cref="EntityCreationException">Thrown if Station informations doesn't meet requirements. (eg:mac address format)</exception>
-    /// <exception cref="EntitySavingException">Thrown if updating doesn't execute properly.</exception>
-    public Station AddGenericStation(string macAddress)
+    /// <returns>Result containing created Station from database.</returns>
+    public Result<Station> AddGenericStation(string macAddress)
     {
         return AddNewStation("Unnamed Station", macAddress, 0.0f, 0.0f, null);
     }
@@ -58,15 +57,7 @@ public class StationService(IRepository<Station> stationBaseRepository, IStation
     /// </returns>
     public bool DeleteStation(int idStation)
     {
-        try
-        {
-            return stationBaseRepository.Delete(idStation) != null;
-        }
-        catch (Exception ex) when (ex is EntityFetchingException ||
-                                   ex is EntitySavingException)
-        {
-            return false;
-        }
+        return stationBaseRepository.Delete(idStation).IsSuccess;
     }
 
     /// <summary>
@@ -78,15 +69,13 @@ public class StationService(IRepository<Station> stationBaseRepository, IStation
     /// <param name="latitude">Float representing Station latitude coordinate.</param>
     /// <param name="longitude">Float representing Station longitude coordinate.</param>
     /// <param name="userId">Nullable Int representing Station owner idn could be null if no current owner.</param>
-    /// <returns>Modified Station from database.</returns>
-    /// <exception cref="EntityCreationException">Thrown if Station informations doesn't meet requirements. (eg:mac address format)</exception>
-    /// <exception cref="EntitySavingException">Thrown if updating doesn't execute properly.</exception>
-    public Station UpdateStation (int id, 
-                                  string name, 
-                                  string macAddress, 
-                                  float latitude, 
-                                  float longitude, 
-                                  int? userId)
+    /// <returns>Result containing modified Station from database.</returns>
+    public Result<Station> UpdateStation (int id, 
+                                            string name, 
+                                            string macAddress, 
+                                            float latitude, 
+                                            float longitude, 
+                                            int? userId)
     {
         try
         {
@@ -101,7 +90,10 @@ public class StationService(IRepository<Station> stationBaseRepository, IStation
                                    ex is InvalidStationCoordinatesException ||
                                    ex is InvalidStationUserIdException)
         {
-            throw new EntityCreationException();
+            return Result<Station>.Failure(string.Format(
+                                                    ExceptionsBaseMessages.ENTITY_FORMAT,
+                                                    nameof(Station),
+                                                    ex.Message));
         }
 
     }
@@ -110,9 +102,8 @@ public class StationService(IRepository<Station> stationBaseRepository, IStation
     /// Retreive Station based on it's Id.
     /// </summary>
     /// <param name="idStation">Int corresponding to Station unique Id.</param>
-    /// <returns>A Station object.</returns>
-    /// <exception cref="EntityFetchingException">Thrown if no data is found.</exception>
-    public Station GetStationById(int idStation)
+    /// <returns>Result containing selected Station.</returns>
+    public Result<Station> GetStationById(int idStation)
     {
         return stationBaseRepository.GetById(idStation);
     }
@@ -121,9 +112,8 @@ public class StationService(IRepository<Station> stationBaseRepository, IStation
     /// Retreive a Station based on given mac address.
     /// </summary>
     /// <param name="macAddress">Mac address owned by desired station.</param>
-    /// <returns>A Station.</returns>
-    /// <exception cref="EntityFetchingException">Thrown if no data is found.</exception>
-    public Station GetStationByMacAddress(string macAddress)
+    /// <returns>Result containing selected Station.</returns>
+    public Result<Station> GetStationByMacAddress(string macAddress)
     {
         return stationRepository.GetByMacAddress(macAddress);
     }
@@ -138,15 +128,7 @@ public class StationService(IRepository<Station> stationBaseRepository, IStation
     /// </returns>
     public bool IsStationRegistered(string macAddress)
     {
-        try
-        {
-            _ = stationRepository.GetByMacAddress(macAddress);
-            return true;
-        }
-        catch (EntityFetchingException)
-        {
-            return false;
-        }
+        return stationRepository.GetByMacAddress(macAddress).IsSuccess;
     }
 
     /// <summary>
@@ -160,15 +142,8 @@ public class StationService(IRepository<Station> stationBaseRepository, IStation
     /// </returns>
     public bool IsOwnerOfStation(int userId, int idStation)
     {
-        try
-        {
-            var station = stationBaseRepository.GetById(idStation);
-            return station.UserId == userId;
-        }
-        catch (EntityFetchingException)
-        {
-            return false;
-        }
+        var station = stationBaseRepository.GetById(idStation);
+        return station.IsSuccess && station.Value.UserId == userId;
     }
 
     /// <summary>
@@ -177,9 +152,8 @@ public class StationService(IRepository<Station> stationBaseRepository, IStation
     /// </summary>
     /// <param name="includeComponents">Bool indicating to include or not station's components.</param>
     /// <param name="includeMeasurePoints">Bool indicating to include or not station's measure points.</param>
-    /// <returns>List of Stations.</returns>
-    /// <exception cref="EntityFetchingException">Thrown if no data is found.</exception>
-    public IEnumerable<Station> GetAll(bool includeComponents, bool includeMeasurePoints)
+    /// <returns>Result contining a list of Stations.</returns>
+    public Result<IEnumerable<Station>> GetAll(bool includeComponents, bool includeMeasurePoints)
     {
         return stationRepository.GetAll(includeComponents, includeMeasurePoints);
     }
@@ -188,9 +162,8 @@ public class StationService(IRepository<Station> stationBaseRepository, IStation
     /// Get all Stations from a User identified with it's unique Id.
     /// </summary>
     /// <param name="userId">Int representing User unique Id.</param>
-    /// <returns>List of Station.</returns>
-    /// <exception cref="EntityFetchingException">Thrown if no data is found.</exception>
-    public IEnumerable<Station> GetFromUser(int userId) 
+    /// <returns>Result containing the list of Station owned by the user.</returns>
+    public Result<IEnumerable<Station>> GetFromUser(int userId) 
     {
         return stationRepository.GetFromUser(userId);
     }

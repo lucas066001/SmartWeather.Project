@@ -3,12 +3,13 @@ using SmartWeather.Entities.Station;
 using SmartWeather.Entities.Common.Exceptions;
 using SmartWeather.Repositories.Context;
 using SmartWeather.Services.Stations;
+using SmartWeather.Entities.Common;
 
 namespace SmartWeather.Repositories.Stations;
 
 public class StationRepository(SmartWeatherReadOnlyContext readOnlyContext) : IStationRepository
 {
-    public IEnumerable<Station> GetAll(bool includeComponents, bool includeMeasurePoints)
+    public Result<IEnumerable<Station>> GetAll(bool includeComponents, bool includeMeasurePoints)
     {
         IEnumerable<Station>? stationsRetreived = null;
 
@@ -30,18 +31,34 @@ public class StationRepository(SmartWeatherReadOnlyContext readOnlyContext) : IS
             stationsRetreived = readOnlyContext.Stations.AsEnumerable();
         }
 
-        return stationsRetreived ?? throw new EntityFetchingException();
+        return stationsRetreived != null ?
+                    Result<IEnumerable<Station>>.Success(stationsRetreived) : 
+                    Result<IEnumerable<Station>>.Failure(string.Format(
+                                                                    ExceptionsBaseMessages.ENTITY_FETCH,
+                                                                    nameof(Station)));
     }
 
-    public Station GetByMacAddress(string macAddress)
+    public Result<Station> GetByMacAddress(string macAddress)
     {
-        var stationRetreived = readOnlyContext.Stations.Where(s => s.MacAddress == macAddress).FirstOrDefault();
-        return stationRetreived ?? throw new EntityFetchingException();
+        var stationRetreived = readOnlyContext.Stations
+                                              .Where(s => s.MacAddress == macAddress)
+                                              .FirstOrDefault();
+        return stationRetreived != null ?
+                    Result<Station>.Success(stationRetreived) :
+                    Result<Station>.Failure(string.Format(
+                                                    ExceptionsBaseMessages.ENTITY_FETCH,
+                                                    nameof(Station)));
     }
 
-    public IEnumerable<Station> GetFromUser(int userId)
+    public Result<IEnumerable<Station>> GetFromUser(int userId)
     {
-        var stationsRetreived = readOnlyContext.Stations.Where(s => s.UserId == userId).ToList();
-        return stationsRetreived ?? throw new EntityFetchingException();
+        var stationsRetreived = readOnlyContext.Stations
+                                               .Where(s => s.UserId == userId)
+                                               .ToList();
+        return stationsRetreived != null ?
+                    Result<IEnumerable<Station>>.Success(stationsRetreived) :
+                    Result<IEnumerable<Station>>.Failure(string.Format(
+                                                    ExceptionsBaseMessages.ENTITY_FETCH,
+                                                    nameof(Station)));
     }
 }

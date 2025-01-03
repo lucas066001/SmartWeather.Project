@@ -2,7 +2,6 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using SmartWeather.Api.Controllers.Component;
 using SmartWeather.Entities.Component;
 using SmartWeather.Entities.MeasurePoint;
 using SmartWeather.Entities.Station;
@@ -11,7 +10,6 @@ using SmartWeather.Services.Authentication;
 using SmartWeather.Services.Components;
 using SmartWeather.Services.MeasurePoints;
 using SmartWeather.Services.Stations;
-using SmartWeather.Services.Users;
 
 public class AccessManagerHelper
 {
@@ -45,8 +43,13 @@ public class AccessManagerHelper
         try
         {
             var token = controllerContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-            int userId = _authenticationService.GetUserIdFromToken(token);
-            Role userRole = _authenticationService.GetUserRoleFromToken(token);
+            var userId = _authenticationService.GetUserIdFromToken(token);
+            var userRole = _authenticationService.GetUserRoleFromToken(token);
+
+            if (userId == -1 || userRole == Role.Unauthorized)
+            {
+                return false;
+            }
 
             bool isOwner = false;
             if (typeof(T) == typeof(Station))
