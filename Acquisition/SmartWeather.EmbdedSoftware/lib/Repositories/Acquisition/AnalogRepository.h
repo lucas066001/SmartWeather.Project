@@ -17,18 +17,11 @@ namespace SmartWeather::Repositories::Acquisition
     public:
         AnalogRepository(int gpioPin, BrokerService *brokerService);
 
-        void StartAcquisition() override;
-        void StopAcquisition() override;
-        bool GetState() override;
+        void Acquire() override;
         PinConfig GetConfig() override;
 
     private:
-        static void AcquisitionTask(void *pvParameters);
-        void AcquisitionLoop();
-
         BrokerService *_brokerService;
-        TaskHandle_t _taskHandle;
-        bool _running;
         int _gpioPin;
         int _defaultLocalId = 1;
     };

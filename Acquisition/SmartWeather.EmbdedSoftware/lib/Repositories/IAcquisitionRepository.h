@@ -10,9 +10,7 @@ namespace SmartWeather::Repositories
     class IAcquisitionRepository
     {
     public:
-        virtual void StartAcquisition() = 0;
-        virtual void StopAcquisition() = 0;
-        virtual bool GetState() = 0;
+        virtual void Acquire() = 0;
         virtual PinConfig GetConfig() = 0;
     };
 }

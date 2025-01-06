@@ -12,7 +12,6 @@
 #include <algorithm>
 #include <Arduino.h>
 #include <PinsConstants.h>
-#include <TimeService.h>
 #include <CommonService.h>
 #include <BoardStateService.h>
 #include <ConnectionService.h>
@@ -38,7 +37,6 @@ namespace SmartWeather::Services::Mqtt
     public:
         static BrokerSingleton *GetInstance(BoardStateService *boardStateService = nullptr,
                                             ConnectionService *connectionService = nullptr,
-                                            TimeService *timeService = nullptr,
                                             CommonService *commonService = nullptr);
 
         void Launch();
@@ -62,13 +60,11 @@ namespace SmartWeather::Services::Mqtt
         BoardStateService &_boardStateService;
         ConnectionService &_connectionService;
         CommonService &_commonService;
-        TimeService &_timeService;
         bool _connected;
         bool _acquireMessages;
 
         BrokerSingleton(BoardStateService &boardStateService,
                         ConnectionService &connectionService,
-                        TimeService &timeService,
                         CommonService &commonService);
         ~BrokerSingleton();
         BrokerSingleton(const BrokerSingleton &) = delete;

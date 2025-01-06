@@ -24,11 +24,9 @@ namespace SmartWeather::Services::Mqtt
                       ConnectionService &connectionService);
 
         int GetSationDatabseId();
-        int GetCorrespondingComponentDatabaseId(int gpioPin);
         int GetCorrespondingMeasurePointDatabaseId(int gpioPin, int localMeasurePointId);
         void ConfigureStation();
         void LaunchAcquisition();
-        void StopAcquisition();
         bool IsStationConfigured();
         void SendComponentDataSavingRequest(int gpioPin, int measurePointId, float value);
         void RegisterAcquisitionRepo(IAcquisitionRepository *acquisitionRepository);

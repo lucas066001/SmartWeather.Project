@@ -14,7 +14,6 @@ void MqttHeader::FromString(const String &jsonString)
 
         RequestEmitter = json["RequestEmitter"].as<String>();
         RequestIdentifier = json["RequestIdentifier"].as<String>();
-        DateTime = json["DateTime"].as<String>();
 
         if (RequestEmitter.length() == 0 || RequestIdentifier.length() == 0)
         {
@@ -34,7 +33,6 @@ String MqttHeader::ToString()
 
     json["RequestEmitter"] = RequestEmitter;
     json["RequestIdentifier"] = RequestIdentifier;
-    json["DateTime"] = DateTime;
 
     String output;
     serializeJson(doc, output);
@@ -45,12 +43,10 @@ void MqttHeader::ToJson(JsonObject &json)
 {
     json["RequestEmitter"] = RequestEmitter;
     json["RequestIdentifier"] = RequestIdentifier;
-    json["DateTime"] = DateTime;
 }
 
 void MqttHeader::FromJson(JsonObject &json)
 {
     RequestEmitter = json["RequestEmitter"].as<String>();
     RequestIdentifier = json["RequestIdentifier"].as<String>();
-    DateTime = json["DateTime"].as<String>();
 }

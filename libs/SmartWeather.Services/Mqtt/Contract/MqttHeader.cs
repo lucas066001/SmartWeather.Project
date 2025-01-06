@@ -7,7 +7,6 @@ public class MqttHeader
 {
     public required string RequestEmitter { get; set; }
     public required string RequestIdentifier { get; set; }
-    public DateTime DateTime { get; set; }
 
     public static MqttHeader Generate()
     {
@@ -24,7 +23,6 @@ public class MqttHeader
         {
             RequestEmitter = emitterId,
             RequestIdentifier = Guid.NewGuid().ToString(),
-            DateTime = DateTime.UtcNow
         };
     }
 

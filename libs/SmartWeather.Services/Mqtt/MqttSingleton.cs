@@ -110,8 +110,7 @@ public class MqttSingleton
             errorHeader = new MqttHeader()
             {
                 RequestEmitter = request.Header.RequestEmitter,
-                RequestIdentifier = request.Header.RequestIdentifier,
-                DateTime = DateTime.Now
+                RequestIdentifier = request.Header.RequestIdentifier
             };
         }
         else
@@ -119,8 +118,7 @@ public class MqttSingleton
             errorHeader = new MqttHeader()
             {
                 RequestEmitter = DefaultIdentifiers.DEFAULT_SENDER_ID,
-                RequestIdentifier = DefaultIdentifiers.DEFAULT_REQUEST_ID,
-                DateTime = DateTime.Now
+                RequestIdentifier = DefaultIdentifiers.DEFAULT_REQUEST_ID
             };
         }
 
@@ -138,8 +136,7 @@ public class MqttSingleton
         var successHeader = new MqttHeader()
         {
             RequestEmitter = request.Header.RequestEmitter,
-            RequestIdentifier = request.Header.RequestIdentifier,
-            DateTime = DateTime.Now
+            RequestIdentifier = request.Header.RequestIdentifier
         };
 
         var successResponse = MqttResponse.Success(successHeader, (int)objectType, data);

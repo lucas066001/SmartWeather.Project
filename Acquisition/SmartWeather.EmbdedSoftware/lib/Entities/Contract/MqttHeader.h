@@ -13,7 +13,6 @@ namespace SmartWeather::Entities::Contract
     public:
         String RequestEmitter;
         String RequestIdentifier;
-        String DateTime;
 
         void FromString(const String &jsonString) override;
         String ToString() override;

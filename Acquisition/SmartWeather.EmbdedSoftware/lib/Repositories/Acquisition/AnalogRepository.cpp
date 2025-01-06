@@ -5,63 +5,25 @@ using namespace SmartWeather::Repositories::Acquisition;
 
 AnalogRepository::AnalogRepository(int gpioPin, BrokerService *brokerService)
     : _brokerService(brokerService),
-      _taskHandle(nullptr),
-      _running(false),
       _gpioPin(gpioPin)
 {
     pinMode(_gpioPin, INPUT);
 }
 
-void AnalogRepository::AcquisitionTask(void *pvParameters)
+void AnalogRepository::Acquire()
 {
-    AnalogRepository *service = static_cast<AnalogRepository *>(pvParameters);
-    service->AcquisitionLoop();
-    vTaskDelete(NULL);
-}
+    uint16_t value = analogRead(_gpioPin);
 
-void AnalogRepository::StartAcquisition()
-{
-    if (_running)
+    if (isnan(value))
     {
-        Serial.println("Acquisition déjà en cours.");
-        return;
+        Serial.println("Erreur lors de la lecture des données GPIO PIN : " + String(_gpioPin));
     }
-
-    _running = true;
-
-    String taskName = "Analog Acquisition Task, PIN : " + String(_gpioPin);
-
-    xTaskCreate(
-        AnalogRepository::AcquisitionTask,
-        taskName.c_str(),
-        8192,
-        this,
-        1,
-        &_taskHandle);
-
-    if (_taskHandle == nullptr)
+    else
     {
-        Serial.println("Erreur lors de la création de la tâche d'acquisition.");
-        _running = false;
+        Serial.print("GPIO PIN [" + String(_gpioPin) + "] : ");
+        Serial.println(value);
+        _brokerService->SendComponentDataSavingRequest(_gpioPin, _defaultLocalId, value);
     }
-}
-
-void AnalogRepository::StopAcquisition()
-{
-    if (_running && _taskHandle != nullptr)
-    {
-        _running = false;
-
-        vTaskDelete(_taskHandle);
-        _taskHandle = nullptr;
-
-        Serial.println("Acquisition arrêtée.");
-    }
-}
-
-bool AnalogRepository::GetState()
-{
-    return _running;
 }
 
 PinConfig AnalogRepository::GetConfig()
@@ -79,26 +41,4 @@ PinConfig AnalogRepository::GetConfig()
     analogPinConf.MeasurePoints = configs;
 
     return analogPinConf;
-}
-
-void AnalogRepository::AcquisitionLoop()
-{
-    while (_running)
-    {
-        uint16_t value = analogRead(_gpioPin);
-
-        if (isnan(value))
-        {
-            Serial.println("Erreur lors de la lecture des données GPIO PIN : " + String(_gpioPin));
-        }
-        else
-        {
-            Serial.print("GPIO PIN : " + String(_gpioPin));
-            Serial.println(value);
-
-            _brokerService->SendComponentDataSavingRequest(_gpioPin, _defaultLocalId, value);
-        }
-
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
 }

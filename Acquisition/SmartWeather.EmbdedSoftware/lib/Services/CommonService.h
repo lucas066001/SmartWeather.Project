@@ -3,18 +3,22 @@
 
 #include "ConnectionService.h"
 
-namespace SmartWeather::Services {
+namespace SmartWeather::Services
+{
 
-    class CommonService {
+    class CommonService
+    {
     public:
-        CommonService(ConnectionService& connectionService);
+        CommonService(ConnectionService &connectionService, BoardStateService &boardStateService);
 
         String GenerateGuid();
+        void BlockBoardError();
 
     private:
-        ConnectionService& _connectionService;
+        ConnectionService &_connectionService;
+        BoardStateService &_boardStateService;
     };
 
-} 
+}
 
 #endif

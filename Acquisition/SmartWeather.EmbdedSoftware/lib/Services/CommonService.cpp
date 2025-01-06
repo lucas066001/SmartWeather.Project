@@ -1,9 +1,11 @@
 #include "CommonService.h"
 
 using namespace SmartWeather::Services;
+using namespace SmartWeather::Constants;
 
-CommonService::CommonService(ConnectionService &connectionService)
-                            : _connectionService(connectionService)
+CommonService::CommonService(ConnectionService &connectionService, BoardStateService &boardStateService)
+    : _connectionService(connectionService),
+      _boardStateService(boardStateService)
 {
 }
 
@@ -18,6 +20,14 @@ String SmartWeather::Services::CommonService::GenerateGuid()
 
   String guid = block1 + "-" + block2 + "-" + block3 + "-" + block4 + "-" + mac;
   guid.toUpperCase();
-  
+
   return guid;
+}
+
+void SmartWeather::Services::CommonService::BlockBoardError()
+{
+  while (true)
+  {
+    _boardStateService.BlinkState(BoardState::ERROR);
+  }
 }

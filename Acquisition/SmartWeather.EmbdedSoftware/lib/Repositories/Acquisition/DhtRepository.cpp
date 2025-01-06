@@ -1,71 +1,42 @@
 #include <Acquisition/DhtRepository.h>
+#include "DhtRepository.h"
 
 using namespace SmartWeather::Repositories;
 using namespace SmartWeather::Repositories::Acquisition;
 
 DhtRepository::DhtRepository(BrokerService *brokerService)
     : _brokerService(brokerService),
-      _dht(SmartWeather::Constants::DHT_PIN, DHT11),
-      _taskHandle(nullptr),
-      _running(false)
+      _dht(SmartWeather::Constants::DHT_PIN, DHT11)
 {
     _dht.begin();
 }
 
-void DhtRepository::AcquisitionTask(void *pvParameters)
+void DhtRepository::Acquire()
 {
-    DhtRepository *service = static_cast<DhtRepository *>(pvParameters);
-    service->AcquisitionLoop();
-    vTaskDelete(NULL);
-}
+    float temperature = _dht.readTemperature();
+    float humidity = _dht.readHumidity();
 
-void DhtRepository::StartAcquisition()
-{
-    if (_running)
+    if (isnan(temperature) || isnan(humidity))
     {
-        Serial.println("Acquisition déjà en cours.");
-        return;
+        Serial.println("Erreur lors de la lecture des données DHT.");
     }
-
-    _running = true;
-
-    xTaskCreate(
-        DhtRepository::AcquisitionTask,
-        "DHT Acquisition Task",
-        8192,
-        this,
-        1,
-        &_taskHandle);
-
-    if (_taskHandle == nullptr)
+    else
     {
-        Serial.println("Erreur lors de la création de la tâche d'acquisition.");
-        _running = false;
+        Serial.print("Température: ");
+        Serial.println(temperature);
+        Serial.print("Humidité: ");
+        Serial.print(humidity);
+        Serial.println("%");
+
+        _brokerService->SendComponentDataSavingRequest(SmartWeather::Constants::DHT_PIN, _tempId, temperature);
+        _brokerService->SendComponentDataSavingRequest(SmartWeather::Constants::DHT_PIN, _humidityId, humidity);
     }
-}
-
-void DhtRepository::StopAcquisition()
-{
-    if (_running && _taskHandle != nullptr)
-    {
-        _running = false;
-
-        vTaskDelete(_taskHandle);
-        _taskHandle = nullptr;
-
-        Serial.println("Acquisition arrêtée.");
-    }
-}
-
-bool DhtRepository::GetState()
-{
-    return _running;
 }
 
 PinConfig DhtRepository::GetConfig()
 {
     PinConfig dhtConf;
-    dhtConf.DefaultName = "DHT Sensor";
+    dhtConf.DefaultName = "DHT Sensor - Pin[" + String(SmartWeather::Constants::DHT_PIN) + "]";
     dhtConf.GpioPin = DHT_PIN;
     dhtConf.ComponentType = (int)ComponentType::Sensor;
     std::vector<MeasurePointConfig> configs;
@@ -82,31 +53,4 @@ PinConfig DhtRepository::GetConfig()
     dhtConf.MeasurePoints = configs;
 
     return dhtConf;
-}
-
-void DhtRepository::AcquisitionLoop()
-{
-    while (_running)
-    {
-        float temperature = _dht.readTemperature();
-        float humidity = _dht.readHumidity();
-
-        if (isnan(temperature) || isnan(humidity))
-        {
-            Serial.println("Erreur lors de la lecture des données DHT.");
-        }
-        else
-        {
-            Serial.print("Température: ");
-            Serial.println(temperature);
-            Serial.print("Humidité: ");
-            Serial.print(humidity);
-            Serial.println("%");
-
-            _brokerService->SendComponentDataSavingRequest(SmartWeather::Constants::DHT_PIN, _tempId, temperature);
-            _brokerService->SendComponentDataSavingRequest(SmartWeather::Constants::DHT_PIN, _humidityId, humidity);
-        }
-
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
 }

@@ -2,16 +2,19 @@
 #define BOARD_STATE_SERVICE_H
 
 #include <Arduino.h>
-#include "DiodeConstants.h"  
+#include "DiodeConstants.h"
 
-namespace SmartWeather::Services {
+namespace SmartWeather::Services
+{
 
-    class BoardStateService {
+    class BoardStateService
+    {
     public:
         BoardStateService();
 
         SmartWeather::Constants::BoardState GetState();
         void SetState(SmartWeather::Constants::BoardState newState);
+        void BlinkState(SmartWeather::Constants::BoardState newState);
 
     private:
         SmartWeather::Constants::BoardState currentState;
@@ -19,6 +22,6 @@ namespace SmartWeather::Services {
         void updateLeds();
     };
 
-} 
+}
 
 #endif

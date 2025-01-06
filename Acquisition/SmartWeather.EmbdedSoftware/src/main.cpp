@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <TimeService.h>
 #include <CommonService.h>
 #include <ConnectionService.h>
 #include <BoardStateService.h>
@@ -20,20 +19,11 @@ using namespace SmartWeather::Repositories::Acquisition;
 using namespace SmartWeather::Repositories::Actuator;
 using namespace SmartWeather::Services::Mqtt::RequestHandlers;
 
-TimeService timeService;
 BoardStateService boardStateService;
 ConnectionService connectionService(boardStateService);
 AccessPointService accessPointService(boardStateService);
-CommonService commonService(connectionService);
+CommonService commonService(connectionService, boardStateService);
 BrokerSingleton *brokerSingleton;
-BrokerService *brokerService;
-DhtRepository *dhtRepository;
-AnalogRepository *uvRepository;
-AnalogRepository *moistureRepository;
-DigitalActuatorRepository *pumpRepository;
-ActuatorCommandRequestHandler *actuatorRequestHandler;
-
-bool connectionError = false;
 
 void setup()
 {
@@ -46,25 +36,7 @@ void setup()
     // Initialize broker service with dependencies
     brokerSingleton = BrokerSingleton::GetInstance(&boardStateService,
                                                    &connectionService,
-                                                   &timeService,
                                                    &commonService);
-
-    brokerService = new BrokerService(brokerSingleton, commonService, boardStateService, connectionService);
-    dhtRepository = new DhtRepository(brokerService);
-    uvRepository = new AnalogRepository(UV_PIN, brokerService);
-    moistureRepository = new AnalogRepository(MOISTURE_PIN, brokerService);
-    pumpRepository = new DigitalActuatorRepository(BLUE_DIODE_PIN, brokerService);
-
-    brokerService->RegisterAcquisitionRepo(dhtRepository);
-    brokerService->RegisterAcquisitionRepo(uvRepository);
-    brokerService->RegisterAcquisitionRepo(moistureRepository);
-    brokerService->RegisterAcquisitionRepo(moistureRepository);
-    brokerService->RegisterAcquisitionRepo(moistureRepository);
-    brokerService->RegisterActuatorRepo(pumpRepository);
-
-    actuatorRequestHandler = new ActuatorCommandRequestHandler(brokerSingleton);
-    actuatorRequestHandler->RegisterActuatorRepository(pumpRepository);
-    brokerSingleton->Handlers.push_back(actuatorRequestHandler);
 }
 
 void loop()
@@ -76,44 +48,61 @@ void loop()
         accessPointService.HandleClient();
     }
 
-    // Once user filled registration form connection could be established
-    if (Constants::TARGET_WIFI_PASSWORD != "" &&
-        Constants::TARGET_WIFI_SSID != "" &&
-        !connectionService.IsConnected())
+    // Wait for the client to fill the form
+    // Indicating user action required by blinking the led
+    while (Constants::TARGET_WIFI_PASSWORD == "" || Constants::TARGET_WIFI_SSID == "")
     {
-        accessPointService.Stop();
-        connectionService.Connect();
-
-        if (connectionService.IsConnected())
-        {
-
-            // Initialize timeservice for future needs
-            timeService.Init();
-
-            // Initialize Broker service to start publish / subscribe events
-            brokerSingleton->Launch();
-
-            // At this stage broker should be connected
-            if (!brokerSingleton->IsConnected())
-            {
-                boardStateService.SetState(BoardState::ERROR);
-                connectionError = true;
-            }
-            else
-            {
-                brokerService->ConfigureStation();
-            }
-
-            if (brokerService->IsStationConfigured())
-            {
-                Serial.println("Station is configured, should start acquisition");
-                brokerService->LaunchAcquisition();
-            }
-        }
-        else
-        {
-            boardStateService.SetState(BoardState::ERROR);
-            connectionError = true;
-        }
+        boardStateService.BlinkState(BoardState::PENDING);
     }
+
+    // Close the server because no longer needed
+    accessPointService.Stop();
+    boardStateService.BlinkState(BoardState::OK);
+
+    connectionService.Connect();
+
+    // If unable to connect, restart process is needed
+    if (!connectionService.IsConnected())
+    {
+        commonService.BlockBoardError();
+    }
+
+    // Acquisition process can now be launched
+    BrokerService brokerService(brokerSingleton, commonService, boardStateService, connectionService);
+
+    DhtRepository dhtRepository(&brokerService);
+    AnalogRepository uvRepository(UV_PIN, &brokerService);
+    AnalogRepository moistureRepository(MOISTURE_PIN, &brokerService);
+    DigitalActuatorRepository pumpRepository(BLUE_DIODE_PIN, &brokerService);
+
+    brokerService.RegisterAcquisitionRepo(&dhtRepository);
+    brokerService.RegisterAcquisitionRepo(&uvRepository);
+    brokerService.RegisterAcquisitionRepo(&moistureRepository);
+    brokerService.RegisterAcquisitionRepo(&moistureRepository);
+    brokerService.RegisterAcquisitionRepo(&moistureRepository);
+    brokerService.RegisterActuatorRepo(&pumpRepository);
+
+    ActuatorCommandRequestHandler actuatorRequestHandler(brokerSingleton);
+
+    actuatorRequestHandler.RegisterActuatorRepository(&pumpRepository);
+    brokerSingleton->Handlers.push_back(&actuatorRequestHandler);
+
+    // Initialize Broker service to start publish / subscribe events
+    brokerSingleton->Launch();
+
+    // At this stage broker should be connected
+    if (!brokerSingleton->IsConnected())
+    {
+        commonService.BlockBoardError();
+    }
+
+    brokerService.ConfigureStation();
+
+    if (!brokerService.IsStationConfigured())
+    {
+        Serial.println("Station is configured, should start acquisition");
+        commonService.BlockBoardError();
+    }
+
+    brokerService.LaunchAcquisition();
 }

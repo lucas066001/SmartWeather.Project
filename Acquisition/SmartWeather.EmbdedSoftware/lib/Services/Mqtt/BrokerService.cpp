@@ -26,25 +26,6 @@ int BrokerService::GetSationDatabseId()
     }
 }
 
-int BrokerService::GetCorrespondingComponentDatabaseId(int gpioPin)
-{
-    if (IsStationConfigured())
-    {
-        for (auto configComponent : _brokerSingleton->CurrentStationConfig->ConfigComponents)
-        {
-            if (configComponent.GpioPin == gpioPin)
-            {
-                return configComponent.DatabaseId;
-            }
-        }
-        return 0;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
 int BrokerService::GetCorrespondingMeasurePointDatabaseId(int gpioPin, int localMeasurePointId)
 {
     if (IsStationConfigured())
@@ -70,20 +51,10 @@ int BrokerService::GetCorrespondingMeasurePointDatabaseId(int gpioPin, int local
     }
 }
 
-// Probably needs to be deleted
-// void configureStationTask(void *pvParameters)
-// {
-//     BrokerSingleton *broker = static_cast<BrokerSingleton *>(pvParameters);
-//     broker->ConfigureStation();
-//     vTaskDelete(NULL); // Supprimer la tâche après exécution
-// }
-
 void BrokerService::ConfigureStation()
 {
     // First we prepare the necessary content for station conf request
     StationConfigRequest dataContent;
-
-    // Will need refactor
     std::vector<PinConfig> stationPinsConfig;
 
     for (IAcquisitionRepository *repo : _acquisitionRepos)
@@ -152,6 +123,7 @@ void BrokerService::ConfigureStation()
                 String *configTopic = new String(MQTT_ACTUATOR_TOPIC_FORMAT);
                 configTopic->concat(MQTT_STATION_TARGET);
                 configTopic->replace("{0}", String(receivedConf->StationDatabaseId));
+                _brokerSingleton->Topics.clear();
                 _brokerSingleton->Topics.push_back(configTopic);
                 _brokerSingleton->Subscribe(configTopic->c_str());
             }
@@ -175,17 +147,12 @@ void BrokerService::ConfigureStation()
 
 void BrokerService::LaunchAcquisition()
 {
-    for (IAcquisitionRepository *repo : _acquisitionRepos)
+    while (true)
     {
-        repo->StartAcquisition();
-    }
-}
-
-void BrokerService::StopAcquisition()
-{
-    for (IAcquisitionRepository *repo : _acquisitionRepos)
-    {
-        repo->StopAcquisition();
+        for (IAcquisitionRepository *repo : _acquisitionRepos)
+        {
+            repo->Acquire();
+        }
     }
 }
 

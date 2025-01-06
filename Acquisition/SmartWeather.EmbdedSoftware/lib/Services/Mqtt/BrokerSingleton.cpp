@@ -12,14 +12,12 @@ BrokerSingleton *BrokerSingleton::_instance = nullptr;
 
 BrokerSingleton *BrokerSingleton::GetInstance(BoardStateService *boardStateService,
                                               ConnectionService *connectionService,
-                                              TimeService *timeService,
                                               CommonService *commonService)
 {
     if (_instance == nullptr)
     {
         _instance = new BrokerSingleton(*boardStateService,
                                         *connectionService,
-                                        *timeService,
                                         *commonService);
     }
     return _instance;
@@ -27,11 +25,9 @@ BrokerSingleton *BrokerSingleton::GetInstance(BoardStateService *boardStateServi
 
 BrokerSingleton::BrokerSingleton(BoardStateService &boardStateService,
                                  ConnectionService &connectionService,
-                                 TimeService &timeService,
                                  CommonService &commonService)
     : _boardStateService(boardStateService),
       _connectionService(connectionService),
-      _timeService(timeService),
       _commonService(commonService),
       _mqttClient(_wifiClient)
 
@@ -57,20 +53,16 @@ void BrokerSingleton::Launch()
         xTaskCreate(
             [](void *param)
             {
-                // Appel de la méthode _startAcquisition
+                // Launch acquisition in a separate task
                 static_cast<BrokerSingleton *>(param)->_startAcquisition();
-                vTaskDelete(NULL); // On supprime la tâche une fois terminée
+                vTaskDelete(NULL);
             },
-            "MQTT_Acquisition", // Nom de la tâche
-            16384,              // Taille de la pile (peut être ajustée)
-            this,               // Paramètre (instance actuelle)
-            1,                  // Priorité de la tâche
-            NULL                // Handle de la tâche (pas nécessaire ici)
-        );
+            "MQTT_Acquisition",
+            16384,
+            this,
+            1,
+            NULL);
 
-        // std::thread tAcquisition(std::bind(&BrokerSingleton::_startAcquisition, this));
-
-        // tAcquisition.detach();
         Serial.println("Mqtt loop started");
     }
 }
@@ -91,7 +83,6 @@ void BrokerSingleton::SendRequest(String requestId,
     {
         // Generate proper request
         MqttHeader mqttHeader;
-        mqttHeader.DateTime = _timeService.GetCurrentDateTime();
         mqttHeader.RequestEmitter = _connectionService.GetCurrentMacAddress();
         mqttHeader.RequestIdentifier = requestId;
 
@@ -164,7 +155,6 @@ void BrokerSingleton::SendSuccessResponse(MqttRequest &request,
     {
         // Generate proper response
         MqttHeader mqttHeader;
-        mqttHeader.DateTime = _timeService.GetCurrentDateTime();
         mqttHeader.RequestEmitter = request.Header.RequestEmitter;
         mqttHeader.RequestIdentifier = request.Header.RequestIdentifier;
 
@@ -200,7 +190,6 @@ void BrokerSingleton::SendErrorResponse(String &requestEmitter,
     {
         // Generate proper response
         MqttHeader mqttHeader;
-        mqttHeader.DateTime = _timeService.GetCurrentDateTime();
         mqttHeader.RequestEmitter = requestEmitter;
         mqttHeader.RequestIdentifier = requestIdentifier;
 
