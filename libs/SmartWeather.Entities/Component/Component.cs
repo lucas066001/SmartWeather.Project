@@ -71,7 +71,7 @@ public class Component
         }
         StationId = stationId;
 
-        if(!(0 <= gpioPin && gpioPin <= 32))
+        if(!(0 <= gpioPin && gpioPin <= 39))
         {
             throw new InvalidComponentGpioPinException();
         }

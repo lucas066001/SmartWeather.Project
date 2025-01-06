@@ -76,7 +76,7 @@ function MeanDataMetrics({
     volume: number;
   }
 
-  const refreshFrequency: number = 30;
+  const refreshFrequency: number = 3;
 
   const updateLatency = () => {
     let nbStationChecked: number = 0;
@@ -153,11 +153,11 @@ function MeanDataMetrics({
     stations.forEach((station) => {
       stationsLatency.push({ station: station, latency: undefined });
     });
-    return () => {};
+    return () => { };
   }, [stations]);
 
   useEffect(() => {
-    // console.log(lastUpdatedMeasurePoints.id)
+    console.log(lastUpdatedMeasurePoints)
     // console.log(stationMeasurePointsMap)
     const concernedStation: StationMeasurePointsResponse | undefined =
       stationMeasurePointsMap?.find((sm) =>
@@ -186,7 +186,7 @@ function MeanDataMetrics({
       }
     }
 
-    return () => {};
+    return () => { };
   }, [
     lastUpdatedMeasurePoints,
     stationMeasurePointsMap,
@@ -350,7 +350,7 @@ function MeanDataMetrics({
                       }}
                       className={twMerge(
                         selectedStation?.id === stationLatency.station.id &&
-                          "font-semibold"
+                        "font-semibold"
                       )}
                     >
                       <TableCell>{stationLatency.station.name}</TableCell>
@@ -360,8 +360,8 @@ function MeanDataMetrics({
                           ? stationLatency.latency <= meanLatency
                             ? "🟢"
                             : stationLatency.latency >= meanLatency * 1.15
-                            ? "🔴"
-                            : "🟡"
+                              ? "🔴"
+                              : "🟡"
                           : "⚫"}
                       </TableCell>
                     </TableRow>
