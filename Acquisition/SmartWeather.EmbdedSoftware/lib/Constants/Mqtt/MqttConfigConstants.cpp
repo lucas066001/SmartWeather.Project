@@ -3,7 +3,9 @@
 namespace SmartWeather::Constants::Mqtt
 {
     const char *MQTT_HOST = "localhost";
-    const IPAddress MQTT_IP(192, 168, 1, 78);
+    // const IPAddress MQTT_IP(192, 168, 1, 78);192.168.30.81
+    const IPAddress MQTT_IP(192, 168, 30, 81);
+    // const IPAddress MQTT_IP(10, 101, 53, 165);
     const int MQTT_PORT = 1883;
     const int MQTT_MAX_MESSAGE_SIZE = 2048;
     const int MQTT_TIMEOUT = 120000;

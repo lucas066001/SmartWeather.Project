@@ -266,6 +266,7 @@ void BrokerSingleton::_connect()
             {
                 Subscribe(topic->c_str());
             }
+            _commonService.LogHeap();
             return;
         }
     }
@@ -309,7 +310,7 @@ void BrokerSingleton::_startAcquisition()
         }
 
         // Pause légère pour éviter de saturer le CPU
-        // vTaskDelay(10 / portTICK_PERIOD_MS);
+        vTaskDelay(10 / portTICK_PERIOD_MS);
     }
 }
 

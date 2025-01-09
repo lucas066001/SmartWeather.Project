@@ -153,6 +153,7 @@ void BrokerService::LaunchAcquisition()
         {
             repo->Acquire();
         }
+        delay(5000);
     }
 }
 
@@ -170,6 +171,7 @@ void BrokerService::SendComponentDataSavingRequest(int gpioPin, int measurePoint
 
     _brokerSingleton->SendMessage(measureDataSavingTopicRequest,
                                   String(value, 2));
+    _commonService.LogHeap();
 }
 
 void BrokerService::RegisterAcquisitionRepo(IAcquisitionRepository *acquisitionRepository)

@@ -12,11 +12,13 @@ namespace SmartWeather::Services
         CommonService(ConnectionService &connectionService, BoardStateService &boardStateService);
 
         String GenerateGuid();
+        void LogHeap();
         void BlockBoardError();
 
     private:
         ConnectionService &_connectionService;
         BoardStateService &_boardStateService;
+        uint32_t memlast = 0;
     };
 
 }

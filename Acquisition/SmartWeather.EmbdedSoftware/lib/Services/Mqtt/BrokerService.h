@@ -7,6 +7,7 @@
 #include <CommonService.h>
 #include <PinsConstants.h>
 #include <vector>
+#include <string>
 #include <IAcquisitionRepository.h>
 #include <IActuatorRepository.h>
 

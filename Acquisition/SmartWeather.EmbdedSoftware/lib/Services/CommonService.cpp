@@ -7,6 +7,7 @@ CommonService::CommonService(ConnectionService &connectionService, BoardStateSer
     : _connectionService(connectionService),
       _boardStateService(boardStateService)
 {
+  memlast = ESP.getFreeHeap();
 }
 
 String SmartWeather::Services::CommonService::GenerateGuid()
@@ -22,6 +23,18 @@ String SmartWeather::Services::CommonService::GenerateGuid()
   guid.toUpperCase();
 
   return guid;
+}
+
+void SmartWeather::Services::CommonService::LogHeap()
+{
+  Serial.print("**************");
+  Serial.print("Heap: ");
+  Serial.println(ESP.getFreeHeap());
+  Serial.print("Loss: ");
+  uint32_t memcur = ESP.getFreeHeap();
+  Serial.println(memlast - memcur);
+  memlast = memcur;
+  Serial.print("**************");
 }
 
 void SmartWeather::Services::CommonService::BlockBoardError()

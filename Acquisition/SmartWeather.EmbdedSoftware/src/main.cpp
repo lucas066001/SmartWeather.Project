@@ -43,21 +43,16 @@ void loop()
 {
     // First, user needs to fill form
     // So the station will be able to connect to internet
-    if (accessPointService.IsAvailable())
+    boardStateService.SetState(BoardState::PENDING);
+    while (accessPointService.IsAvailable())
     {
         accessPointService.HandleClient();
+        if (Constants::TARGET_WIFI_PASSWORD != "" && Constants::TARGET_WIFI_SSID != "")
+        {
+            accessPointService.Stop();
+            boardStateService.BlinkState(BoardState::OK);
+        }
     }
-
-    // Wait for the client to fill the form
-    // Indicating user action required by blinking the led
-    while (Constants::TARGET_WIFI_PASSWORD == "" || Constants::TARGET_WIFI_SSID == "")
-    {
-        boardStateService.BlinkState(BoardState::PENDING);
-    }
-
-    // Close the server because no longer needed
-    accessPointService.Stop();
-    boardStateService.BlinkState(BoardState::OK);
 
     connectionService.Connect();
 
