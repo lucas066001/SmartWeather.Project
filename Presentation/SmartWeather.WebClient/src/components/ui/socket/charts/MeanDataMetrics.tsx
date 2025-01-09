@@ -3,26 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { ISocketHandler } from "@/components/ui/socket/ISocketHandler";
 import { StationMeasurePointsResponse } from "@/services/station/dtos/station_measure_points_response";
-import {
-  StationDto,
-  StationType,
-} from "@/services/station/dtos/station_response";
-import { Card, CardContent, CardHeader } from "../../card";
+import { StationLatencyDetailsDto } from "@/services/station/dtos/station_response";
 import Arrow from "@/components/icons/Arrow";
 import { twMerge } from "tailwind-merge";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../../table";
-import { Input } from "../../input";
-import { Car, CircleX, MapPin } from "lucide-react";
-import { Map, Marker, Overlay, ZoomControl } from "pigeon-maps";
+
 import {
   ChartConfig,
   ChartContainer,
@@ -39,8 +23,8 @@ import {
   Legend,
   Line,
 } from "recharts";
-import { time } from "console";
 import CardLabel from "../../cardLabel";
+import StationsInformations from "../../stationsInformations";
 
 function MeanDataMetrics({
   lastUpdatedMeasurePoints,
@@ -59,17 +43,9 @@ function MeanDataMetrics({
   const [lastVolumeCheck, setLastVolumeCheck] = useState<number>(0); // :timestamp representing the last time that volume has been checked
   const [meanDatas, setMeanDatas] = useState<MeanData[]>([]); // :timestamp representing the last time that volume has been checked
   const [stationsLatency, setStationsLatency] = useState<
-    StationLatencyDetails[]
+    StationLatencyDetailsDto[]
   >([]); // :objects representing each stations and their corresponding latency
 
-  const [searchStation, setSearchStation] = useState("");
-  const [selectedStation, setSelectedStation] = useState<
-    StationDto | undefined
-  >();
-  interface StationLatencyDetails {
-    station: StationDto;
-    latency: number | undefined;
-  }
   interface MeanData {
     time: Date;
     latency: number;
@@ -109,8 +85,6 @@ function MeanDataMetrics({
           stationsLatency[stationLatencyIndex].latency = currentLatency;
         } else {
           const station = stations.find((s) => s.id == stationId);
-          console.log("station");
-          console.log(station);
 
           if (station) {
             stationsLatency.push({ latency: currentLatency, station: station });
@@ -124,7 +98,6 @@ function MeanDataMetrics({
         }
       }
     });
-    console.log("updateMeanLatency");
     setPreviousMeanLatency(meanLatency);
     setMeanLatency(Number((sumLatencies / nbStationChecked).toFixed(2)));
     if (minLatency) {
@@ -153,12 +126,10 @@ function MeanDataMetrics({
     stations.forEach((station) => {
       stationsLatency.push({ station: station, latency: undefined });
     });
-    return () => { };
+    return () => {};
   }, [stations]);
 
   useEffect(() => {
-    console.log(lastUpdatedMeasurePoints)
-    // console.log(stationMeasurePointsMap)
     const concernedStation: StationMeasurePointsResponse | undefined =
       stationMeasurePointsMap?.find((sm) =>
         sm.measurePointsIds?.includes(lastUpdatedMeasurePoints.id)
@@ -176,8 +147,6 @@ function MeanDataMetrics({
         previousReceived[concernedStation.stationId] = lastLatency;
         currentReceived[concernedStation.stationId] = new Date().getTime();
       }
-      // console.log("station n°" + concernedStation.stationId + "gets updates");
-      // console.log("newDataArrived =" + newDataArrived);
 
       if (newDataArrived >= refreshFrequency) {
         updateLatency();
@@ -186,7 +155,7 @@ function MeanDataMetrics({
       }
     }
 
-    return () => { };
+    return () => {};
   }, [
     lastUpdatedMeasurePoints,
     stationMeasurePointsMap,
@@ -313,119 +282,11 @@ function MeanDataMetrics({
         </CardLabel>
       </div>
 
-      <CardLabel
-        label="Stations list"
-        className="h-[calc(100vh-80px-1.75rem*2)] w-1/2 flex-none"
-      >
-        <div className="p-4 flex gap-4 h-full w-full">
-          <div className="flex flex-col">
-            <label htmlFor="search">Filter by name</label>
-            <div className="flex gap-2 mt-2">
-              <Input
-                id="search"
-                type="search"
-                className="mb-4"
-                placeholder="Research ..."
-                value={searchStation}
-                onChange={(e) => {
-                  setSearchStation(e.target.value);
-                }}
-              />
-            </div>
-            <Table className="min-w-64">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Station name</TableHead>
-                  <TableHead>Latency</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {stationsLatency
-                  .filter((sl) => sl.station.name.includes(searchStation))
-                  .map((stationLatency) => (
-                    <TableRow
-                      key={stationLatency.station.id}
-                      onClick={() => {
-                        setSelectedStation(stationLatency.station);
-                      }}
-                      className={twMerge(
-                        selectedStation?.id === stationLatency.station.id &&
-                        "font-semibold"
-                      )}
-                    >
-                      <TableCell>{stationLatency.station.name}</TableCell>
-                      <TableCell>{stationLatency.latency}</TableCell>
-                      <TableCell>
-                        {stationLatency.latency
-                          ? stationLatency.latency <= meanLatency
-                            ? "🟢"
-                            : stationLatency.latency >= meanLatency * 1.15
-                              ? "🔴"
-                              : "🟡"
-                          : "⚫"}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </div>
-
-          <div className="h-full rounded-xl overflow-hidden flex-1 ">
-            {window && (
-              <Map
-                defaultCenter={[46.2276, 2.2137]}
-                center={
-                  selectedStation && [
-                    selectedStation.latitude,
-                    selectedStation.longitude,
-                  ]
-                }
-                defaultZoom={5.8}
-                zoom={selectedStation && 10}
-                zoomSnap
-                boxClassname="rounded overflow-hidden"
-              >
-                {selectedStation && (
-                  <Overlay
-                    className="z-50"
-                    anchor={[
-                      selectedStation.latitude,
-                      selectedStation.longitude,
-                    ]}
-                  >
-                    <Card className="p-4 relative ">
-                      <CircleX
-                        onClick={() => setSelectedStation(undefined)}
-                        className="text-titleBrown absolute right-[-10px] top-[-10px] cursor-pointer bg-white p-1 rounded-full w-7 h-7"
-                      />
-                      <strong>{selectedStation.name}</strong>
-                      <br />
-                      Type:{" "}
-                      {selectedStation.type === StationType.Professionnal
-                        ? "Professional"
-                        : "Private"}
-                      <br />
-                      ID: {selectedStation.id}
-                    </Card>
-                  </Overlay>
-                )}
-                {stations.map((station) => {
-                  return (
-                    <Marker
-                      key={station.id}
-                      className="z-10"
-                      width={50}
-                      anchor={[station.latitude, station.longitude]}
-                      onClick={() => setSelectedStation(station)}
-                    />
-                  );
-                })}
-                <ZoomControl />
-              </Map>
-            )}
-          </div>
-        </div>
-      </CardLabel>
+      <StationsInformations
+        stations={stations}
+        stationsLatency={stationsLatency}
+        meanLatency={meanLatency}
+      />
     </div>
   );
 }

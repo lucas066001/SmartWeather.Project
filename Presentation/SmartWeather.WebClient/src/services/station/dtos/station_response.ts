@@ -14,3 +14,9 @@ export enum StationType {
     Professionnal,
     Private
 }
+
+
+export interface StationLatencyDetailsDto {
+    station: StationDto;
+    latency: number | undefined;
+  }
