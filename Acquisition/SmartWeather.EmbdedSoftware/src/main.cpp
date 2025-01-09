@@ -73,8 +73,6 @@ void loop()
     brokerService.RegisterAcquisitionRepo(&dhtRepository);
     brokerService.RegisterAcquisitionRepo(&uvRepository);
     brokerService.RegisterAcquisitionRepo(&moistureRepository);
-    brokerService.RegisterAcquisitionRepo(&moistureRepository);
-    brokerService.RegisterAcquisitionRepo(&moistureRepository);
     brokerService.RegisterActuatorRepo(&pumpRepository);
 
     ActuatorCommandRequestHandler actuatorRequestHandler(brokerSingleton);
