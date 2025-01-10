@@ -40,7 +40,7 @@ function StationsTable({ rows, onSelectedRow }: IStationsTableProps) {
             onClick={() => {
               onSelectedRow(id);
             }}
-            className={twMerge(selected && "font-semibold")}
+            className={twMerge("cursor-pointer", selected && "font-semibold")}
           >
             <TableCell>{name}</TableCell>
             <TableCell>{latency}</TableCell>

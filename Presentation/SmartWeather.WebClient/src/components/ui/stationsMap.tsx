@@ -20,7 +20,6 @@ function StationsMap({
   selectedStation,
   onSelectedStationChange,
 }: IStationsMapProps) {
-  console.log(selectedStation);
   return (
     <>
       {window && (

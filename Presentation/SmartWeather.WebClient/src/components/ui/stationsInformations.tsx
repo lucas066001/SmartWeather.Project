@@ -13,7 +13,7 @@ import StationsTable, { IStationRow } from "./stationsTable";
 interface IStationInformationsProps {
   stationsLatency: StationLatencyDetailsDto[];
   stations: StationDto[];
-  meanLatency: number;
+  meanLatency?: number;
 }
 
 function StationsInformations({
@@ -39,13 +39,14 @@ function StationsInformations({
           id,
           latency,
           selected: id === selectedStation?.id,
-          state: latency
-            ? latency <= meanLatency
-              ? "🟢"
-              : latency >= meanLatency * 1.15
-              ? "🔴"
-              : "🟡"
-            : "⚫",
+          state:
+            meanLatency !== undefined && latency
+              ? latency <= meanLatency
+                ? "🟢"
+                : latency >= meanLatency * 1.15
+                ? "🔴"
+                : "🟡"
+              : "⚫",
         })),
     [stationsLatency, search, selectedStation]
   );
