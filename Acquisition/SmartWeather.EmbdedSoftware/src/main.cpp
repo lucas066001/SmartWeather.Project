@@ -68,7 +68,7 @@ void loop()
     DhtRepository dhtRepository(&brokerService);
     AnalogRepository uvRepository(UV_PIN, &brokerService);
     AnalogRepository moistureRepository(MOISTURE_PIN, &brokerService);
-    DigitalActuatorRepository pumpRepository(BLUE_DIODE_PIN, &brokerService);
+    DigitalActuatorRepository pumpRepository(PUMP_PIN, &brokerService);
 
     brokerService.RegisterAcquisitionRepo(&dhtRepository);
     brokerService.RegisterAcquisitionRepo(&uvRepository);
