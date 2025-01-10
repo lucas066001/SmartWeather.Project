@@ -27,6 +27,12 @@ public class MeasureDataService (IMeasureDataRepository measureDataRepository)
     /// <returns>Result containing a list of MeasureData.</returns>
     public Result<IEnumerable<MeasureData>> GetFromMeasurePoint(int idMeasurePoint, DateTime startPeriod, DateTime endPeriod)
     {
-        return measureDataRepository.GetFromMeasurePoint(idMeasurePoint, startPeriod, endPeriod).Result;
+        try
+        {
+            return measureDataRepository.GetFromMeasurePoint(idMeasurePoint, startPeriod, endPeriod).Result;
+        }catch (Exception ex) { 
+            Console.WriteLine(ex.Message);
+            return Result<IEnumerable<MeasureData>>.Failure(ex.Message);
+        }
     }
 }

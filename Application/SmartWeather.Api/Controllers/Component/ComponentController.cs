@@ -197,7 +197,7 @@ public class ComponentController : ControllerBase
     {
         ApiResponse<EmptyResponse> response;
 
-        if (!(request.ComponentId > 0) ||
+        if (!(request.ComponentGpioPin > 0) ||
             !(request.StationId > 0))
         {
             return BadRequest(ApiResponse<EmptyResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
@@ -212,7 +212,7 @@ public class ComponentController : ControllerBase
         try
         {
             bool isActionExecuted = await _mqttService.SendActuatorCommand(request.StationId,
-                                                                     request.ComponentId,
+                                                                     request.ComponentGpioPin,
                                                                      request.ComponentValueUpdate);
             if (isActionExecuted)
             {
