@@ -35,7 +35,7 @@ class SignalRService {
             return await this.connection.invoke<T>(methodName, content);
         } catch (error) {
             console.error(`Erreur lors de l'appel de '${methodName}':`, error);
-            throw error;
+            // throw error;
         }
     }
 

@@ -1,4 +1,4 @@
-import MainLayout from "@/components/ui/MainLayout";
+import MainLayout from "@/components/ui/mainLayout";
 import React from "react";
 
 function page() {

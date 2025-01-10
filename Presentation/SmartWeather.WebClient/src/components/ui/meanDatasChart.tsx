@@ -24,11 +24,11 @@ interface IMeanDatasChartProps {
 
 const chartConfig = {
   desktop: {
-    label: "Desktop",
+    label: "volume",
     color: "#67C44D",
   },
   mobile: {
-    label: "Mobile",
+    label: "latency",
     color: "#5384AF",
   },
 } satisfies ChartConfig;

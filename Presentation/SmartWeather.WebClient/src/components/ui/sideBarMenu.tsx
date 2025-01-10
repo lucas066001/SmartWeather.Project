@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import MenuLink, { ILink } from "./MenuLink";
+import MenuLink, { ILink } from "./menuLink";
 import Image from "next/image";
 import extendedLogo from "../../../public/images/logo-extended.svg";
 import compactedLogo from "../../../public/images/logo-compacted.svg";

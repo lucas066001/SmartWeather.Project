@@ -1,4 +1,4 @@
-import MainLayout from "@/components/ui/MainLayout";
+import MainLayout from "@/components/ui/mainLayout";
 import SocketConnector from "@/components/ui/socket/socketConnector";
 
 function DashboardPage() {
