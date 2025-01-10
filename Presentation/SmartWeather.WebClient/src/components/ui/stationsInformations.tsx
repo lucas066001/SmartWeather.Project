@@ -38,6 +38,7 @@ function StationsInformations({
           name,
           id,
           latency,
+          selected: id === selectedStation?.id,
           state: latency
             ? latency <= meanLatency
               ? "🟢"
@@ -46,7 +47,7 @@ function StationsInformations({
               : "🟡"
             : "⚫",
         })),
-    [stationsLatency]
+    [stationsLatency, search, selectedStation]
   );
 
   return (

@@ -82,12 +82,17 @@ function MeanDataMetrics({
         );
 
         if (stationLatencyIndex > -1) {
-          stationsLatency[stationLatencyIndex].latency = currentLatency;
+          const newStationsLatency = [...stationsLatency];
+          newStationsLatency[stationLatencyIndex].latency = currentLatency;
+          setStationsLatency(newStationsLatency);
         } else {
           const station = stations.find((s) => s.id == stationId);
 
           if (station) {
-            stationsLatency.push({ latency: currentLatency, station: station });
+            setStationsLatency((curr) => [
+              ...curr,
+              { station: station, latency: currentLatency },
+            ]);
           }
         }
         const threshold = 1500;
@@ -121,10 +126,11 @@ function MeanDataMetrics({
   };
 
   useEffect(() => {
-    console.log(stations);
-
     stations.forEach((station) => {
-      stationsLatency.push({ station: station, latency: undefined });
+      setStationsLatency((curr) => [
+        ...curr,
+        { station: station, latency: undefined },
+      ]);
     });
     return () => {};
   }, [stations]);
