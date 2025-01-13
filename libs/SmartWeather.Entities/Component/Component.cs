@@ -3,6 +3,7 @@ using SmartWeather.Entities.Station;
 using SmartWeather.Entities.MeasurePoint;
 using System.Text.RegularExpressions;
 using SmartWeather.Entities.Component.Exceptions;
+using SmartWeather.Entities.ActivationPlan;
 
 public class Component
 {
@@ -14,6 +15,7 @@ public class Component
     public int GpioPin { get; set; }
     public virtual Station Station { get; set; } = null!;
     public virtual ICollection<MeasurePoint> MeasurePoints { get; set; } = [];
+    public virtual ICollection<ActivationPlan> ActivationPlans { get; set; } = [];
 
     public static readonly Regex HexColorRegex = new Regex(@"#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
                                                            RegexOptions.Compiled | RegexOptions.IgnoreCase);

@@ -9,11 +9,8 @@ using SmartWeather.Entities.Component;
 using SmartWeather.Entities.Station;
 using SmartWeather.Api.Controllers.Component.Dtos.Converters;
 using SmartWeather.Services.Mqtt;
-using SmartWeather.Entities.Common.Exceptions;
 using SmartWeather.Entities.User;
 using SmartWeather.Api.Helpers;
-using Microsoft.AspNetCore.Identity;
-using SmartWeather.Api.Controllers.Authentication.Dtos;
 
 [Route("api/[controller]")]
 [ApiController]

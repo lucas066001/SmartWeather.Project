@@ -2,10 +2,12 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using SmartWeather.Entities.ActivationPlan;
 using SmartWeather.Entities.Component;
 using SmartWeather.Entities.MeasurePoint;
 using SmartWeather.Entities.Station;
 using SmartWeather.Entities.User;
+using SmartWeather.Services.ActivationPlan;
 using SmartWeather.Services.Authentication;
 using SmartWeather.Services.Components;
 using SmartWeather.Services.MeasurePoints;
@@ -17,16 +19,19 @@ public class AccessManagerHelper
     private readonly StationService _stationService;
     private readonly ComponentService _componentService;
     private readonly MeasurePointService _measurePointService;
+    private readonly ActivationPlanService _activationPlanService;
 
     public AccessManagerHelper(AuthenticationService authenticationService,
                                StationService stationService,
                                ComponentService componentService,
-                               MeasurePointService measurePointService)
+                               MeasurePointService measurePointService,
+                               ActivationPlanService activationPlanService)
     {
         _authenticationService = authenticationService;
         _stationService = stationService;
         _componentService = componentService;
         _measurePointService = measurePointService;
+        _activationPlanService = activationPlanService;
     }
 
     /// <summary>
@@ -67,6 +72,10 @@ public class AccessManagerHelper
             else if (typeof(T) == typeof(User))
             {
                 isOwner = entityId == userId;
+            }
+            else if (typeof(T) == typeof(ActivationPlan))
+            {
+                isOwner = _activationPlanService.IsOwnerOfActivationPlan(userId, entityId);
             }
 
             if (isOwner || (grantedRole != null && grantedRole.Contains(userRole)))

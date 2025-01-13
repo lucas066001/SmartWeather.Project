@@ -5,6 +5,7 @@ using SmartWeather.Entities.Component;
 using SmartWeather.Entities.MeasurePoint;
 using SmartWeather.Entities.Station;
 using SmartWeather.Entities.User;
+using SmartWeather.Entities.ActivationPlan;
 using SmartWeather.Repositories.Context.Configurations;
 
 public class SmartWeatherContext(DbContextOptions<SmartWeatherContext> options) : DbContext(options)
@@ -13,6 +14,7 @@ public class SmartWeatherContext(DbContextOptions<SmartWeatherContext> options) 
     public DbSet<Station> Stations { get; set; }
     public DbSet<Component> Components { get; set; }
     public DbSet<MeasurePoint> MeasurePoints { get; set; }
+    public DbSet<ActivationPlan> ActivationPlans { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -20,6 +22,7 @@ public class SmartWeatherContext(DbContextOptions<SmartWeatherContext> options) 
         new StationConfiguration().Configure(modelBuilder.Entity<Station>());
         new ComponentConfiguration().Configure(modelBuilder.Entity<Component>());
         new MeasurePointConfiguration().Configure(modelBuilder.Entity<MeasurePoint>());
+        new ActivationPlanConfiguration().Configure(modelBuilder.Entity<ActivationPlan>());
 
         base.OnModelCreating(modelBuilder);
     }
