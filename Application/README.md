@@ -86,6 +86,10 @@ Main configurations is located in appsettings.json file:
         ]
     }
     ```
+- Generate database migration : 
+    ```
+    dotnet ef migrations add MIGRATION_NAME --project SmartWeather.Repositories --startup-project SmartWeather.Api --context
+    ```
 ---
 
 ## Key Features 🌟

@@ -18,6 +18,8 @@ using SmartWeather.Repositories.ComponentDatas;
 using SmartWeather.Services.MeasurePoints;
 using SmartWeather.Repositories.MeasurePoints;
 using SmartWeather.Repositories.BaseRepository;
+using SmartWeather.Services.ActivationPlan;
+using SmartWeather.Repositories.ActivationPlan;
 
 public static class DependencyInjection
 {
@@ -47,6 +49,7 @@ public static class DependencyInjection
         services.AddScoped(typeof(IStationRepository), typeof(StationRepository));
         services.AddScoped(typeof(IComponentRepository), typeof(ComponentRepository));
         services.AddScoped(typeof(IMeasurePointRepository), typeof(MeasurePointRepository));
+        services.AddScoped(typeof(IActivationPlanRepository), typeof(ActivationPlanRepository));
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
     }
 

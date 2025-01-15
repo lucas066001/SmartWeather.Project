@@ -14,6 +14,14 @@ public class ActivationPlan
     public virtual Component Component { get; set; } = null!;
 
     /// <summary>
+    /// Empty constructor required to enable EntityFramework creation.
+    /// Required because implemented constructor doesn't reference all attributes as parameters.
+    /// </summary>
+    public ActivationPlan()
+    {
+    }
+
+    /// <summary>
     /// Create an ActivationPlan based on given informations.
     /// </summary>
     /// <param name="name">String representing activation human readable name.</param>

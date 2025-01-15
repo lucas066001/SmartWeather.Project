@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SmartWeather.Services.ActivationPlan;
 using SmartWeather.Services.Authentication;
 using SmartWeather.Services.ComponentDatas;
 using SmartWeather.Services.Components;
@@ -31,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<StationService>();
         services.AddScoped<ComponentService>();
         services.AddScoped<MeasurePointService>();
+        services.AddScoped<ActivationPlanService>();
     }
 
     public static void AddDocumentDbServices(this IServiceCollection services)
