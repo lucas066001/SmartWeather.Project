@@ -12,29 +12,34 @@ public class ActivationPlanService(IRepository<ActivationPlan> activationPlanBas
     /// <summary>
     /// Create new ActivationPlan in database based on given infos.
     /// </summary>
-    /// <param name="name">String representing activation plan name.</param>
-    /// <param name="startingDay">int representing enum corresponding DayOfWeek.</param>
-    /// <param name="period">TimeSpan representing the time elapsed between two activations</param>
-    /// <param name="duration">TimeSpan representing the time an activativation will last</param>
-    /// <param name="componentId">Int representing activation plan target component unique id.</param>
+    /// <param name="name">String representing activation human readable name.</param>
+    /// <param name="startingDate">DateTime indicating when the plan will start.</param>
+    /// <param name="endingDate">DaTime indicating when the plan will end.</param>
+    /// <param name="periodInDay">TimeSpan representing the time elapsed between two activations.</param>
+    /// <param name="activationTime">TimeSpan representing the time an activativation will start in the day.</param>
+    /// <param name="duration">TimeSpan representing the time an activativation will last.</param>
+    /// <param name="componentId">Int representing component unique Id to activate.</param>
     /// <returns>Result containing newly created entity.</returns>
     public Result<ActivationPlan> AddNewActivationPlan(string name,
-                                      int startingDay,
-                                      TimeSpan period,
-                                      TimeSpan duration,
-                                      int componentId)
+                                                       DateTime startingDate,
+                                                       DateTime endingDate,
+                                                       int periodInDay,
+                                                       TimeSpan activationTime,
+                                                       TimeSpan duration,
+                                                       int componentId)
     {
         try
         {
-            ActivationPlan activationPlanToCreate = new(name, 
-                                                        startingDay, 
-                                                        period,
-                                                        duration, 
+            ActivationPlan activationPlanToCreate = new(name,
+                                                        startingDate,
+                                                        endingDate,
+                                                        periodInDay,
+                                                        activationTime,
+                                                        duration,
                                                         componentId);
             return activationPlanBaseRepository.Create(activationPlanToCreate);
         }
         catch (Exception ex) when (ex is InvalidActivationPlanNameException ||
-                                   ex is InvalidActivationPlanStartingDayException ||
                                    ex is InvalidActivationPlanComponentIdException)
         {
             return Result<ActivationPlan>.Failure(string.Format(
@@ -60,27 +65,32 @@ public class ActivationPlanService(IRepository<ActivationPlan> activationPlanBas
     /// <summary>
     /// Modify ActivationPlan in database.
     /// </summary>
-    /// <param name="id">Int representing activation plan unique Id.</param>
-    /// <param name="name">String representing activation plan name.</param>
-    /// <param name="startingDay">int representing enum corresponding DayOfWeek.</param>
-    /// <param name="period">TimeSpan representing the time elapsed between two activations</param>
-    /// <param name="duration">TimeSpan representing the time an activativation will last</param>
-    /// <param name="componentId">Int representing activation plan target component unique id.</param>
+    /// <param name="name">String representing activation human readable name.</param>
+    /// <param name="startingDate">DateTime indicating when the plan will start.</param>
+    /// <param name="endingDate">DaTime indicating when the plan will end.</param>
+    /// <param name="periodInDay">TimeSpan representing the time elapsed between two activations.</param>
+    /// <param name="activationTime">TimeSpan representing the time an activativation will start in the day.</param>
+    /// <param name="duration">TimeSpan representing the time an activativation will last.</param>
+    /// <param name="componentId">Int representing component unique Id to activate.</param>
     /// <returns>Result containing modified component in database.</returns>
     public Result<ActivationPlan> UpdateComponent(int id,
                                                   string name,
-                                                  int startingDay,
-                                                  TimeSpan period,
+                                                  DateTime startingDate,
+                                                  DateTime endingDate,
+                                                  int periodInDay,
+                                                  TimeSpan activationTime,
                                                   TimeSpan duration,
                                                   int componentId)
     {
         try
         {
             ActivationPlan activationPlanToUpdate = new(name,
-                                                       startingDay,
-                                                       period,
-                                                       duration,
-                                                       componentId)
+                                                        startingDate,
+                                                        endingDate,
+                                                        periodInDay,
+                                                        activationTime,
+                                                        duration,
+                                                        componentId)
             {
                 Id = id
             };

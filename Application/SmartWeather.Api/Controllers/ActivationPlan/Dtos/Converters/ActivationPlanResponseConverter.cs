@@ -11,8 +11,10 @@ public class ActivationPlanResponseConverter
         {
             Id = activationPlan.Id,
             Name = activationPlan.Name,
-            StartingDay = activationPlan.StartingDay,
-            Period = activationPlan.Period,
+            StartingDate = activationPlan.StartingDate,
+            EndingDate = activationPlan.EndingDate,
+            ActivationTime = activationPlan.ActivationTime,
+            PeriodInDay = activationPlan.PeriodInDay,
             Duration = activationPlan.Duration,
             ComponentId = activationPlan.ComponentId,
             Component = activationPlan.Component != null ? ComponentResponseConverter.ConvertComponentToComponentResponse(activationPlan.Component) : null

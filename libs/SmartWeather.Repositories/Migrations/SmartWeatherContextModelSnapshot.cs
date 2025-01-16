@@ -25,21 +25,27 @@ namespace SmartWeather.Repositories.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<TimeSpan>("ActivationTime")
+                        .HasColumnType("time(6)");
+
                     b.Property<int>("ComponentId")
                         .HasColumnType("int");
 
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time(6)");
 
+                    b.Property<DateTime>("EndingDate")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<TimeSpan>("Period")
-                        .HasColumnType("time(6)");
-
-                    b.Property<int>("StartingDay")
+                    b.Property<int>("PeriodInDay")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("StartingDate")
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 

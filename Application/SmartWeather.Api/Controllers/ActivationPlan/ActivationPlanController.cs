@@ -36,8 +36,7 @@ public class ActivationPlanController : Controller
         ApiResponse<ActivationPlanResponse> response;
 
         if (string.IsNullOrWhiteSpace(request.Name) ||
-            !(request.StartingDay >= 0 && request.StartingDay <= 6) ||
-            !(request.Period.Ticks >= 1_000_000) ||
+            !(request.PeriodInDay >= 1) ||
             !(request.Duration.Ticks >= 1_000_000) ||
             !(request.ComponentId > 0))
         {
@@ -51,7 +50,7 @@ public class ActivationPlanController : Controller
             return Unauthorized(response);
         }
 
-        var createdActivationPlan = _activationPlanService.AddNewActivationPlan(request.Name, request.StartingDay, request.Period, request.Duration, request.ComponentId);
+        var createdActivationPlan = _activationPlanService.AddNewActivationPlan(request.Name, request.StartingDate, request.EndingDate, request.PeriodInDay, request.ActivationTime, request.Duration, request.ComponentId);
 
         if (createdActivationPlan.IsFailure)
         {
@@ -102,8 +101,7 @@ public class ActivationPlanController : Controller
         ApiResponse<ActivationPlanResponse> response;
 
         if (string.IsNullOrWhiteSpace(request.Name) ||
-            !(request.StartingDay >= 0 && request.StartingDay <= 6) ||
-            !(request.Period.Ticks >= 1_000_000) ||
+            !(request.PeriodInDay >= 1) ||
             !(request.Duration.Ticks >= 1_000_000) ||
             !(request.ComponentId > 0) ||
             !(request.Id > 0))
@@ -118,7 +116,7 @@ public class ActivationPlanController : Controller
             return Unauthorized(response);
         }
 
-        var updatedActivationPlan = _activationPlanService.UpdateComponent(request.Id, request.Name, request.StartingDay, request.Period, request.Duration, request.ComponentId);
+        var updatedActivationPlan = _activationPlanService.UpdateComponent(request.Id, request.Name, request.StartingDate, request.EndingDate, request.PeriodInDay, request.ActivationTime,request.Duration, request.ComponentId);
 
         if (updatedActivationPlan.IsFailure)
         {

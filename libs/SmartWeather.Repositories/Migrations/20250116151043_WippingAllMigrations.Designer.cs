@@ -11,8 +11,8 @@ using SmartWeather.Repositories.Context;
 namespace SmartWeather.Repositories.Migrations
 {
     [DbContext(typeof(SmartWeatherContext))]
-    [Migration("20250115073122_Adding_ActivationPlan")]
-    partial class Adding_ActivationPlan
+    [Migration("20250116151043_WippingAllMigrations")]
+    partial class WippingAllMigrations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,21 +28,27 @@ namespace SmartWeather.Repositories.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<TimeSpan>("ActivationTime")
+                        .HasColumnType("time(6)");
+
                     b.Property<int>("ComponentId")
                         .HasColumnType("int");
 
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time(6)");
 
+                    b.Property<DateTime>("EndingDate")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<TimeSpan>("Period")
-                        .HasColumnType("time(6)");
-
-                    b.Property<int>("StartingDay")
+                    b.Property<int>("PeriodInDay")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("StartingDate")
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 

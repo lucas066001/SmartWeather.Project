@@ -10,8 +10,10 @@ internal class ActivationPlanConfiguration : IEntityTypeConfiguration<Activation
         builder.ToTable(nameof(ActivationPlan));
         builder.HasKey(component => component.Id);
         builder.Property(component => component.Name);
-        builder.Property(component => component.StartingDay);
-        builder.Property(component => component.Period);
+        builder.Property(component => component.StartingDate);
+        builder.Property(component => component.ActivationTime);
+        builder.Property(component => component.EndingDate);
+        builder.Property(component => component.PeriodInDay);
         builder.Property(component => component.Duration);
         builder.Property(component => component.ComponentId);
         builder.HasOne(e => e.Component)

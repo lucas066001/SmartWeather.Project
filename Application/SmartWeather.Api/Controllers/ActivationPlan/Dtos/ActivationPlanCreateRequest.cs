@@ -3,8 +3,10 @@
 public class ActivationPlanCreateRequest
 {
     public string Name { get; set; } = null!;
-    public int StartingDay { get; set; }
-    public TimeSpan Period { get; set; }
+    public DateTime StartingDate { get; set; }
+    public DateTime EndingDate { get; set; }
+    public TimeSpan ActivationTime { get; set; }
     public TimeSpan Duration { get; set; }
+    public int PeriodInDay { get; set; }
     public int ComponentId { get; set; }
 }

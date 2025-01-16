@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using MySql.EntityFrameworkCore.Metadata;
 
 #nullable disable
@@ -6,7 +7,7 @@ using MySql.EntityFrameworkCore.Metadata;
 namespace SmartWeather.Repositories.Migrations
 {
     /// <inheritdoc />
-    public partial class Init_Mysql : Migration
+    public partial class WippingAllMigrations : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -80,6 +81,32 @@ namespace SmartWeather.Repositories.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "ActivationPlan",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false),
+                    StartingDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    EndingDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    ActivationTime = table.Column<TimeSpan>(type: "time(6)", nullable: false),
+                    Duration = table.Column<TimeSpan>(type: "time(6)", nullable: false),
+                    PeriodInDay = table.Column<int>(type: "int", nullable: false),
+                    ComponentId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ActivationPlan", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ActivationPlan_Component_ComponentId",
+                        column: x => x.ComponentId,
+                        principalTable: "Component",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "MeasurePoint",
                 columns: table => new
                 {
@@ -103,37 +130,20 @@ namespace SmartWeather.Repositories.Migrations
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
-            migrationBuilder.CreateTable(
-                name: "MeasureData",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    MeasurePointId = table.Column<int>(type: "int", nullable: false),
-                    Value = table.Column<float>(type: "float", nullable: false),
-                    DateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MeasureData", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_MeasureData_MeasurePoint_MeasurePointId",
-                        column: x => x.MeasurePointId,
-                        principalTable: "MeasurePoint",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
+            migrationBuilder.InsertData(
+                table: "User",
+                columns: new[] { "Id", "Email", "PasswordHash", "Role", "Username" },
+                values: new object[] { 1, "admin@smartweather.net", "749F09BADE8ACA755660EEB17792DA880218D4FBDC4E25FBEC279D7FE9F65D70", 1, "admin" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ActivationPlan_ComponentId",
+                table: "ActivationPlan",
+                column: "ComponentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Component_StationId",
                 table: "Component",
                 column: "StationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MeasureData_MeasurePointId_DateTime",
-                table: "MeasureData",
-                columns: new[] { "MeasurePointId", "DateTime" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_MeasurePoint_ComponentId",
@@ -162,7 +172,7 @@ namespace SmartWeather.Repositories.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "MeasureData");
+                name: "ActivationPlan");
 
             migrationBuilder.DropTable(
                 name: "MeasurePoint");

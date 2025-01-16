@@ -23,4 +23,8 @@
     <ProjectReference Include="..\SmartWeather.Services\SmartWeather.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>
