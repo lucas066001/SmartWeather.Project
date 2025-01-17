@@ -43,7 +43,7 @@ export async function login(_prevState: any, formData: FormData) {
   }
   const res = await signin(parse.data.email, parse.data.password);
 
-  if (res.status != Status.OK) return { message: res.message };
+  if (res.status != Status.OK) return { errorMessage: res.message };
   if(res.data) await saveToken(res.data?.token);
   revalidatePath("/dashboard");
   redirect("/dashboard");
@@ -63,7 +63,7 @@ export async function registerCheck(_prevState: any, formData: FormData) {
   }
   const res = await register(parse.data.name, parse.data.email, parse.data.password);
 
-  if (res.status != Status.OK) return { message: res.message };
+  if (res.status != Status.OK) return { errorMessage: res.message };
   if(res.data) await saveToken(res.data?.token);
   redirect("/dashboard");
 }

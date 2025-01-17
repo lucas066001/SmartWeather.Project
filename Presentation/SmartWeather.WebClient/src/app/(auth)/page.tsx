@@ -5,12 +5,22 @@ import LoadingCircle from "@/components/icons/loadingCircle";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from "@/components/ui/label";
-import { useActionState } from "react";
+import { toast } from "@/hooks/use-toast";
+import { useActionState, useEffect } from "react";
 
 const initialState : any = {};
 function LoginPage() {
   const [state, formAction, pending] = useActionState(login, initialState);
   const getFieldError = (fieldName: string) => state.fieldErrors ? state.fieldErrors[fieldName]?.[0] || null : null;
+  useEffect(() => {
+    if(state.errorMessage){
+      toast({
+        className : "bg-alert text-white",
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      })
+    }
+  },[state]);
 
   return (
     <>
@@ -36,7 +46,7 @@ function LoginPage() {
             id="password"
             name="password"
             type="password"
-            placeholder="password"
+            placeholder="Password"
           />
         </div>
         <div className="flex flex-col gap-2">
