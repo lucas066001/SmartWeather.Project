@@ -1,5 +1,6 @@
 ﻿using MQTTnet;
 using SmartWeather.Api.Mqtt.Handlers;
+using SmartWeather.Services.ActivationPlan;
 using SmartWeather.Services.ComponentDatas;
 using SmartWeather.Services.Components;
 using SmartWeather.Services.Constants;
@@ -16,6 +17,7 @@ public class PostStartup : IHostedService
     private readonly ComponentService _componentService;
     private readonly MeasureDataService _componentDataService;
     private readonly MeasurePointService _measurePointService;
+    private readonly ActivationPlanService _activationPlanService;
 
     public PostStartup(MqttSingleton mqttSingleton, IServiceScopeFactory scopeFactory)
     {
@@ -24,6 +26,7 @@ public class PostStartup : IHostedService
         _componentService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<ComponentService>();
         _componentDataService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<MeasureDataService>();
         _measurePointService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<MeasurePointService>();
+        _activationPlanService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<ActivationPlanService>();
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -40,7 +43,13 @@ public class PostStartup : IHostedService
                                                     CommunicationConstants.MQTT_SERVER_TARGET);
         await _mqttSingleton.SubscribeAsync(stationsActuatorsTopic);
 
+        var stationsActivationPlanTopic = string.Format(CommunicationConstants.MQTT_ACTIVATION_PLAN_TOPIC_FORMAT,
+                                                        CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
+                                                        CommunicationConstants.MQTT_SERVER_TARGET);
+        await _mqttSingleton.SubscribeAsync(stationsActivationPlanTopic);
+
         _mqttSingleton.RegisterRequestHandler(new ConfigRequestHandler(_mqttSingleton, _stationService, _componentService, _measurePointService));
+        _mqttSingleton.RegisterRequestHandler(new ActivationPlanRequestHandler(_mqttSingleton, _activationPlanService));
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
