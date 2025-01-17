@@ -42,7 +42,7 @@ function UserMenu({className}: ICardUserMenuProps) {
                                     }}>
                                     <div className="flex gap-4 p-1">
                                         {!isLoading && <Logout className=""></Logout>}
-                                        {isLoading && <LoadingCircle className="" />}
+                                        {isLoading && <LoadingCircle color="#B1B1B1"/>}
                                         <span className="text-disabled">Logout</span>
                                     </div>
                                 </button>

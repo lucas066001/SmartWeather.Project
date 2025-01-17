@@ -13,3 +13,15 @@ export interface UserSigninResponse {
     role: Role,
     token: string
 }
+
+export interface UserRegisterRequest {
+    name : string,
+    email: string,
+    password: string
+}
+
+export interface UserRegisterResponse {
+    id: number,
+    role: Role,
+    token: string
+}

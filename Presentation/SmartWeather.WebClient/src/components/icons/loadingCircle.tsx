@@ -1,6 +1,10 @@
-import { IIcon } from "./type";
 
-function LoadingCircle({ className }: IIcon) {
+interface ILoadingCircleProps {
+  color: string;
+  className?: string;
+}
+
+function LoadingCircle({ className, color }: ILoadingCircleProps) {
   return (
     <svg
       className={className}
@@ -10,14 +14,14 @@ function LoadingCircle({ className }: IIcon) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <radialGradient id="a12" cx=".66" fx=".66" cy=".3125" fy=".3125" gradientTransform="scale(1.5)">
-        <stop offset="0" stopColor="#B1B1B1" />
-        <stop offset=".3" stopColor="#B1B1B1" stopOpacity=".9" />
-        <stop offset=".6" stopColor="#B1B1B1" stopOpacity=".6" />
-        <stop offset=".8" stopColor="#B1B1B1" stopOpacity=".3" />
-        <stop offset="1" stopColor="#B1B1B1" stopOpacity="0" />
+        <stop offset="0" stopColor={color} />
+        <stop offset=".3" stopColor={color} stopOpacity=".9" />
+        <stop offset=".6" stopColor={color} stopOpacity=".6" />
+        <stop offset=".8" stopColor={color} stopOpacity=".3" />
+        <stop offset="1" stopColor={color} stopOpacity="0" />
       </radialGradient>
       <circle
-        transform-origin="center"
+        transformOrigin="center"
         fill="none"
         stroke="url(#a12)"
         strokeWidth="30"
@@ -40,10 +44,10 @@ function LoadingCircle({ className }: IIcon) {
         />
       </circle>
       <circle
-        transform-origin="center"
+        transformOrigin="center"
         fill="none"
         opacity=".2"
-        stroke="#B1B1B1"
+        stroke={color}
         strokeWidth="30"
         strokeLinecap="round"
         cx="100"

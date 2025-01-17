@@ -10,6 +10,7 @@ export default {
     extend: {
       colors: {
         primary: "#67C44D",
+        lightPrimary:"#76D15B",
         secondary: "#604538",
         disabled: "#B1B1B1",
         titleBrown: "#745427",

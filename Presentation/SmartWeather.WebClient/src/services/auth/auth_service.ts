@@ -1,5 +1,5 @@
-import { post } from "../api_service"
-import { UserSigninRequest, UserSigninResponse } from "./dtos/signin"
+import { post } from "../api_service";
+import { UserRegisterRequest, UserRegisterResponse, UserSigninRequest, UserSigninResponse } from "./dtos/signin";
 
 const endpoints = {
     signin: "Authentication/Signin",
@@ -12,4 +12,13 @@ export async function signin(email: string, password: string) {
         password
     }
     return await post<UserSigninResponse>(endpoints.signin, content);
+}
+
+export async function register(name: string, email: string, password: string) {
+    const content: UserRegisterRequest = {
+        name,
+        email,
+        password
+    }
+    return await post<UserRegisterResponse>(endpoints.register, content);
 }
