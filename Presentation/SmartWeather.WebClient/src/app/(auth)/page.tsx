@@ -7,19 +7,31 @@ import { Input } from '@/components/ui/input';
 import { Label } from "@/components/ui/label";
 import { useActionState } from "react";
 
-const initialState = {};
+const initialState : any = {};
 function LoginPage() {
   const [state, formAction, pending] = useActionState(login, initialState);
+  const getFieldError = (fieldName: string) => state.fieldErrors ? state.fieldErrors[fieldName]?.[0] || null : null;
+
   return (
     <>
       <h3 className="text-primary font-bold text-xl">Login</h3>
       <form className="flex flex-col gap-y-5 w-3/4" action={formAction}>
         <div className="flex flex-col gap-y-2">
-          <Label className="text-secondary" htmlFor="email">Email adress</Label>
+          <div className="flex flex-row">
+            <Label className="text-secondary" htmlFor="email">Email adress</Label>
+            {getFieldError("email") && (
+                <span className="text-alert text-xs ml-auto">{getFieldError("email")}</span>
+            )}
+          </div>
           <Input id="email" name="email" type="email" placeholder="Email" />
         </div>
         <div className="flex flex-col gap-y-2">
-          <Label className="text-secondary" htmlFor="password">Password</Label>
+          <div className="flex flex-row">
+            <Label className="text-secondary" htmlFor="password">Password</Label>
+            {getFieldError("password") && (
+                <span className="text-alert text-xs ml-auto">{getFieldError("password")}</span>
+            )}
+          </div>
           <Input
             id="password"
             name="password"

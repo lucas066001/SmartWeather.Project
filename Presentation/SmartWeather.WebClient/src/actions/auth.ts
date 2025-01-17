@@ -39,7 +39,7 @@ export async function login(_prevState: any, formData: FormData) {
   });
 
   if(!parse.success) {
-    return parse.error.flatten().fieldErrors;
+    return parse.error.flatten();
   }
   const res = await signin(parse.data.email, parse.data.password);
 
@@ -59,7 +59,7 @@ export async function registerCheck(_prevState: any, formData: FormData) {
   });
 
   if(!parse.success) {
-    return parse.error.flatten().fieldErrors;
+    return parse.error.flatten();
   }
   const res = await register(parse.data.name, parse.data.email, parse.data.password);
 

@@ -12,7 +12,7 @@ const initialState : any = {};
 function RegisterPage() {
   const [state, formAction, pending] = useActionState(registerCheck, initialState);
 
-  const getFieldError = (fieldName: string) => state[fieldName]?.[0] || null;
+  const getFieldError = (fieldName: string) => state.fieldErrors ? state.fieldErrors[fieldName]?.[0] || null : null;
   return (
     <>
       <h3 className="text-primary font-bold text-xl mx-auto">Register</h3>
