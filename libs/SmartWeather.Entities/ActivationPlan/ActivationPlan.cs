@@ -64,4 +64,34 @@ public class ActivationPlan
         PeriodInDay = periodInDay;
         Duration = duration;
     }
+
+    /// <summary>
+    /// Return the time remaining until next activation, with the number of activations until end of the period.
+    /// </summary>
+    /// <returns>Time until next activation and nb cycle remaining.</returns>
+    public Tuple<TimeSpan, int>? GetNextActivation()
+    {
+        if (DateTime.Now > EndingDate)
+        {
+            return null;
+        }
+
+        DateTime now = DateTime.Now;
+
+        DateTime nextActivation = StartingDate.Date + ActivationTime;
+
+        while (nextActivation <= now)
+        {
+            nextActivation = nextActivation.AddDays(PeriodInDay);
+        }
+
+        if (nextActivation > EndingDate)
+        {
+            return null;
+        }
+
+        int remainingCycles = (int)Math.Floor((EndingDate - nextActivation).TotalDays / PeriodInDay) + 1;
+
+        return new(nextActivation - now, remainingCycles);
+    }
 }

@@ -26,6 +26,7 @@ public class ContractHelper
         {
             case ObjectTypes.CONFIG_REQUEST:
             case ObjectTypes.ACTUATOR_REQUEST:
+            case ObjectTypes.ACTIVATION_PLAN_REQUEST:
                 return true;
             default:
                 return false;
