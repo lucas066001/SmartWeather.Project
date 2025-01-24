@@ -20,8 +20,12 @@ done
 sleep 1
 
 # Créer le connecteur source MQTT vers Kafka
-echo "Creating MQTT source connector..."
-curl -X POST -H "Content-Type: application/json" --data @/config/mqtt_source_config.json http://localhost:8083/connectors
-
+# Vérifier si le connecteur existe déjà
+if curl -s http://localhost:8083/connectors/mqtt-source-toserver-connector >/dev/null; then
+  echo "Connector 'mqtt-source-toserver-connector' already exists. Skipping creation."
+else
+  echo "Creating MQTT source connector..."
+  curl -X POST -H "Content-Type: application/json" --data @/config/mqtt_source_config.json http://localhost:8083/connectors
+fi
 # Garder le script actif en attendant les processus enfants (comme connect-distributed)
 wait

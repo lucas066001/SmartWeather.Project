@@ -96,7 +96,7 @@ services:
       - smart-weather-network
 
   mqtt-connector:
-    container_name: mqtt-connector
+    # container_name: mqtt-connector
     image: confluentinc/cp-kafka-connect:7.3.0
     depends_on:
       - init-kafka
@@ -109,6 +109,9 @@ services:
       - ./conf:/config
       - ./conf/connect_distributed.properties:/etc/kafka/connect-distributed.properties
     entrypoint: ["/bin/bash", "/config/mqtt-startup.sh"]
+    deploy:
+      mode: replicated
+      replicas: 2
     networks:
       - smart-weather-network
 
