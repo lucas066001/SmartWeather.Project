@@ -96,6 +96,7 @@ docker compose -f ./app.yml up -d
 - **[lucas066001]** - Project Lead
 - **[matthias-goupil]** - Front-end developer
 - **[DuquesnoyPaul]** - Front-end developer
+- **[Az-r-ow]** - QA
 
 ---
 
