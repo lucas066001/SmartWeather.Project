@@ -17,11 +17,7 @@ services:
     depends_on:
       - smart-weather-api
       - mysql-master
-      - mysql-proxy
       - hivemq-proxy
-      - kafka-0
-      - kafka-1
-      - kafka-2
     deploy:
       restart_policy:
         condition: on-failure
