@@ -2,9 +2,8 @@ version: "3.9"
 name: smartweather-project
 
 include:
-  # - "./Influxdb/influxdb.yml"
-  - "./Mysql/mysql-cluster.yml"
-  - "./Elasticsearch/elasticsearch-cluster.yml"
+  - "./Mysql/mysql-single-node.yml"
+  - "./Elasticsearch/elasticsearch-single-node.yml"
 
 networks:
   smart-weather-network:
