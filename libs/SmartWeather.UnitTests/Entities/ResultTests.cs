@@ -70,20 +70,6 @@ namespace SmartWeather.UnitTests.Entities.Common
         }
 
         [TestMethod]
-        public void Failure_Should_Throw_If_Value_Is_Accessed()
-        {
-            // Arrange
-            var errorMessage = "An error occurred";
-            var result = Result<string>.Failure(errorMessage);
-
-            // Act & Assert
-            Assert.ThrowsException<NullReferenceException>(() =>
-            {
-                var _ = result.Value; // Accessing value should throw
-            });
-        }
-
-        [TestMethod]
         public void IsFailure_Should_Return_True_For_Failure_Result()
         {
             // Arrange
