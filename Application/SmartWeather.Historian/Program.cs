@@ -8,9 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddDocumentRepositories(builder.Configuration);
-builder.Services.AddKafkaServices(builder.Configuration);
+builder.Services.AddMqttServices(builder.Configuration);
 builder.Services.AddDocumentDbServices();
-builder.Services.AddHostedService<PostStartup>();
+builder.Services.AddHostedService<MeasureDataConsumer>();
 
 var app = builder.Build();
 

@@ -1,5 +1,4 @@
-﻿using MQTTnet;
-using SmartWeather.Api.Mqtt.Handlers;
+﻿using SmartWeather.Api.Mqtt.Handlers;
 using SmartWeather.Services.ActivationPlan;
 using SmartWeather.Services.ComponentDatas;
 using SmartWeather.Services.Components;
@@ -8,9 +7,9 @@ using SmartWeather.Services.MeasurePoints;
 using SmartWeather.Services.Mqtt;
 using SmartWeather.Services.Stations;
 
-namespace SmartWeather.Api.Configuration;
+namespace SmartWeather.Api.HostedServices;
 
-public class PostStartup : IHostedService
+public class StationConfigurationConsumer : IHostedService
 {
     private readonly MqttSingleton _mqttSingleton;
     private readonly StationService _stationService;
@@ -19,7 +18,7 @@ public class PostStartup : IHostedService
     private readonly MeasurePointService _measurePointService;
     private readonly ActivationPlanService _activationPlanService;
 
-    public PostStartup(MqttSingleton mqttSingleton, IServiceScopeFactory scopeFactory)
+    public StationConfigurationConsumer(MqttSingleton mqttSingleton, IServiceScopeFactory scopeFactory)
     {
         _mqttSingleton = mqttSingleton;
         _stationService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<StationService>();

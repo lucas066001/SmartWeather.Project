@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using SmartWeather.Services;
 using SmartWeather.Repositories;
 using SmartWeather.Services.Options;
-using SmartWeather.Api.Configuration;
 using SmartWeather.Repositories.Context;
 using SmartWeather.Api.Helpers;
+using SmartWeather.Api.HostedServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,7 +66,7 @@ builder.Services.AddCors(options =>
 
 
 builder.Services.AddControllers();
-builder.Services.AddHostedService<PostStartup>();
+builder.Services.AddHostedService<StationConfigurationConsumer>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

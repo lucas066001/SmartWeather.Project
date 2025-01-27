@@ -1,15 +1,11 @@
-﻿using Confluent.Kafka;
-using SmartWeather.Services.ComponentDatas;
-using SmartWeather.Services.Components;
-using SmartWeather.Services.MeasurePoints;
+﻿using SmartWeather.Services.ComponentDatas;
 using SmartWeather.Services.Mqtt;
-using SmartWeather.Services.Stations;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace SmartWeather.Services.Kafka.Handlers;
 
-public class MeasureDataMessageHandler : IKafkaMessageHandler
+public class MeasureDataMessageHandler : IMqttMessageHandler
 {
     private MeasureDataService _measureDataService;
     private static readonly Regex _measureDataTopicRegex = new Regex(
@@ -21,15 +17,17 @@ public class MeasureDataMessageHandler : IKafkaMessageHandler
         _measureDataService = measureDataService;
     }
 
-    public void Handle(ConsumeResult<string, string> message)
+    public bool IsAbleToHandle(string originTopic)
     {
-        var messageValue = message.Message.Value;
-        var keyValue = message.Message.Key;
+        return _measureDataTopicRegex.Match(originTopic).Success;
+    }
 
-        if (!string.IsNullOrEmpty(messageValue) &&
-            !string.IsNullOrEmpty(keyValue))
+    public void Handle(string payload, string originTopic)
+    {
+        if (!string.IsNullOrEmpty(payload) &&
+            !string.IsNullOrEmpty(originTopic))
         {
-            Match match = _measureDataTopicRegex.Match(message.Message.Key);
+            Match match = _measureDataTopicRegex.Match(originTopic);
 
             if (match.Success)
             {
@@ -38,7 +36,7 @@ public class MeasureDataMessageHandler : IKafkaMessageHandler
                     return;
                 }
 
-                if (!float.TryParse(messageValue, NumberStyles.Float, CultureInfo.InvariantCulture, out float measureDataValue))
+                if (!float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float measureDataValue))
                 {
                     return;
                 }
@@ -53,10 +51,5 @@ public class MeasureDataMessageHandler : IKafkaMessageHandler
                 }
             }
         }
-    }
-
-    public bool IsAbleToHandle(string kafkaTopic)
-    {
-        return "smartweather.measure.data" == kafkaTopic;
     }
 }
