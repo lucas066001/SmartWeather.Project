@@ -1,7 +1,6 @@
 using SmartWeather.Repositories;
 using SmartWeather.Services;
 using SmartWeather.Socket.Api.Configuration;
-using SmartWeather.Socket.Api.Hubs.MeasurePoint;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +19,7 @@ builder.Services.AddSignalR();
 
 builder.Services.AddRelationalRepositories(builder.Configuration);
 builder.Services.AddRelationalDbServices();
-builder.Services.AddKafkaServices(builder.Configuration);
+builder.Services.AddMqttServices(builder.Configuration);
 builder.Services.AddConsumer();
 
 var app = builder.Build();

@@ -1,9 +1,7 @@
-﻿using Confluent.Kafka;
-using SmartWeather.Services.Constants;
+﻿using SmartWeather.Services.Constants;
 using SmartWeather.Services.Mqtt.Contract;
 using SmartWeather.Services.Mqtt.Dtos;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using static SmartWeather.Services.Mqtt.Dtos.StationConfigRequest;
 using static SmartWeather.Services.Mqtt.MqttSingleton;
 

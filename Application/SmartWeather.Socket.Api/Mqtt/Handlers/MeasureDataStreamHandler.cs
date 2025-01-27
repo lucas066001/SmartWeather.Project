@@ -1,17 +1,14 @@
-﻿using Confluent.Kafka;
-using Google.Protobuf.WellKnownTypes;
-using Microsoft.AspNetCore.SignalR;
-using SmartWeather.Services.ComponentDatas;
-using SmartWeather.Services.Kafka;
+﻿using Microsoft.AspNetCore.SignalR;
+using SmartWeather.Services.Mqtt;
 using SmartWeather.Socket.Api.Contract;
 using SmartWeather.Socket.Api.Hubs.MeasurePoint;
 using SmartWeather.Socket.Api.Hubs.MeasurePoint.Dtos;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace SmartWeather.Socket.Api.Kafka.Handlers;
+namespace SmartWeather.Socket.Api.Mqtt.Handlers;
 
-public class MeasureDataStreamHandler : IKafkaMessageHandler
+public class MeasureDataStreamHandler : IMqttMessageHandler
 {
     private IHubContext<MeasurePointHub> _measureDataHub;
     private static readonly Regex _measureDataTopicRegex = new Regex(
@@ -23,15 +20,17 @@ public class MeasureDataStreamHandler : IKafkaMessageHandler
         _measureDataHub = measureDataHub;
     }
 
-    public void Handle(ConsumeResult<string, string> message)
+    public bool IsAbleToHandle(string originTopic)
     {
-        var messageValue = message.Message.Value;
-        var keyValue = message.Message.Key;
+        return _measureDataTopicRegex.Match(originTopic).Success;
+    }
 
-        if (!string.IsNullOrEmpty(messageValue) &&
-            !string.IsNullOrEmpty(keyValue))
+    public void Handle(string payload, string originTopic)
+    {
+        if (!string.IsNullOrEmpty(payload) &&
+            !string.IsNullOrEmpty(originTopic))
         {
-            Match match = _measureDataTopicRegex.Match(message.Message.Key);
+            Match match = _measureDataTopicRegex.Match(originTopic);
 
             if (match.Success)
             {
@@ -40,7 +39,7 @@ public class MeasureDataStreamHandler : IKafkaMessageHandler
                     return;
                 }
 
-                if (!float.TryParse(messageValue, NumberStyles.Float, CultureInfo.InvariantCulture, out float measureDataValue))
+                if (!float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float measureDataValue))
                 {
                     return;
                 }
@@ -73,10 +72,6 @@ public class MeasureDataStreamHandler : IKafkaMessageHandler
                 }
             }
         }
-    }
 
-    public bool IsAbleToHandle(string kafkaTopic)
-    {
-        return "smartweather.measure.data" == kafkaTopic;
     }
 }

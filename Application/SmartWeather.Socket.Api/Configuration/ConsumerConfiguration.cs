@@ -1,4 +1,4 @@
-﻿using SmartWeather.Socket.Api.Kafka;
+﻿using SmartWeather.Socket.Api.HostedServices;
 
 namespace SmartWeather.Socket.Api.Configuration;
 
