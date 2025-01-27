@@ -7,7 +7,7 @@ EXPOSE 8080
 EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Debug
+ARG BUILD_CONFIGURATION=Release
 COPY "./libs/SmartWeather.Entities" ./libs/SmartWeather.Entities
 COPY "./libs/SmartWeather.Repositories" ./libs/SmartWeather.Repositories
 COPY "./libs/SmartWeather.Services" ./libs/SmartWeather.Services
@@ -16,7 +16,7 @@ RUN dotnet restore "./Application/SmartWeather.Socket.Api/SmartWeather.Socket.Ap
 RUN dotnet build "./Application/SmartWeather.Socket.Api/SmartWeather.Socket.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Debug
+ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./Application/SmartWeather.Socket.Api/SmartWeather.Socket.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final

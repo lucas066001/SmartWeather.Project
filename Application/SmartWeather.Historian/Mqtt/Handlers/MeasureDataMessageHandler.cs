@@ -24,6 +24,7 @@ public class MeasureDataMessageHandler : IMqttMessageHandler
 
     public void Handle(string payload, string originTopic)
     {
+        Console.WriteLine($"Handling incoming message : {payload}");
         if (!string.IsNullOrEmpty(payload) &&
             !string.IsNullOrEmpty(originTopic))
         {
