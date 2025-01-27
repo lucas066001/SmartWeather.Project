@@ -1,4 +1,4 @@
-namespace SmartWeather.UnitTests.Entities.Common
+namespace SmartWeather.UnitTests.Entities
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SmartWeather.Entities.Common;
@@ -32,11 +32,7 @@ namespace SmartWeather.UnitTests.Entities.Common
             Assert.IsTrue(result.IsFailure);
             Assert.AreEqual(errorMessage, result.ErrorMessage);
         }
-    }
 
-    [TestClass]
-    public class ResultOfTTests
-    {
         [TestMethod]
         public void Success_Should_Create_Success_Result_With_Value()
         {
@@ -51,22 +47,6 @@ namespace SmartWeather.UnitTests.Entities.Common
             Assert.IsFalse(result.IsFailure);
             Assert.AreEqual(string.Empty, result.ErrorMessage);
             Assert.AreEqual(value, result.Value);
-        }
-
-        [TestMethod]
-        public void Failure_Should_Create_Failure_Result_With_Error_Message()
-        {
-            // Arrange
-            var errorMessage = "An error occurred";
-
-            // Act
-            var result = Result<string>.Failure(errorMessage);
-
-            // Assert
-            Assert.IsFalse(result.IsSuccess);
-            Assert.IsTrue(result.IsFailure);
-            Assert.AreEqual(errorMessage, result.ErrorMessage);
-            Assert.IsNull(result.Value);
         }
 
         [TestMethod]

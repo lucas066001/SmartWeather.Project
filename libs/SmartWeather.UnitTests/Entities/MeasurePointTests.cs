@@ -1,4 +1,4 @@
-namespace SmartWeather.UnitTests.Entities.MeasurePoint
+namespace SmartWeather.UnitTests.Entities
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SmartWeather.Entities.MeasurePoint;
