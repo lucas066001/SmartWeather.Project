@@ -46,7 +46,7 @@ public class MqttSingleton
         var password = configuration.GetSection(nameof(Mqtt))[nameof(Mqtt.Password)];
 
         _mqttOptions = new MqttClientOptionsBuilder()
-            .WithClientId(clientId)
+            .WithClientId($"{clientId}.{Guid.NewGuid()}")
             .WithTcpServer(brokerAddress, brokerPort) 
             .WithCleanSession()
             .WithWillQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
@@ -66,22 +66,6 @@ public class MqttSingleton
         if (!_mqttClient.IsConnected)
         {
             await _mqttClient.ConnectAsync(_mqttOptions);
-
-            //var stationsConfigsTopic = string.Format(CommunicationConstants.MQTT_CONFIG_TOPIC_FORMAT,
-            //                                CommunicationConstants.MQTT_SERVER_TARGET);
-            //await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(stationsConfigsTopic).Build());
-            
-            //var stationsSensorsTopic = string.Format(CommunicationConstants.MQTT_SENSOR_TOPIC_FORMAT, 
-            //                                            CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
-            //                                            CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
-            //                                            CommunicationConstants.MQTT_SERVER_TARGET);
-            //await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(stationsSensorsTopic).Build());
-
-            //var stationsActuatorsTopic = string.Format(CommunicationConstants.MQTT_ACTUATOR_TOPIC_FORMAT, 
-            //                                            CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
-            //                                            CommunicationConstants.MQTT_SINGLE_LEVEL_WILDCARD,
-            //                                            CommunicationConstants.MQTT_SERVER_TARGET);
-            //await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(stationsActuatorsTopic).Build());
         }
     }
 
