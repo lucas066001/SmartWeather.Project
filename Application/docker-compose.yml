@@ -17,16 +17,6 @@ services:
     depends_on:
       mysql-master:
         condition: service_healthy
-      mysql-slave-1:
-        condition: service_healthy
-      mysql-slave-2:
-        condition: service_healthy
-      kafka-0:
-        condition: service_healthy
-      kafka-1:
-        condition: service_healthy
-      kafka-2:
-        condition: service_healthy
     deploy:
       restart_policy:
         condition: on-failure
@@ -36,28 +26,18 @@ services:
       - smart-weather-network
 
   smart-weather-historian:
-    # container_name: smart-weather-historian
+    container_name: smart-weather-historian
     build:
       context: ./..
       dockerfile: ./Application/SmartWeather.Historian/Dockerfile
-    # ports:
-    #   - "8090:8090"
+    ports:
+      - "8090:8090"
     depends_on:
       mysql-master:
         condition: service_healthy
-      mysql-slave-1:
-        condition: service_healthy
-      mysql-slave-2:
-        condition: service_healthy
-      kafka-0:
-        condition: service_healthy
-      kafka-1:
-        condition: service_healthy
-      kafka-2:
-        condition: service_healthy
     deploy:
-      mode: replicated
-      replicas: 2
+      # mode: replicated
+      # replicas: 2
       restart_policy:
         condition: on-failure
         delay: 3s
@@ -74,16 +54,6 @@ services:
       - "8093:8093"
     depends_on:
       mysql-master:
-        condition: service_healthy
-      mysql-slave-1:
-        condition: service_healthy
-      mysql-slave-2:
-        condition: service_healthy
-      kafka-0:
-        condition: service_healthy
-      kafka-1:
-        condition: service_healthy
-      kafka-2:
         condition: service_healthy
     deploy:
       restart_policy:
