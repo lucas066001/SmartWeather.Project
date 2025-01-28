@@ -11,9 +11,9 @@ public class MeasureDataConfiguration : IElasticIndexConfigurator
     {
         return new Properties<MeasureData>()
         {
-            { nameof(MeasureData.MeasurePointId), new IntegerNumberProperty() },
-            { nameof(MeasureData.Value), new FloatNumberProperty() },
-            { nameof(MeasureData.DateTime), new DateProperty() },
+            { "measurePointId", new IntegerNumberProperty() },
+            { "value", new FloatNumberProperty() },
+            { "dateTime", new DateProperty() },
         };
     }
 }
