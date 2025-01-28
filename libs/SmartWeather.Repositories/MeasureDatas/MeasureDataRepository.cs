@@ -12,6 +12,10 @@ public class MeasureDataRepository(SmartWeatherDocumentsContext elasticContext) 
     public async void Create(MeasureData data)
     {
         var response = await elasticContext.Client.IndexAsync(data, idx => idx.Index(elasticContext.MeasureDataIndex));
+        if (response.IsSuccess())
+        {
+            Console.WriteLine("Insertion de MeasureData avec succès");
+        }
     }
 
     public async Task<Result<IEnumerable<MeasureData>>> GetFromMeasurePoint(int idMeasurePoint, DateTime startPeriod, DateTime endPeriod)
@@ -32,10 +36,10 @@ public class MeasureDataRepository(SmartWeatherDocumentsContext elasticContext) 
                             .Value(idMeasurePoint)
                         ),
                         m => m.Range(dr => dr
-                            .DateRange(dt => dt.From(startPeriod))
+                            .DateRange(dt => dt.Field(f => f.DateTime).From(startPeriod))
                         ),
                         m => m.Range(dr => dr
-                            .DateRange(dt => dt.To(endPeriod))
+                            .DateRange(dt => dt.Field(f => f.DateTime).To(endPeriod))
                         )
                     )
                 )
