@@ -1,9 +1,16 @@
-﻿namespace SmartWeather.Entities.ComponentData;
+﻿using System.Text.Json.Serialization;
+
+namespace SmartWeather.Entities.ComponentData;
 
 public class MeasureData
 {
+    [JsonPropertyName("measurePointId")]
     public int MeasurePointId { get; set; }
+
+    [JsonPropertyName("value")]
     public float Value { get; set; }
+    
+    [JsonPropertyName("dateTime")]
     public DateTime DateTime { get; set; }
 
     /// <summary>
