@@ -3,7 +3,7 @@ name: libs-ci
 on:
   push:
     paths:
-      - ./libs/**
+      - libs
 
 jobs:
   build:
