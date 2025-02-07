@@ -1,0 +1,28 @@
+name: libs-ci
+
+on:
+  push:
+    paths:
+      - ./libs/**
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore ./libs/SmartWeather.CSharpLibraries.sln
+
+      - name: Build projects
+        run: dotnet build --configuration Release ./libs/SmartWeather.CSharpLibraries.sln
+
+      - name: Run tests
+        run: dotnet test --no-build --verbosity normal ./libs/SmartWeather.CSharpLibraries.sln
