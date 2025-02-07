@@ -3,7 +3,8 @@ name: libs-ci
 on:
   push:
     paths:
-      - libs
+      - libs/**
+  workflow_dispatch:
 
 jobs:
   build:
