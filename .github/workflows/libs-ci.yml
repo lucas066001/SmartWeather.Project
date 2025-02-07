@@ -26,4 +26,4 @@ jobs:
         run: dotnet build --configuration Release ./libs/SmartWeather.CSharpLibraries.sln
 
       - name: Run tests
-        run: dotnet test --no-build --verbosity normal ./libs/SmartWeather.CSharpLibraries.sln
+        run: dotnet test --no-build --configuration Release --verbosity normal ./libs/SmartWeather.CSharpLibraries.sln
