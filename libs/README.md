@@ -2,7 +2,6 @@
 
 Welcome to the **Libraries** folder of SmartWeather! This section contains reusable code components written in C# to support various applications, from station mocker to api. It follows an **n-tier architecture** for scalability, maintainability, and code reusability. Currently implemented with exception-based method, will probably be refactor to match common programming standards.
 
-
 ---
 
 ## Table of Contents 📋
