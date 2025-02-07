@@ -17,6 +17,14 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
       - name: Restore dependencies
         run: dotnet restore ./libs/SmartWeather.CSharpLibraries.sln
 
@@ -32,8 +40,23 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
+      - name: Restore cached NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
       - name: Build projects
         run: dotnet build --configuration Release ./libs/SmartWeather.CSharpLibraries.sln
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: built-app
+          path: ./libs/**/bin/Release/
+          retention-days: 1
 
   test:
     runs-on: ubuntu-latest
@@ -46,6 +69,20 @@ jobs:
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: "8.0.x"
+
+      - name: Restore cached NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: built-app
+          path: ./libs/
 
       - name: Run tests
         run: dotnet test --no-build --configuration Release --verbosity normal ./libs/SmartWeather.CSharpLibraries.sln
