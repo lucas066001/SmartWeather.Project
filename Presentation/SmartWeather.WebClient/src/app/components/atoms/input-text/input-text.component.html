@@ -1,0 +1,51 @@
+<ng-container *ngIf="!availableTypes.includes(type) || type == 'text'">
+    <label *ngIf="label" [for]="inputId" class="block mb-2 text-sm font-medium text-[var(--sm-text-color)]">
+        {{ label }}
+    </label>
+    <div class="relative">
+        <div *ngIf="iconName" class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+            <img [src]="themeService.getIconPath(iconName)" alt="iconName" class="h-5">
+        </div>
+        <input type="text" [id]="inputId" class="border text-sm rounded-lg block w-full p-2.5 focus:ring-[var(--sm-primary)] focus:border-[var(--sm-primary)]
+            bg-[var(--sm-input-background)] border-[var(--sm-border-color)] text-[var(--sm-text-color)] 
+            placeholder-[var(--sm-placeholder-color)]"
+            [ngClass]="{ 'ps-10': iconName , 'border-[var(--sm-error-color)]' : isError, 'opacity-50 cursor-not-allowed' : disabled}"
+            [placeholder]="placeholder ? placeholder : ''" [attr.disabled]="disabled ? true : null"
+            (input)="onChange($event)">
+    </div>
+    <p *ngIf="isError" class="text-sm text-[var(--sm-error-color)]">{{errorMessage}}</p>
+</ng-container>
+
+<ng-container *ngIf="availableTypes.includes(type) && type == 'password'">
+    <label *ngIf="label" [for]="inputId" class="block mb-2 text-sm font-medium text-[var(--sm-text-color)]">
+        {{ label }}
+    </label>
+    <div class="relative">
+        <div *ngIf="iconName" class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+            <img [src]="themeService.getIconPath(iconName)" alt="iconName" class="h-5">
+        </div>
+        <input type="password" [id]="inputId" class="border text-sm rounded-lg block w-full p-2.5 focus:ring-[var(--sm-primary)] focus:border-[var(--sm-primary)]
+            bg-[var(--sm-input-background)] border-[var(--sm-border-color)] text-[var(--sm-text-color)] 
+            placeholder-[var(--sm-placeholder-color)]"
+            [ngClass]="{ 'ps-10': iconName , 'border-[var(--sm-error-color)]' : isError, 'opacity-50 cursor-not-allowed' : disabled}"
+            [placeholder]="placeholder ? placeholder : ''" [attr.disabled]="disabled ? true : null">
+    </div>
+    <p *ngIf="isError" class="text-sm text-[var(--sm-error-color)]">{{errorMessage}}</p>
+</ng-container>
+
+<ng-container *ngIf="availableTypes.includes(type) && type == 'email'">
+    <label *ngIf="label" [for]="inputId" class="block mb-2 text-sm font-medium text-[var(--sm-text-color)]">
+        {{ label }}
+    </label>
+    <div class="relative">
+        <div *ngIf="iconName" class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+            <img [src]="themeService.getIconPath(iconName)" alt="iconName" class="h-5">
+        </div>
+        <input type="email" [id]="inputId" class="border text-sm rounded-lg block w-full p-2.5 focus:ring-[var(--sm-primary)] focus:border-[var(--sm-primary)]
+            bg-[var(--sm-input-background)] border-[var(--sm-border-color)] text-[var(--sm-text-color)] 
+            placeholder-[var(--sm-placeholder-color)]"
+            [ngClass]="{ 'ps-10': iconName , 'border-[var(--sm-error-color)]' : isError, 'opacity-50 cursor-not-allowed' : disabled}"
+            [placeholder]="placeholder ? placeholder : ''" [attr.disabled]="disabled ? true : null">
+    </div>
+    <p *ngIf="isError" class="text-sm text-[var(--sm-error-color)]">{{errorMessage}}</p>
+</ng-container>

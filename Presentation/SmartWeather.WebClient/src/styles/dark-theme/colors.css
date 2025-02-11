@@ -1,3 +1,19 @@
 .sm-dark-theme {
-    --sm-text-color: #333;
+    --sm-background-color: #2d2d2d;
+    --sm-primary-color: #70a264;
+    --sm-secondary-color: #8b6f4d;
+    --sm-text-color: #e0e0e0;
+    --sm-heading-color: #a1b58c;
+    --sm-link-color: #a8c294;
+    --sm-button-color: #4e7c43;
+    --sm-button-text-color: #ffffff;
+    --sm-border-color: #444444;
+    --sm-placeholder-color: #666666;
+    --sm-card-background: #3c3c3c;
+    --sm-card-border-color: #555555;
+    --sm-text-muted-color: #b0b0b0;
+    --sm-success-color: #66b566;
+    --sm-warning-color: #c88e5a;
+    --sm-error-color: #e57373;
+    --sm-input-background: #cccccc85;
 }

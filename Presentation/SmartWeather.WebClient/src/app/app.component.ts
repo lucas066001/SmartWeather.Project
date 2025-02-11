@@ -1,24 +1,27 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { ThemeService } from '@services/core/theme.service';
-import { UITheme } from '@constants/ui-theme';
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';  // Import Router for navigation
+import { AuthService } from '@services/core/auth.service'; // Import AuthService to check authentication status
 
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  title = 'SmartWeather.WebClient';
+export class AppComponent implements OnInit {
+  title = 'SmartWeather';
 
-  constructor(private themeService: ThemeService) { }
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) { }
 
-  setLightTheme() {
-    this.themeService.setTheme(UITheme.LIGHT);
-  }
-
-  setDarkTheme() {
-    this.themeService.setTheme(UITheme.DARK);
+  // OnInit lifecycle hook to perform the redirect logic
+  ngOnInit(): void {
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['/dashboard']);
+    } else {
+      this.router.navigate(['/login']);
+    }
   }
 }
