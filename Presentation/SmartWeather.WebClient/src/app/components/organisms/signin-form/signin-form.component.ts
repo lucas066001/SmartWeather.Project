@@ -7,6 +7,8 @@ import { AuthenticationService } from '@services/authentication/authentication.s
 import { UserSigninRequest, UserSigninResponse } from '@models/dtos/authentication-dtos';
 import { ApiResponse } from '@models/api-response';
 import { Router } from '@angular/router';
+import { Status } from '@constants/api-status';
+import { AuthService } from '@services/core/auth.service';
 
 @Component({
   selector: 'app-signin-form',
@@ -19,7 +21,7 @@ export class SigninFormComponent implements OnInit {
   isSubmitting = false;
   incorrectCredentials = false;
 
-  constructor(public themeService: ThemeService, private fb: FormBuilder, private authenticationService: AuthenticationService, private router: Router) { }
+  constructor(public themeService: ThemeService, private fb: FormBuilder, private authService: AuthService, private authenticationService: AuthenticationService, private router: Router) { }
 
   ngOnInit() {
     this.loginForm = this.fb.group({
@@ -50,7 +52,10 @@ export class SigninFormComponent implements OnInit {
     this.authenticationService.signin(signinResquest).subscribe(({
       next: (response) => {
         console.log('Connexion réussie :', response);
-        this.router.navigate(['/dashboard']);
+        if (response.status == Status.OK && response.data) {
+          this.authService.setToken(response.data.token);
+          this.router.navigate(['/dashboard']);
+        }
       },
       error: (error: ApiResponse<UserSigninResponse>) => {
         console.log('Erreur de connexion :', error);

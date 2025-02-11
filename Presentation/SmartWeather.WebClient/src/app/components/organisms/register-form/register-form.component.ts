@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonComponent } from '@components/atoms/button/button.component';
+import { Status } from '@constants/api-status';
 import { ApiResponse } from '@models/api-response';
 import { UserRegisterRequest, UserSigninRequest, UserSigninResponse } from '@models/dtos/authentication-dtos';
 import { AuthenticationService } from '@services/authentication/authentication.service';
+import { AuthService } from '@services/core/auth.service';
 import { ThemeService } from '@services/core/theme.service';
 
 @Component({
@@ -14,12 +16,12 @@ import { ThemeService } from '@services/core/theme.service';
   templateUrl: './register-form.component.html',
   styleUrl: './register-form.component.css'
 })
-export class RegisterFormComponent {
+export class RegisterFormComponent implements OnInit {
   registerForm!: FormGroup;
   isSubmitting = false;
   incorrectInputs = false;
 
-  constructor(public themeService: ThemeService, private fb: FormBuilder, private authenticationService: AuthenticationService, private router: Router) { }
+  constructor(public themeService: ThemeService, private fb: FormBuilder, private authService: AuthService, private authenticationService: AuthenticationService, private router: Router) { }
 
   ngOnInit() {
     this.registerForm = this.fb.group(
@@ -55,7 +57,10 @@ export class RegisterFormComponent {
     this.authenticationService.register(registerResquest).subscribe(({
       next: (response) => {
         console.log('Création réussie :', response);
-        this.router.navigate(['/dashboard']);
+        if (response.status == Status.OK && response.data) {
+          this.authService.setToken(response.data.token);
+          this.router.navigate(['/dashboard']);
+        }
       },
       error: (error: ApiResponse<UserSigninResponse>) => {
         console.log('Erreur de connexion :', error);
