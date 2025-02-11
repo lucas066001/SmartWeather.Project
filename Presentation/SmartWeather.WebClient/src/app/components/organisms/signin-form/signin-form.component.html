@@ -15,7 +15,7 @@
                 bg-[var(--sm-input-background)] border-[var(--sm-border-color)] text-[var(--sm-text-color)] 
                 placeholder-[var(--sm-placeholder-color)]" [attr.disabled]="isSubmitting ? true : null"
                 [ngClass]="{'cursor-not-allowed opacity-50' : isSubmitting, 'border-[var(--sm-error-color)]' : (email?.invalid && email?.touched) ? true : false}"
-                placeholder="sample@email.com" formControlName="email">
+                placeholder="sample@email.com" formControlName="email" (click)="resetError()">
         </div>
         <p *ngIf="email?.invalid && email?.touched" class="text-sm text-[var(--sm-error-color)]">Email is incorrect</p>
     </div>
@@ -34,12 +34,14 @@
                 bg-[var(--sm-input-background)] border-[var(--sm-border-color)] text-[var(--sm-text-color)] 
                 placeholder-[var(--sm-placeholder-color)]" [attr.disabled]="isSubmitting ? true : null"
                 [ngClass]="{'cursor-not-allowed opacity-50' : isSubmitting, 'border-[var(--sm-error-color)]' : (password?.invalid && password?.touched) ? true : false}"
-                placeholder="••••••••" formControlName="password">
+                placeholder="••••••••" formControlName="password" (click)="resetError()">
         </div>
         <p *ngIf="password?.invalid && password?.touched" class="text-sm text-[var(--sm-error-color)]">Password must be
             at
             least 6 chars long.</p>
     </div>
+
+    <p *ngIf="incorrectCredentials" class="text-sm text-[var(--sm-error-color)]">Email or password doesn't match.</p>
 
     <!-- Remember Me & forgot password -->
     <div class="flex items-center justify-between">

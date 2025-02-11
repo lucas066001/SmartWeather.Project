@@ -1,0 +1,101 @@
+<!-- Formulaire -->
+<form [formGroup]="registerForm" (ngSubmit)="submitForm()" class="space-y-4">
+
+    <!-- Username field -->
+    <div>
+        <label for="username-field" class="block mb-2 text-sm font-medium text-[var(--sm-text-color)]">
+            Username
+        </label>
+
+        <div class="relative">
+            <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                <img [src]="themeService.getIconPath('user-icon')" alt="user-icon" class="h-5">
+            </div>
+            <input type="text" id="username-field" class="border text-sm rounded-lg ps-10 block w-full p-2.5 focus:ring-[var(--sm-primary)] focus:border-[var(--sm-primary)]
+                bg-[var(--sm-input-background)] border-[var(--sm-border-color)] text-[var(--sm-text-color)] 
+                placeholder-[var(--sm-placeholder-color)]" [attr.disabled]="isSubmitting ? true : null"
+                [ngClass]="{'cursor-not-allowed opacity-50' : isSubmitting, 'border-[var(--sm-error-color)]' : (username?.invalid && username?.touched) ? true : false}"
+                placeholder="SuperCoolPseudo" formControlName="username" (click)="resetError()">
+        </div>
+        <p *ngIf="username?.invalid && username?.touched" class="text-sm text-[var(--sm-error-color)]">Username must be
+            at
+            least 3 chars</p>
+    </div>
+
+    <!-- Email field -->
+    <div>
+        <label for="email-field" class="block mb-2 text-sm font-medium text-[var(--sm-text-color)]">
+            Email
+        </label>
+
+        <div class="relative">
+            <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                <img [src]="themeService.getIconPath('email-icon')" alt="email-icon" class="h-5">
+            </div>
+            <input type="text" id="email-field" class="border text-sm rounded-lg ps-10 block w-full p-2.5 focus:ring-[var(--sm-primary)] focus:border-[var(--sm-primary)]
+                bg-[var(--sm-input-background)] border-[var(--sm-border-color)] text-[var(--sm-text-color)] 
+                placeholder-[var(--sm-placeholder-color)]" [attr.disabled]="isSubmitting ? true : null"
+                [ngClass]="{'cursor-not-allowed opacity-50' : isSubmitting, 'border-[var(--sm-error-color)]' : (email?.invalid && email?.touched) ? true : false}"
+                placeholder="sample@email.com" formControlName="email" (click)="resetError()">
+        </div>
+        <p *ngIf="email?.invalid && email?.touched" class="text-sm text-[var(--sm-error-color)]">Email is incorrect</p>
+    </div>
+
+    <!-- Password field -->
+    <div>
+        <label for="password-field" class="block mb-2 text-sm font-medium text-[var(--sm-text-color)]">
+            Password
+        </label>
+
+        <div class="relative">
+            <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                <img [src]="themeService.getIconPath('key-icon')" alt="key-icon" class="h-5">
+            </div>
+            <input type="password" id="password-field" class="border text-sm rounded-lg ps-10 block w-full p-2.5 focus:ring-[var(--sm-primary)] focus:border-[var(--sm-primary)]
+                bg-[var(--sm-input-background)] border-[var(--sm-border-color)] text-[var(--sm-text-color)] 
+                placeholder-[var(--sm-placeholder-color)]" [attr.disabled]="isSubmitting ? true : null"
+                [ngClass]="{'cursor-not-allowed opacity-50' : isSubmitting, 'border-[var(--sm-error-color)]' : (password?.invalid && password?.touched) ? true : false}"
+                placeholder="••••••••" formControlName="password" (click)="resetError()">
+        </div>
+        <p *ngIf="password?.invalid && password?.touched" class="text-sm text-[var(--sm-error-color)]">Password must be
+            at
+            least 6 chars long.</p>
+    </div>
+
+    <div>
+        <label for="password-confirm-field" class="block mb-2 text-sm font-medium text-[var(--sm-text-color)]">
+            Confirm password
+        </label>
+
+        <div class="relative">
+            <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                <img [src]="themeService.getIconPath('key-icon')" alt="key-icon" class="h-5">
+            </div>
+            <input type="password" id="password-confirm-field" class="border text-sm rounded-lg ps-10 block w-full p-2.5 focus:ring-[var(--sm-primary)] focus:border-[var(--sm-primary)]
+                bg-[var(--sm-input-background)] border-[var(--sm-border-color)] text-[var(--sm-text-color)] 
+                placeholder-[var(--sm-placeholder-color)]" [attr.disabled]="isSubmitting ? true : null"
+                [ngClass]="{'cursor-not-allowed opacity-50' : isSubmitting, 'border-[var(--sm-error-color)]' : (password?.invalid && password?.touched) ? true : false}"
+                placeholder="••••••••" formControlName="confirmPassword" (click)="resetError()">
+        </div>
+        <p *ngIf="confirmPassword?.touched && registerForm.hasError('passwordMismatch')"
+            class="text-sm text-[var(--sm-error-color)]">
+            Password should
+            be the same</p>
+    </div>
+
+    <p *ngIf="incorrectInputs" class="text-sm text-[var(--sm-error-color)]">Unable to create an account.</p>
+
+    <!-- Submit button -->
+    <div class="flex align-center justify-center gap-4">
+        <app-button [disabled]="isSubmitting || registerForm.invalid" [theme]="'green'" [type]="'submit'">
+            {{ isSubmitting ? 'Creating account...' : 'Register' }}
+        </app-button>
+    </div>
+</form>
+
+<!-- Lien d'inscription -->
+<div class="mt-6 text-center">
+    <p class="text-sm text-[var(--sm-text-muted)]">Already member ?
+        <a href="/login" class="text-[var(--sm-primary)] hover:underline">Signin</a>
+    </p>
+</div>

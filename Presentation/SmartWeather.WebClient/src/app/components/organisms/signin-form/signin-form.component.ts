@@ -4,7 +4,9 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { ButtonComponent } from '@components/atoms/button/button.component';
 import { ThemeService } from '@services/core/theme.service';
 import { AuthenticationService } from '@services/authentication/authentication.service';
-import { UserSigninRequest } from '@models/dtos/authentication-dtos';
+import { UserSigninRequest, UserSigninResponse } from '@models/dtos/authentication-dtos';
+import { ApiResponse } from '@models/api-response';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-signin-form',
@@ -15,8 +17,9 @@ import { UserSigninRequest } from '@models/dtos/authentication-dtos';
 export class SigninFormComponent implements OnInit {
   loginForm!: FormGroup;
   isSubmitting = false;
+  incorrectCredentials = false;
 
-  constructor(public themeService: ThemeService, private fb: FormBuilder, private authenticationService: AuthenticationService) { }
+  constructor(public themeService: ThemeService, private fb: FormBuilder, private authenticationService: AuthenticationService, private router: Router) { }
 
   ngOnInit() {
     this.loginForm = this.fb.group({
@@ -32,8 +35,8 @@ export class SigninFormComponent implements OnInit {
 
     if (this.loginForm.invalid) {
       console.log('Formulaire invalide');
-
-      return; // Empêche la soumission si le formulaire est invalide
+      this.incorrectCredentials = true;
+      return;
     }
 
     this.isSubmitting = true;
@@ -44,10 +47,23 @@ export class SigninFormComponent implements OnInit {
       password: this.password?.value,
     }
 
-    this.authenticationService.signin(signinResquest).subscribe(rep => {
-      console.log(rep);
-      this.isSubmitting = false;
-    });
+    this.authenticationService.signin(signinResquest).subscribe(({
+      next: (response) => {
+        console.log('Connexion réussie :', response);
+        this.router.navigate(['/dashboard']);
+      },
+      error: (error: ApiResponse<UserSigninResponse>) => {
+        console.log('Erreur de connexion :', error);
+        this.incorrectCredentials = true;
+      }
+    }));
+
+    this.isSubmitting = false;
+  }
+
+  resetError() {
+    this.incorrectCredentials = false;
+    console.log('resetError');
   }
 
   get email() {

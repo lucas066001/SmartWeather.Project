@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
 import { HttpApiService } from '@services/transport/http-api.service';
 import { ApiResponse } from '@models/api-response';
 import { UserRegisterRequest, UserSigninRequest, UserRegisterResponse, UserSigninResponse } from '@models/dtos/authentication-dtos'; // Adjust the path to your models
@@ -39,6 +39,10 @@ export class AuthenticationService {
     return this.httpApiService.post<UserSigninResponse>(
       `${this.baseEndpoint}/${AuthenticationEndpoints.SIGNIN}`,
       user
+    ).pipe(
+      catchError((error) => {
+        return throwError(() => error);
+      })
     );
   }
 }

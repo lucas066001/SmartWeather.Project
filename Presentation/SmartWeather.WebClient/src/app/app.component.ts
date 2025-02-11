@@ -8,20 +8,9 @@ import { AuthService } from '@services/core/auth.service'; // Import AuthService
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'SmartWeather';
 
-  constructor(
-    private router: Router,
-    private authService: AuthService
-  ) { }
+  constructor() { }
 
-  // OnInit lifecycle hook to perform the redirect logic
-  ngOnInit(): void {
-    if (this.authService.isAuthenticated()) {
-      this.router.navigate(['/dashboard']);
-    } else {
-      this.router.navigate(['/login']);
-    }
-  }
 }
