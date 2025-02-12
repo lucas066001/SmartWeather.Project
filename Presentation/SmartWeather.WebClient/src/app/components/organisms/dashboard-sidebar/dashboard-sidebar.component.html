@@ -1,0 +1,24 @@
+<aside id="sidebar"
+    class="relative flex flex-col justify-between border-r-1 border-[var(--sm-card-border-color)] h-screen bg-[var(--sm-detached-background-color)] text-[var(--sm-text-muted-color)] p-4"
+    [ngClass]="{ 'w-[6em] items-center': !isExpanded, 'w-3xs': isExpanded }">
+    <div class="flex p-2 items-center justify-items-center absolute top-[4em] -right-[1em] size-[2em] rounded-lg border-1 border-[var(--sm-card-border-color)] cursor-pointer bg-[var(--sm-detached-background-color)]"
+        (click)="toggleSidebar()">
+        <img [ngClass]="{ 'rotate-180': !isExpanded }" [src]="themeService.getIconPath('arrow-icon')" alt="Arrow icon"
+            class="w-4/5">
+    </div>
+    <section id="top-section" class="flex flex-col items-center">
+        <img *ngIf="isExpanded" [src]="themeService.getIconPath('logo-expanded')" alt="SmartWeather logo" class="w-4/5">
+        <img *ngIf="!isExpanded" [src]="themeService.getIconPath('logo-reduced')" alt="SmartWeather reduced logo"
+            class="w-4/5">
+    </section>
+    <section id="middle-section">
+        <app-pages-links [isExpanded]="isExpanded"></app-pages-links>
+    </section>
+    <section id="bottom-section" class="flex flex-col" [ngClass]="{ 'items-center': !isExpanded }">
+        <app-theme-selector [isExpanded]="isExpanded"></app-theme-selector>
+        <hr class="border-[var(--sm-card-border-color)]" />
+        <p class="text-xs text-center text-[var(--sm-text-muted-color)] mt-2">
+            &copy; 2025 SmartWeather. All rights reserved.
+        </p>
+    </section>
+</aside>

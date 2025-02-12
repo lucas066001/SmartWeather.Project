@@ -6,7 +6,8 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class ThemeService {
-  private readonly storageKey = 'sm-theme';
+  private readonly currentThemeKey = 'sm-theme';
+  private readonly currentLayoutStateKey = 'sm-layout-state';
   private themeSubject = new BehaviorSubject<UITheme>(UITheme.LIGHT);
   theme = this.themeSubject.asObservable();
 
@@ -20,24 +21,39 @@ export class ThemeService {
    */
   setTheme(theme: UITheme) {
     document.body.className = theme;
-    localStorage.setItem(this.storageKey, theme);
+    localStorage.setItem(this.currentThemeKey, theme);
     this.themeSubject.next(theme);
   }
 
   /**
  * Gets the theme from  local storage.
- * @param theme The theme to apply (light or dark).
  * @returns The current theme.
  */
-  getTheme() {
-    return (localStorage.getItem(this.storageKey) as UITheme) || UITheme.LIGHT;
+  getTheme(): UITheme {
+    return (localStorage.getItem(this.currentThemeKey) as UITheme) || UITheme.LIGHT;
+  }
+
+  /**
+ * Sets the current layout theme and updates the local storage.
+ * @param expanded The new state (true or false).
+ */
+  setLayoutState(theme: boolean) {
+    localStorage.setItem(this.currentLayoutStateKey, theme.valueOf().toString());
+  }
+
+  /**
+ * Gets the the current layout state from  local storage.
+ * @returns The current state.
+ */
+  getLayoutState(): boolean {
+    return (localStorage.getItem(this.currentLayoutStateKey)) === 'true';
   }
 
   /**
    * Loads the theme from local storage and applies it.
    */
   private loadTheme() {
-    const savedTheme = (localStorage.getItem(this.storageKey) as UITheme) || UITheme.LIGHT;
+    const savedTheme = (localStorage.getItem(this.currentThemeKey) as UITheme) || UITheme.LIGHT;
     document.body.className = savedTheme;
     this.themeSubject.next(savedTheme);
   }

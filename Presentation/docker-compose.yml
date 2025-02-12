@@ -1,8 +1,8 @@
 version: "3.9"
 name: smartweather-project
 
-include:
-  - "./Kibana/kibana.yml"
+# include:
+#   - "./Kibana/kibana.yml"
 
 networks:
   smart-weather-network:
