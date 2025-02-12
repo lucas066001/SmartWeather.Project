@@ -1,0 +1,24 @@
+<div class="relative w-full">
+    <button type="button" (click)="toggleMenu()"
+        class="cursor-pointer flex items-center justify-center ml-auto p-1.5 rounded-full w-10 h-10 border-2 border-[var(--sm-border-color)] hover:opacity-80">
+        <img [src]="themeService.getIconPath('user-icon')" class="size-full" alt="user icon">
+    </button>
+    <div [ngClass]="{'opacity-0': !isMenuExpanded}"
+        class="absolute right-1 mt-2 w-max w-maw max-w-40 flex flex-col justify-end py-1 mb-4 space-y-2 bg-[var(--sm-background-color)] border border-[var(--sm-border-color)] rounded-lg shadow-xs">
+        <ul class="text-sm text-[var(--sm-text-color)]">
+            <li>
+                <span href="#"
+                    class="border-b border-[var(--sm-card-border-color)] text-sm font-medium flex items-center px-5 py-2">
+                    Lucas Chapuis
+                </span>
+            </li>
+            <li>
+                <a (click)="diconnect()"
+                    class="cursor-pointer flex items-center px-5 py-2 hover:bg-[var(--sm-card-border-color)]">
+                    <img [src]="themeService.getIconPath('logout-icon')" class="w-3.5 h-3.5 me-2" alt="logout icon">
+                    <span class="text-sm text-[var(--sm-text-muted-color)]">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

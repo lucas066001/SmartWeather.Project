@@ -61,14 +61,15 @@ export class RegisterFormComponent implements OnInit {
           this.authService.setToken(response.data.token);
           this.router.navigate(['/dashboard']);
         }
+        this.isSubmitting = false;
       },
       error: (error: ApiResponse<UserSigninResponse>) => {
         console.log('Erreur de connexion :', error);
         this.incorrectInputs = true;
+        this.isSubmitting = false;
       }
     }));
 
-    this.isSubmitting = false;
   }
 
   passwordMatchValidator(): ValidatorFn {
