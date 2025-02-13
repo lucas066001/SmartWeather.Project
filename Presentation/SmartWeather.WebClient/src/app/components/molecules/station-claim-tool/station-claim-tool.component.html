@@ -1,0 +1,30 @@
+<!-- Formulaire -->
+<form [formGroup]="claimForm" (ngSubmit)="submitForm()">
+
+    <!-- MacAdress field -->
+    <label for="mac-address-field" class="block mb-2 text-sm font-medium text-[var(--sm-tertiary-color)]">
+        Station's Mac Address
+    </label>
+
+    <input type="text" id="macaddress-field" class="border text-sm rounded-lg block w-full mb-2 p-2.5 focus:ring-[var(--sm-primary)] focus:border-[var(--sm-primary)]
+                bg-[var(--sm-input-background)] border-[var(--sm-border-color)] text-[var(--sm-text-color)] 
+                placeholder-[var(--sm-placeholder-color)]" [attr.disabled]="isSubmitting ? true : null"
+        [ngClass]="{'cursor-not-allowed opacity-50' : isSubmitting, 'border-[var(--sm-error-color)]' : (macaddress?.invalid && macaddress?.touched) ? true : false}"
+        placeholder="MC:03:56:c..." formControlName="macaddress" (click)="resetError()">
+    <p *ngIf="macaddress?.invalid && macaddress?.touched" class="text-sm text-[var(--sm-error-color)]">Your mac
+        address isn't well formatted</p>
+
+    <p *ngIf="claimError" class="text-sm text-[var(--sm-error-color)]">{{errorMessage}}</p>
+
+    <!-- Help guide -->
+    <p class="mt-2 mb-2 text-xs text-[var(--sm-text-muted)] opacity-80">Don't know where to find your station mac
+        address
+        ?
+        <a href="/register" class="text-[var(--sm-primary-color)] hover:underline">Check our guide</a>
+    </p>
+
+    <!-- Submit button -->
+    <app-button class="mt-2" [disabled]="isSubmitting" [theme]="'blue'" [type]="'submit'">
+        {{ isSubmitting ? 'Loading...' : 'Claim' }}
+    </app-button>
+</form>

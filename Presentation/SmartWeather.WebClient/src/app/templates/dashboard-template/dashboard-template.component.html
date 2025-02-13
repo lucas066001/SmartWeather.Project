@@ -1,7 +1,9 @@
 <main class="flex w-full ">
     <app-dashboard-sidebar class="z-100"></app-dashboard-sidebar>
-    <app-dashboard-header class="w-full z-90"></app-dashboard-header>
-    <section>
-        <ng-content></ng-content>
+    <section class="flex flex-col w-full">
+        <app-dashboard-header class="w-full z-90"></app-dashboard-header>
+        <main class="p-4">
+            <ng-content></ng-content>
+        </main>
     </section>
 </main>

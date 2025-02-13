@@ -1,0 +1,11 @@
+<ul *ngIf="stations.length > 0">
+    <li *ngFor="let station of stations">
+        <app-editable-list-element [theme]="'blue'" (selectEvent)="handleStationSelect($event)"
+            (editEvent)="handleStationEdit($event)" [text]="station.name"
+            [itemId]="station.id"></app-editable-list-element>
+    </li>
+</ul>
+
+<div *ngIf="stations.length <= 0">
+    <p class="text-[var(--sm-text-muted-color)] text-center">No stations available, you need to first claim yours</p>
+</div>

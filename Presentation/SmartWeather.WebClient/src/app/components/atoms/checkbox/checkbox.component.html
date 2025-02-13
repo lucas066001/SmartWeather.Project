@@ -1,8 +1,0 @@
-<label class="inline-flex items-center"
-    [ngClass]="{ 'cursor-pointer': !disabled, 'cursor-not-allowed opacity-50' : disabled }">
-    <input type="checkbox" formControlName="rememberMe"
-        class="w-4 h-4 text-[var(--sm-primary)] border-gray-300 rounded focus:ring-[var(--sm-primary)]"
-        [attr.checked]="isChecked ? true : null" [attr.disabled]="disabled ? true : null"
-        [ngClass]="{ 'cursor-pointer': !disabled, 'cursor-not-allowed' : disabled }">
-    <span class="ml-2 text-sm text-[var(--sm-text-muted)]">Remember me</span>
-</label>

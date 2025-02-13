@@ -14,14 +14,15 @@ export class ButtonComponent {
   @Input() type: string = "button";
   @Input() disabled: boolean = false;
 
-  availableThemes: string[] = ['green', 'brown', 'red'];
+  availableThemes: string[] = ['green', 'brown', 'red', 'blue'];
 
   constructor(public themeService: ThemeService) { }
 
   getButtonClasses(): string {
     const themeColors: { [key: string]: string } = {
       green: 'bg-[var(--sm-primary-color)] hover:bg-[var(--sm-primary-color)]/90 focus:ring-[var(--sm-primary-color)]/50 dark:focus:ring-[var(--sm-primary-color)]/55 ',
-      red: 'bg-[var(--sm-error-color)] hover:bg-[var(--sm-error-color)]/90 focus:ring-[var(--sm-error-color)]/50 dark:focus:ring-[var(--sm-error-color)]/55 '
+      red: 'bg-[var(--sm-error-color)] hover:bg-[var(--sm-error-color)]/90 focus:ring-[var(--sm-error-color)]/50 dark:focus:ring-[var(--sm-error-color)]/55 ',
+      blue: 'bg-[var(--sm-tertiary-color)] hover:bg-[var(--sm-tertiary-color)]/90 focus:ring-[var(--sm-tertiary-color)]/50 dark:focus:ring-[var(--sm-tertiary-color)]/55 '
     };
     let retreivedClasses: string = this.availableThemes.includes(this.theme) ? themeColors[this.theme] : themeColors['green'];
     this.disabled ?

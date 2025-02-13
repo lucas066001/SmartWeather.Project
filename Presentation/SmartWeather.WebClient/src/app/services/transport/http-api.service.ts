@@ -1,22 +1,22 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiResponse } from '@models/api-response'; // Adjust path as needed
+import { ApiResponse } from '@models/api-response';
 import { environment } from 'src/environments/environment';
+import { AuthService } from '@services/core/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HttpApiService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
-  /**
-   * Sends a GET request to the specified endpoint with optional parameters.
-   * @param endpoint API endpoint (relative or absolute URL)
-   * @param params Query parameters (optional)
-   * @returns Observable<ApiResponse<T>>
-   */
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
+  }
+
   get<T>(endpoint: string, params?: Record<string, any>): Observable<ApiResponse<T>> {
     let httpParams = new HttpParams();
     if (params) {
@@ -24,36 +24,24 @@ export class HttpApiService {
         httpParams = httpParams.set(key, params[key]);
       });
     }
-
-    return this.http.get<ApiResponse<T>>(`${environment.apiUrl}/${endpoint}`, { params: httpParams });
+    return this.http.get<ApiResponse<T>>(`${environment.apiUrl}/${endpoint}`, {
+      params: httpParams,
+      headers: this.getAuthHeaders()
+    });
   }
 
-  /**
-   * Sends a POST request with a payload to the specified endpoint.
-   * @param endpoint API endpoint
-   * @param body Request payload
-   * @returns Observable<ApiResponse<T>>
-   */
   post<T>(endpoint: string, body: any): Observable<ApiResponse<T>> {
-    return this.http.post<ApiResponse<T>>(`${environment.apiUrl}/${endpoint}`, body);
+    return this.http.post<ApiResponse<T>>(`${environment.apiUrl}/${endpoint}`, body, {
+      headers: this.getAuthHeaders()
+    });
   }
 
-  /**
-   * Sends a PUT request to update a resource.
-   * @param endpoint API endpoint
-   * @param body Request payload
-   * @returns Observable<ApiResponse<T>>
-   */
   put<T>(endpoint: string, body: any): Observable<ApiResponse<T>> {
-    return this.http.put<ApiResponse<T>>(`${environment.apiUrl}/${endpoint}`, body);
+    return this.http.put<ApiResponse<T>>(`${environment.apiUrl}/${endpoint}`, body, {
+      headers: this.getAuthHeaders()
+    });
   }
 
-  /**
-   * Sends a DELETE request to remove a resource.
-   * @param endpoint API endpoint
-   * @param params Query parameters (optional)
-   * @returns Observable<ApiResponse<T>>
-   */
   delete<T>(endpoint: string, params?: Record<string, any>): Observable<ApiResponse<T>> {
     let httpParams = new HttpParams();
     if (params) {
@@ -61,7 +49,9 @@ export class HttpApiService {
         httpParams = httpParams.set(key, params[key]);
       });
     }
-
-    return this.http.delete<ApiResponse<T>>(`${environment.apiUrl}/${endpoint}`, { params: httpParams });
+    return this.http.delete<ApiResponse<T>>(`${environment.apiUrl}/${endpoint}`, {
+      params: httpParams,
+      headers: this.getAuthHeaders()
+    });
   }
 }
