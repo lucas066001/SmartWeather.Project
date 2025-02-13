@@ -13,7 +13,7 @@ services:
       MAX_ERROR_RATE: 0
       STATION_NB : 50
       DATA_FREQ : 980
-      ADMIN_TOKEN: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiZW1haWwiOiJhZG1pbkBzbWFydHdlYXRoZXIubmV0Iiwicm9sZSI6IjEiLCJuYmYiOjE3MzY0OTgyNjQsImV4cCI6MTczNjUwOTA2NCwiaWF0IjoxNzM2NDk4MjY0LCJpc3MiOiJTbWFydFdlYXRoZXIiLCJhdWQiOiJTbWFydFdlYXRoZXIifQ.7C60ySvYjZwfuNa-6j72m3CuDa08aGc9uUF60NDrGrM"
+      ADMIN_TOKEN: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiZW1haWwiOiJhZG1pbkBzbWFydHdlYXRoZXIubmV0Iiwicm9sZSI6IjEiLCJuYmYiOjE3Mzk0NDE3MDAsImV4cCI6MTczOTQ1MjUwMCwiaWF0IjoxNzM5NDQxNzAwLCJpc3MiOiJTbWFydFdlYXRoZXIiLCJhdWQiOiJTbWFydFdlYXRoZXIifQ.hvqeTTFEF2fnQbNHd-U20hRsKUkinApAtJ5sDCvEeio"
     depends_on:
       - smart-weather-api
       - mysql-master

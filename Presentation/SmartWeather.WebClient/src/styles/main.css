@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+* {
+    transition: all 0.3s ease-out;
+}
+
+body {
+    background-color: var(--sm-background-color);
+}
+
+.sm-menu-icon.selected path {
+    fill: var(--sm-button-text-color);
+}
+
+.sm-menu-icon path {
+    fill: var(--sm-text-muted-color);
+}

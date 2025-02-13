@@ -1,0 +1,23 @@
+<div class="flex min-h-screen items-center justify-center bg-[var(--sm-background-color)] text-[var(--sm-text-color)]">
+    <div class="w-full max-w-md bg-[var(--sm-card-background)] p-8 shadow-lg rounded-lg">
+
+        <!-- Logo -->
+        <div class="flex justify-center mb-6">
+            <img [src]="themeService.getIconPath('logo-expanded')" alt="Logo" class="h-16">
+        </div>
+
+        <!-- Slot for Content -->
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold text-center mb-4">{{ title }}</h2>
+            <ng-content></ng-content>
+        </div>
+
+        <!-- Copyright -->
+        <p class="text-sm text-center text-[var(--sm-text-muted-color)] mt-6">
+            &copy; 2025 SmartWeather. All rights reserved.
+        </p>
+
+    </div>
+</div>
+
+<app-theme-selector class="fixed bottom-4 left-4 z-10"></app-theme-selector>

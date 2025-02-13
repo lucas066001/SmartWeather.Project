@@ -1,0 +1,73 @@
+<!-- Formulaire -->
+<form [formGroup]="loginForm" (ngSubmit)="submitForm()" class="space-y-4">
+
+    <!-- Email field -->
+    <div>
+        <label for="email-field" class="block mb-2 text-sm font-medium text-[var(--sm-text-color)]">
+            Email
+        </label>
+
+        <div class="relative">
+            <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                <img [src]="themeService.getIconPath('email-icon')" alt="email-icon" class="h-5">
+            </div>
+            <input type="text" id="email-field" class="border text-sm rounded-lg ps-10 block w-full p-2.5 focus:ring-[var(--sm-primary)] focus:border-[var(--sm-primary)]
+                bg-[var(--sm-input-background)] border-[var(--sm-border-color)] text-[var(--sm-text-color)] 
+                placeholder-[var(--sm-placeholder-color)]" [attr.disabled]="isSubmitting ? true : null"
+                [ngClass]="{'cursor-not-allowed opacity-50' : isSubmitting, 'border-[var(--sm-error-color)]' : (email?.invalid && email?.touched) ? true : false}"
+                placeholder="sample@email.com" formControlName="email" (click)="resetError()">
+        </div>
+        <p *ngIf="email?.invalid && email?.touched" class="text-sm text-[var(--sm-error-color)]">Email is incorrect</p>
+    </div>
+
+    <!-- Password field -->
+    <div>
+        <label for="password-field" class="block mb-2 text-sm font-medium text-[var(--sm-text-color)]">
+            Password
+        </label>
+
+        <div class="relative">
+            <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                <img [src]="themeService.getIconPath('key-icon')" alt="key-icon" class="h-5">
+            </div>
+            <input type="password" id="password-field" class="border text-sm rounded-lg ps-10 block w-full p-2.5 focus:ring-[var(--sm-primary)] focus:border-[var(--sm-primary)]
+                bg-[var(--sm-input-background)] border-[var(--sm-border-color)] text-[var(--sm-text-color)] 
+                placeholder-[var(--sm-placeholder-color)]" [attr.disabled]="isSubmitting ? true : null"
+                [ngClass]="{'cursor-not-allowed opacity-50' : isSubmitting, 'border-[var(--sm-error-color)]' : (password?.invalid && password?.touched) ? true : false}"
+                placeholder="••••••••" formControlName="password" (click)="resetError()">
+        </div>
+        <p *ngIf="password?.invalid && password?.touched" class="text-sm text-[var(--sm-error-color)]">Password must be
+            at
+            least 6 chars long.</p>
+    </div>
+
+    <p *ngIf="incorrectCredentials" class="text-sm text-[var(--sm-error-color)]">Email or password doesn't match.</p>
+
+    <!-- Remember Me & forgot password -->
+    <div class="flex items-center justify-between">
+        <label class="inline-flex items-center"
+            [ngClass]="{ 'cursor-pointer': !isSubmitting, 'cursor-not-allowed opacity-50' : isSubmitting }">
+            <input type="checkbox" formControlName="rememberMe"
+                class="w-4 h-4 text-[var(--sm-primary)] border-gray-300 rounded focus:ring-[var(--sm-primary)]"
+                [attr.disabled]="isSubmitting ? true : null"
+                [ngClass]="{ 'cursor-pointer': !isSubmitting, 'cursor-not-allowed' : isSubmitting }">
+            <span class="ml-2 text-sm text-[var(--sm-text-muted)]">Remember me</span>
+        </label>
+
+        <a href="#" class="text-sm text-[var(--sm-primary-color)] hover:underline">Forgot password ?</a>
+    </div>
+
+    <!-- Submit button -->
+    <div class="flex align-center justify-center gap-4">
+        <app-button [disabled]="isSubmitting" [theme]="'green'" [type]="'submit'">
+            {{ isSubmitting ? 'Connecting...' : 'Signin' }}
+        </app-button>
+    </div>
+</form>
+
+<!-- Lien d'inscription -->
+<div class="mt-6 text-center">
+    <p class="text-sm text-[var(--sm-text-muted)]">Still no account ?
+        <a href="/register" class="text-[var(--sm-primary-color)] hover:underline">Register</a>
+    </p>
+</div>

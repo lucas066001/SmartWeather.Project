@@ -1,0 +1,9 @@
+<section id="configurato-selector"
+    class="text-[var(--sm-text-color)] flex flex-col h-full max-w-[25%] rounded-lg shadow-2xs border-1 p-2 border-[var(--sm-card-border-color)] bg-[var(--sm-detached-background-color)]">
+    <h3
+        class="w-full text-center mt-2 pb-2 mb-2 text-xl text-[var(--sm-tertiary-color)] border-b-2 font-medium border-b-[var(--sm-tertiary-color-light)]">
+        Stations</h3>
+    <app-station-claim-tool (newStationClaimedEvent)="handleNewStationClaimed($event)"></app-station-claim-tool>
+    <hr class="mb-3 mt-3 border-1 border-dashed border-[var(--sm-tertiary-color)] opacity-50" />
+    <app-station-list [stations]="stationsFromUser"></app-station-list>
+</section>
