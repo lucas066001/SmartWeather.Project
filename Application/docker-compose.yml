@@ -45,23 +45,23 @@ services:
     networks:
       - smart-weather-network
 
-  # smart-weather-socket-api:
-  #   container_name: smart-weather-socket-api
-  #   build:
-  #     context: ./..
-  #     dockerfile: ./Application/SmartWeather.Socket.Api/Dockerfile
-  #   ports:
-  #     - "8093:8093"
-  #   depends_on:
-  #     mysql-master:
-  #       condition: service_healthy
-  #   deploy:
-  #     restart_policy:
-  #       condition: on-failure
-  #       delay: 3s
-  #       max_attempts: 5
-  #   networks:
-  #     - smart-weather-network
+  smart-weather-socket-api:
+    container_name: smart-weather-socket-api
+    build:
+      context: ./..
+      dockerfile: ./Application/SmartWeather.Socket.Api/Dockerfile
+    ports:
+      - "8093:8093"
+    depends_on:
+      mysql-master:
+        condition: service_healthy
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 5
+    networks:
+      - smart-weather-network
 
 networks:
   smart-weather-network:
