@@ -86,7 +86,6 @@ public class StationController : ControllerBase
 
         var updatedStation = _stationService.UpdateStation(retreivedStation.Value.Id,
                                         retreivedStation.Value.Name,
-                                        retreivedStation.Value.MacAddress,
                                         retreivedStation.Value.Latitude,
                                         retreivedStation.Value.Longitude,
                                         userId);
@@ -122,7 +121,7 @@ public class StationController : ControllerBase
         }
 
 
-        var updatedStation = _stationService.UpdateStation(request.Id, request.Name, request.MacAddress, request.Latitude, request.Longitude, request.UserId);
+        var updatedStation = _stationService.UpdateStation(request.Id, request.Name, request.Latitude, request.Longitude, request.UserId);
 
         if (updatedStation.IsFailure)
         {
