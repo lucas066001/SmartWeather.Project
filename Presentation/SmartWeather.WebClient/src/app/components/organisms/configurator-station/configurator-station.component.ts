@@ -6,10 +6,11 @@ import { ComponentEditorComponent } from '../component-editor/component-editor.c
 import { ComponentService } from '@services/component/component.service';
 import { Status } from '@constants/api-status';
 import { ComponentResponse } from '@models/dtos/component-dtos';
+import { MapEditorComponent } from '../map-editor/map-editor.component';
 
 @Component({
   selector: 'app-configurator-station',
-  imports: [CommonModule, ComponentEditorComponent],
+  imports: [CommonModule, ComponentEditorComponent, MapEditorComponent],
   templateUrl: './configurator-station.component.html',
   styleUrl: './configurator-station.component.css'
 })

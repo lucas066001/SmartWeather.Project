@@ -4,10 +4,11 @@
         class="w-full border-b-2 border-dashed border-b-[var(--sm-tertiary-color)] text-[var(--sm-tertiary-color)] p-2 text-2xl text-center font-medium">
         {{stationToEdit.name}}</h5>
     <div id="configurator-details" class="h-full w-full flex flex-col gap-3 justify-center items-center">
-        <div id="configurator-map">
-
+        <div id="configurator-map" style="height: 20em; width: 80%;">
+            <app-map-editor [latitude]="stationToEdit.latitude != null ? stationToEdit.latitude : 0"
+                [longitude]="stationToEdit.longitude != null ? stationToEdit.longitude : 0"></app-map-editor>
         </div>
-        <div id="configurator-components" class="flex items-center gap-3 m-2 ">
+        <div id="configurator-components" class="flex justify-center flex-wrap items-center gap-3 m-2 ">
             <ng-container *ngFor="let component of components">
                 <app-component-editor [componentToEdit]="component" class="h-fit"></app-component-editor>
             </ng-container>
