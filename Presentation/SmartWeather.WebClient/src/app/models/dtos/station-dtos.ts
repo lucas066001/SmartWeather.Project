@@ -8,7 +8,7 @@ export interface StationResponse {
     longitude: number;
     type: StationType;
     userId: number;
-    componentResponse: ComponentResponse[] | null;
+    components: ComponentResponse[] | null;
 }
 
 export interface StationListResponse {

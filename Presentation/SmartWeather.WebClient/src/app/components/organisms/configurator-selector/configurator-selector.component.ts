@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { StationClaimToolComponent } from '@components/molecules/station-claim-tool/station-claim-tool.component';
 import { StationListComponent } from '@components/molecules/station-list/station-list.component';
 import { Status } from '@constants/api-status';
@@ -13,6 +13,8 @@ import { StationService } from '@services/station/station.service';
   styleUrl: './configurator-selector.component.css'
 })
 export class ConfiguratorSelectorComponent implements OnInit {
+
+  @Output() stationSelectedEvent: EventEmitter<StationResponse> = new EventEmitter<StationResponse>();
 
   stationsFromUser: StationResponse[] = [];
 
@@ -39,5 +41,9 @@ export class ConfiguratorSelectorComponent implements OnInit {
 
   handleNewStationClaimed(newStation: StationResponse) {
     this.stationsFromUser.push(newStation);
+  }
+
+  handleStationSelected(selectedStation: StationResponse) {
+    this.stationSelectedEvent.emit(selectedStation);
   }
 }

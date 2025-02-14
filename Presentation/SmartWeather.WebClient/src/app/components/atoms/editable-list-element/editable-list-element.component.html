@@ -1,17 +1,17 @@
 <article *ngIf="!availableThemes.includes(theme) || theme == 'green'"
     class="hover:underline hover:bg-[var(--sm-input-background)] cursor-pointer text-[var(--sm-primary-color)] w-full flex justify-between items-center mb-2 border-2 border-[var(--sm-)] p-1 rounded-lg font-medium"
-    [ngClass]="{'bg-[var(--sm-card-border-color)]': isSelected}">
-    <span class="w-full" (click)="triggerSelectEvent()" [ngClass]="{'font-bold': isSelected}">{{text}}</span>
-    <button class="cursor-pointer rounded-lg hover:opacity-50 p-1" (click)="triggerEditEvent()">
+    [ngClass]="{'bg-[var(--sm-card-border-color)]': isSelected}" (click)="triggerSelectEvent()">
+    <span class="w-full" [ngClass]="{'font-bold': isSelected}">{{text}}</span>
+    <button class="cursor-pointer rounded-lg hover:opacity-50 p-1">
         <img [src]="themeService.getIconPath('green-edit-icon')" alt="edit-icon" class="h-5">
     </button>
 </article>
 
 <article *ngIf="availableThemes.includes(theme) && theme == 'blue'"
     class="hover:underline hover:bg-[var(--sm-input-background)] cursor-pointer text-[var(--sm-tertiary-color)] w-full flex justify-between items-center mb-2 border-2 border-[var(--sm-tertiary-color)] p-1 rounded-lg font-medium"
-    [ngClass]="{'bg-[var(--sm-card-border-color)]': isSelected}">
-    <span class="w-full" (click)="triggerSelectEvent()" [ngClass]="{'font-bold': isSelected}">{{text}}</span>
-    <button class="cursor-pointer rounded-lg hover:opacity-50 p-1" (click)="triggerEditEvent()">
+    [ngClass]="{'bg-[var(--sm-card-border-color)]': isSelected}" (click)="triggerSelectEvent()">
+    <span class="w-full" [ngClass]="{'font-bold': isSelected}">{{text}}</span>
+    <button class="cursor-pointer rounded-lg hover:opacity-50 p-1">
         <img [src]="themeService.getIconPath('blue-edit-icon')" alt="edit-icon" class="h-5">
     </button>
 </article>

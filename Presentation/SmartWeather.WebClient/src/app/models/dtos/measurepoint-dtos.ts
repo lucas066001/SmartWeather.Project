@@ -1,7 +1,9 @@
+import { MeasureUnit } from "@constants/measure-unit";
+
 export interface MeasurePointResponse {
-    Id: number;
-    Name: string;
-    Color: string;
-    Unit: number;
-    ComponentId: number;
+    id: number;
+    name: string;
+    color: string;
+    unit: MeasureUnit;
+    componentId: number;
 }

@@ -1,4 +1,5 @@
 <app-dashboard-template>
-    <app-configurator-selector></app-configurator-selector>
-    <app-configurator-station></app-configurator-station>
+    <app-configurator-selector class="w-[25%]"
+        (stationSelectedEvent)="handleStationSectedEvent($event)"></app-configurator-selector>
+    <app-configurator-station class="w-[75%]" [stationToEdit]="currentSelectedStation"></app-configurator-station>
 </app-dashboard-template>

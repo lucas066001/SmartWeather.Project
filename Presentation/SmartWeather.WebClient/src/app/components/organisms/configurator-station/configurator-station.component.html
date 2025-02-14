@@ -1,1 +1,30 @@
-<p>configurator-station works!</p>
+<section *ngIf="stationToEdit" id="configurato-station"
+    class="text-[var(--sm-text-color)] flex flex-col rounded-lg shadow-2xs h-full border-1 p-2 border-[var(--sm-card-border-color)] bg-[var(--sm-detached-background-color)]">
+    <h5 id="configurator-status"
+        class="w-full border-b-2 border-dashed border-b-[var(--sm-tertiary-color)] text-[var(--sm-tertiary-color)] p-2 text-2xl text-center font-medium">
+        {{stationToEdit.name}}</h5>
+    <div id="configurator-details" class="h-full w-full flex flex-col gap-3 justify-center items-center">
+        <div id="configurator-map">
+
+        </div>
+        <div id="configurator-components" class="flex items-center gap-3 m-2 ">
+            <ng-container *ngFor="let component of components">
+                <app-component-editor [componentToEdit]="component" class="h-fit"></app-component-editor>
+            </ng-container>
+        </div>
+        <div class="h-1/4 flex items-center justify-center">
+            <img [src]="themeService.getIconPath('weather-station')" alt="weather station" class="h-35">
+        </div>
+    </div>
+</section>
+
+<section *ngIf="!stationToEdit" id="configurato-selector"
+    class="text-[var(--sm-text-color)] flex flex-col h-full rounded-lg shadow-2xs border-1 p-5 border-[var(--sm-card-border-color)] bg-[var(--sm-detached-background-color)]">
+    <div
+        class="flex border-dashed border-2 border-[var(--sm-text-muted-color)] rounded-lg items-center justify-center h-full">
+        <span class="text-[var(--sm-text-muted-color)] me-2">
+            Select a station to edit it
+        </span>
+        <img [src]="themeService.getIconPath('click-icon')" alt="click icon" class="h-5">
+    </div>
+</section>
