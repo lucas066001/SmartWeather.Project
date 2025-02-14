@@ -130,7 +130,7 @@ public class ComponentController : ControllerBase
     }
 
     [HttpGet(nameof(GetFromStation))]
-    public ActionResult<ApiResponse<ComponentListResponse>> GetFromStation(int stationId)
+    public ActionResult<ApiResponse<ComponentListResponse>> GetFromStation(int stationId, bool includeComponents = false)
     {
         ApiResponse<ComponentListResponse> response;
 
@@ -145,7 +145,7 @@ public class ComponentController : ControllerBase
             return Unauthorized(response);
         }
 
-        var componentList = _componentService.GetFromStation(stationId);
+        var componentList = _componentService.GetFromStation(stationId, includeComponents);
 
         if (componentList.IsFailure)
         {
