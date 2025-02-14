@@ -1,7 +1,8 @@
 <ul *ngIf="stations.length > 0">
     <li *ngFor="let station of stations">
         <app-editable-list-element [theme]="'blue'" (selectEvent)="handleStationSelect($event)" [text]="station.name"
-            [itemId]="station.id"></app-editable-list-element>
+            [itemId]="station.id"
+            [isSelected]="selectedStationId != null && station.id == selectedStationId"></app-editable-list-element>
     </li>
 </ul>
 

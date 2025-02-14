@@ -1,23 +1,53 @@
-<section *ngIf="stationToEdit" id="configurator-station"
+<form [formGroup]="stationForm" *ngIf="stationToEdit" id="configurator-station"
     class="text-[var(--sm-text-color)] flex flex-col rounded-lg shadow-2xs h-full border-1 p-2 border-[var(--sm-card-border-color)] bg-[var(--sm-detached-background-color)]">
-    <h5 id="configurator-status"
-        class="w-full border-b-2 border-dashed border-b-[var(--sm-tertiary-color)] text-[var(--sm-tertiary-color)] p-2 text-2xl text-center font-medium">
-        {{stationToEdit.name}}</h5>
-    <div id="configurator-details" class="h-full w-full flex flex-col gap-3 justify-center items-center">
-        <div id="configurator-map" style="height: 20em; width: 80%;">
-            <app-map-editor [latitude]="stationToEdit.latitude != null ? stationToEdit.latitude : 0"
-                [longitude]="stationToEdit.longitude != null ? stationToEdit.longitude : 0"></app-map-editor>
+
+    <section id="configurator-status" class="mb-4">
+        <div class="w-full flex justify-between items-center text-[var(--sm-tertiary-color)] p-2 text-2xl font-medium">
+            <div *ngIf="!isEditing"></div>
+            <h5 *ngIf="!isEditing">
+                {{ stationToEdit.name }}
+            </h5>
+
+            <div *ngIf="isEditing" class="w-3/4">
+                <label for="station-name-field" class="block mb-2 text-sm text-start font-medium">
+                    Station name
+                </label>
+                <input type="text" id="station-name-field" class="border text-sm rounded-lg block w-full me-10 p-2.5"
+                    formControlName="name">
+            </div>
+
+            <div id="edit-buttons" class="flex gap-1">
+                <img *ngIf="!isEditing" class="h-5 cursor-pointer hover:opacity-80"
+                    [src]="themeService.getIconPath('blue-edit-icon')" alt="edit-icon" (click)="setEditMode(true)">
+                <img *ngIf="isEditing" class="h-5 me-2 cursor-pointer hover:opacity-80"
+                    [src]="themeService.getIconPath('blue-save-icon')" alt="save-icon" (click)="saveStation()">
+                <img *ngIf="isEditing" class="h-5 cursor-pointer hover:opacity-80"
+                    [src]="themeService.getIconPath('blue-cancel-icon')" alt="cancel-icon" (click)="setEditMode(false)">
+            </div>
         </div>
+
+        <div id="configurator-map" class="flex items-center justify-center w-full" style="height: 20em;">
+            <app-map-editor [latitude]="stationForm.value.latitude" [longitude]="stationForm.value.longitude"
+                [isEditing]="isEditing" (coordinateChange)="updateCoordinates($event)"
+                class="size-full mt-2"></app-map-editor>
+        </div>
+    </section>
+
+    <hr class="border-2 border-[var(--sm-tertiary-light-color)] border-dashed mb-3 mx-auto w-1/2" />
+
+    <div id="configurator-details" class="h-full w-full flex flex-col gap-3 justify-center items-center">
+        <div class="h-1/4 flex items-center justify-center">
+            <img [src]="themeService.getIconPath('weather-station')" alt="weather station" class="h-35">
+        </div>
+
         <div id="configurator-components" class="flex justify-center flex-wrap items-center gap-3 m-2 ">
             <ng-container *ngFor="let component of components">
                 <app-component-editor [componentToEdit]="component" class="h-fit"></app-component-editor>
             </ng-container>
         </div>
-        <div class="h-1/4 flex items-center justify-center">
-            <img [src]="themeService.getIconPath('weather-station')" alt="weather station" class="h-35">
-        </div>
     </div>
-</section>
+</form>
+
 
 <section *ngIf="!stationToEdit" id="configurato-selector"
     class="text-[var(--sm-text-color)] flex flex-col h-full rounded-lg shadow-2xs border-1 p-5 border-[var(--sm-card-border-color)] bg-[var(--sm-detached-background-color)]">

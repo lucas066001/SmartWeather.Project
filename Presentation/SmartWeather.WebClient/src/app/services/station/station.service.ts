@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpApiService } from '@services/transport/http-api.service';
 import { ApiResponse } from '@models/api-response';
-import { StationResponse, StationClaimRequest, StationListResponse } from '@models/dtos/station-dtos';
+import { StationResponse, StationClaimRequest, StationListResponse, StationUpdateRequest } from '@models/dtos/station-dtos';
 
 @Injectable({
   providedIn: 'root'
@@ -27,12 +27,12 @@ export class StationService {
     return this.httpApiService.post<StationResponse>(`${this.baseEndpoint}/Claim`, request);
   }
 
-  // /**
-  //  * Update a station
-  //  */
-  // update(request: StationUpdateRequest): Observable<ApiResponse<StationResponse>> {
-  //   return this.httpApiService.put<StationResponse>(`${this.baseEndpoint}/Update`, request);
-  // }
+  /**
+   * Update a station
+   */
+  update(request: StationUpdateRequest): Observable<ApiResponse<StationResponse>> {
+    return this.httpApiService.put<StationResponse>(`${this.baseEndpoint}/Update`, request);
+  }
 
   // /**
   //  * Delete a station by ID

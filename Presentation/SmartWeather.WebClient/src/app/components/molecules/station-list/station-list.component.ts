@@ -15,9 +15,12 @@ export class StationListComponent {
   @Input() stations: StationResponse[] = [];
   @Output() stationSelectEvent: EventEmitter<StationResponse> = new EventEmitter<StationResponse>();
 
+  selectedStationId: number | null = null;
+
   handleStationSelect(stationId: number) {
     let foundStation = this.stations.find(station => station.id === stationId);
     this.stationSelectEvent.emit(foundStation);
+    this.selectedStationId = stationId;
     console.log(`Station ${foundStation} selected`);
   }
 

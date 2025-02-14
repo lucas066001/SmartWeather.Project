@@ -18,3 +18,11 @@ export interface StationListResponse {
 export interface StationClaimRequest {
     macAddress: string;
 }
+
+export interface StationUpdateRequest {
+    id: number;
+    name: string;
+    latitude: number;
+    longitude: number;
+    userId: number;
+}
