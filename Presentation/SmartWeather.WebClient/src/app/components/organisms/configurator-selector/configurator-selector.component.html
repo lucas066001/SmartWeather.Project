@@ -6,5 +6,5 @@
     <app-station-claim-tool (newStationClaimedEvent)="handleNewStationClaimed($event)"></app-station-claim-tool>
     <hr class="mb-3 mt-3 border-1 border-dashed border-[var(--sm-tertiary-color)] opacity-50" />
     <app-station-list [stations]="stationsFromUser" (stationSelectEvent)="handleStationSelected($event)"
-        class="overflow-scroll h-[23em]"></app-station-list>
+        class="overflow-auto "></app-station-list>
 </section>

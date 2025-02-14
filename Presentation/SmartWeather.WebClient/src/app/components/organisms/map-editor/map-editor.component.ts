@@ -60,8 +60,9 @@ export class MapEditorComponent implements AfterViewInit {
 
   // Met à jour la position du marqueur si les inputs changent
   ngOnChanges(): void {
-    if (this.map && this.marker) {
+    if (this.map && this.marker && this.circle) {
       this.marker.setLatLng([this.latitude, this.longitude]);
+      this.circle.setLatLng([this.latitude, this.longitude]);
       this.map.setView([this.latitude, this.longitude], 13);
     }
   }
