@@ -3,7 +3,6 @@
 public class MeasurePointUpdateRequest
 {
     public int Id { get; set; }
-    public int LocalId { get; set; }
     public string Name { get; set; } = null!;
     public string Color { get; set; } = null!;
     public int Unit { get; set; }
