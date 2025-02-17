@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonComponent } from '@components/atoms/button/button.component';
-import { Status } from '@constants/api-status';
+import { Status } from '@constants/api/api-status';
 import { ApiResponse } from '@models/api-response';
 import { StationClaimRequest, StationResponse } from '@models/dtos/station-dtos';
 import { StationService } from '@services/station/station.service';

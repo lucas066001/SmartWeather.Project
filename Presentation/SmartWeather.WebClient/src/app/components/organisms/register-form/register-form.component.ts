@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonComponent } from '@components/atoms/button/button.component';
-import { Status } from '@constants/api-status';
+import { Status } from '@constants/api/api-status';
 import { ApiResponse } from '@models/api-response';
 import { UserRegisterRequest, UserSigninRequest, UserSigninResponse } from '@models/dtos/authentication-dtos';
 import { AuthenticationService } from '@services/authentication/authentication.service';

@@ -1,4 +1,4 @@
-import { StationType } from "@constants/station-type";
+import { StationType } from "@constants/entities/station-type";
 import { ComponentResponse } from "./component-dtos";
 
 export interface StationResponse {
@@ -8,7 +8,7 @@ export interface StationResponse {
     longitude: number;
     type: StationType;
     userId: number;
-    componentResponse: ComponentResponse[] | null;
+    components: ComponentResponse[] | null;
 }
 
 export interface StationListResponse {
@@ -17,4 +17,12 @@ export interface StationListResponse {
 
 export interface StationClaimRequest {
     macAddress: string;
+}
+
+export interface StationUpdateRequest {
+    id: number;
+    name: string;
+    latitude: number;
+    longitude: number;
+    userId: number;
 }

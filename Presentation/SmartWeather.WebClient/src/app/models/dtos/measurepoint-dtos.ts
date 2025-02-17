@@ -1,7 +1,17 @@
+import { MeasureUnit } from "@constants/entities/measure-unit";
+
 export interface MeasurePointResponse {
-    Id: number;
-    Name: string;
-    Color: string;
-    Unit: number;
-    ComponentId: number;
+    id: number;
+    name: string;
+    color: string;
+    unit: MeasureUnit;
+    componentId: number;
+}
+
+export interface MeasurePointUpdateRequest {
+    id: number;
+    name: string;
+    color: string;
+    unit: number;
+    componentId: number;
 }

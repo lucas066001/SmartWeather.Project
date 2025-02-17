@@ -16,7 +16,6 @@ export class EditableListElementComponent {
   @Input() itemId: number = -1;
 
   @Output() selectEvent: EventEmitter<number> = new EventEmitter<number>();
-  @Output() editEvent: EventEmitter<number> = new EventEmitter<number>();
 
   availableThemes: string[] = ['green', 'blue'];
 
@@ -24,10 +23,6 @@ export class EditableListElementComponent {
 
   triggerSelectEvent() {
     this.selectEvent.emit(this.itemId);
-  }
-
-  triggerEditEvent() {
-    this.editEvent.emit(this.itemId);
   }
 
 }

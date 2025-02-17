@@ -92,9 +92,9 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
     /// </summary>
     /// <param name="idStation">Int representing Station unique Id.</param>
     /// <returns>Result containing list of Component.</returns>
-    public Result<IEnumerable<Component>> GetFromStation(int idStation)
+    public Result<IEnumerable<Component>> GetFromStation(int idStation, bool includeComponents = false)
     {
-        return componentRepository.GetFromStation(idStation);
+        return componentRepository.GetFromStation(idStation, includeComponents);
     }
 
     /// <summary>

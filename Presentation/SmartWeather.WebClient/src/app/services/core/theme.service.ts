@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { UITheme } from '@constants/ui-theme';
+import { UITheme } from '@constants/ui/ui-theme';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({

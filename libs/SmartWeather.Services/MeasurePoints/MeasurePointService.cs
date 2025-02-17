@@ -58,14 +58,12 @@ public class MeasurePointService (IRepository<MeasurePoint> measurePointBaseRepo
     /// Modify MeasurePoint in database.
     /// </summary>
     /// <param name="id">Int representing MeasurePoint unique Id.</param>
-    /// <param name="localId">Int representing MeasurePoint embded id.</param>
     /// <param name="name">String representing MeasurePoint name.</param>
     /// <param name="color">String representing MeasurePoint color.</param>
     /// <param name="unit">Int representing MeasurePoint unit.</param>
     /// <param name="componentId">Int representing measure point component holder id.</param>
     /// <returns>Result containing updated MeasurePoint</returns>
     public Result<MeasurePoint> UpdateMeasurePoint (int id, 
-                                            int localId, 
                                             string name, 
                                             string color, 
                                             int unit, 
@@ -73,11 +71,21 @@ public class MeasurePointService (IRepository<MeasurePoint> measurePointBaseRepo
     {
         try
         {
-            MeasurePoint MeasurePointToUpdate = new(localId, name, color, unit, componentId)
+            var MeasurePointToUpdate = measurePointBaseRepository.GetById(id);
+            if (MeasurePointToUpdate.IsSuccess)
             {
-                Id = id
-            };
-            return measurePointBaseRepository.Update(MeasurePointToUpdate);
+                MeasurePointToUpdate.Value.Name = name;
+                MeasurePointToUpdate.Value.Color = color;
+                MeasurePointToUpdate.Value.Unit = (MeasureUnit)unit;
+
+                return measurePointBaseRepository.Update(MeasurePointToUpdate.Value);
+            }
+            else
+            {
+                return Result<MeasurePoint>.Failure(string.Format(
+                                            ExceptionsBaseMessages.ENTITY_FETCH,
+                                            nameof(MeasurePoint)));
+            }
         }
         catch (Exception ex) when(ex is InvalidMeasurePointLocalIdException ||
                                    ex is InvalidMeasurePointNameException ||

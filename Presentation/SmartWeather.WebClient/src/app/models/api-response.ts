@@ -1,4 +1,4 @@
-import { Status } from "@constants/api-status";
+import { Status } from "@constants/api/api-status";
 
 export class ApiResponse<T> {
     status: Status;

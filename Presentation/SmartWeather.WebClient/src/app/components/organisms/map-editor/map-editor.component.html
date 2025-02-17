@@ -1,0 +1,32 @@
+<section class="size-full flex">
+    <div [id]="currentMapId" class="relative  rounded-md z-10"
+        [ngClass]="{'size-full' : !isEditing, 'h-full w-3/4': isEditing}"></div>
+
+    <div *ngIf="isEditing" class="w-1/4 p-3">
+        <label for="username-field" class="block mb-2 text-sm font-medium text-[var(--sm-muted-text-color)]">
+            Latitude
+        </label>
+
+        <div class="relative">
+            <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                <img [src]="themeService.getIconPath('ping-icon')" alt="user-icon" class="h-5">
+            </div>
+            <input type="text" id="username-field" class="border text-sm rounded-lg ps-10 block w-full p-2.5 focus:ring-[var(--sm-primary)] focus:border-[var(--sm-primary)]
+                bg-[var(--sm-input-background)] border-[var(--sm-border-color)] text-[var(--sm-text-color)] 
+                placeholder-[var(--sm-placeholder-color)]" [placeholder]="latitude">
+        </div>
+        <label for="username-field" class="block mb-2 text-sm font-medium text-[var(--sm-muted-text-color)]">
+            Longitude
+        </label>
+
+        <div class="relative">
+            <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                <img [src]="themeService.getIconPath('ping-icon')" alt="user-icon" class="h-5">
+            </div>
+            <input type="text" id="username-field" class="border text-sm rounded-lg ps-10 block w-full p-2.5 focus:ring-[var(--sm-primary)] focus:border-[var(--sm-primary)]
+                bg-[var(--sm-input-background)] border-[var(--sm-border-color)] text-[var(--sm-text-color)] 
+                placeholder-[var(--sm-placeholder-color)]" [placeholder]="longitude">
+        </div>
+
+    </div>
+</section>

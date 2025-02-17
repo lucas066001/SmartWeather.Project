@@ -10,7 +10,7 @@ public interface IComponentRepository
     /// </summary>
     /// <param name="stationId">Int representing Station unique Id.</param>
     /// <returns>Result containing list of Component.</returns>
-    public Result<IEnumerable<Component>> GetFromStation(int stationId);
+    public Result<IEnumerable<Component>> GetFromStation(int stationId, bool includeComponents);
 
     /// <summary>
     /// Retreive Component based on it's unique Id.

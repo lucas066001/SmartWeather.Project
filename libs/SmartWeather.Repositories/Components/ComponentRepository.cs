@@ -35,9 +35,18 @@ public class ComponentRepository(SmartWeatherReadOnlyContext readOnlyContext) : 
                                                                         nameof(Component)));
     }
 
-    public Result<IEnumerable<Component>> GetFromStation(int stationId)
+    public Result<IEnumerable<Component>> GetFromStation(int stationId, bool includeComponents)
     {
-        var componentsRetreived = readOnlyContext.Components.Where(s => s.StationId == stationId).ToList();
+        var componentsRetreived = new List<Component>();
+
+        if (!includeComponents)
+        {
+            componentsRetreived = readOnlyContext.Components.Where(s => s.StationId == stationId).ToList();
+        }
+        else
+        {
+            componentsRetreived = readOnlyContext.Components.Include(c => c.MeasurePoints).Where(s => s.StationId == stationId).ToList();
+        }
 
         return componentsRetreived != null ?
                     Result<IEnumerable<Component>>.Success(componentsRetreived) :

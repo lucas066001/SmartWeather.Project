@@ -65,25 +65,34 @@ public class StationService(IRepository<Station> stationBaseRepository, IStation
     /// </summary>
     /// <param name="id">Int representing Station unique Id.</param>
     /// <param name="name">String representing Station name.</param>
-    /// <param name="macAddress">String representing Station mac address.</param>
     /// <param name="latitude">Float representing Station latitude coordinate.</param>
     /// <param name="longitude">Float representing Station longitude coordinate.</param>
     /// <param name="userId">Nullable Int representing Station owner idn could be null if no current owner.</param>
     /// <returns>Result containing modified Station from database.</returns>
     public Result<Station> UpdateStation (int id, 
                                             string name, 
-                                            string macAddress, 
                                             float latitude, 
                                             float longitude, 
                                             int? userId)
     {
         try
         {
-            Station stationToUpdate = new(name, macAddress, latitude, longitude, userId)
+            var stationToUpdate = stationBaseRepository.GetById(id);
+            if (stationToUpdate.IsSuccess)
             {
-                Id = id
-            };
-            return stationBaseRepository.Update(stationToUpdate);
+                stationToUpdate.Value.Name = name;
+                stationToUpdate.Value.Latitude = latitude;
+                stationToUpdate.Value.Longitude = longitude;
+                stationToUpdate.Value.UserId = userId;
+                return stationBaseRepository.Update(stationToUpdate.Value);
+
+            }
+            else
+            {
+                return Result<Station>.Failure(string.Format(
+                                        ExceptionsBaseMessages.ENTITY_FETCH,
+                                        nameof(Station)));
+            }
         }
         catch (Exception ex) when (ex is InvalidStationNameException ||
                                    ex is InvalidStationMacAddressException ||

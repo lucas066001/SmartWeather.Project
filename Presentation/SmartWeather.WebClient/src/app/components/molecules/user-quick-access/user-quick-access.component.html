@@ -3,8 +3,8 @@
         class="cursor-pointer flex items-center justify-center ml-auto p-1.5 rounded-full w-10 h-10 border-2 border-[var(--sm-border-color)] hover:opacity-80">
         <img [src]="themeService.getIconPath('user-icon')" class="size-full" alt="user icon">
     </button>
-    <div [ngClass]="{'opacity-100': isMenuExpanded}"
-        class="opacity-0 absolute right-1 mt-2 w-max w-maw max-w-40 flex flex-col justify-end py-1 mb-4 space-y-2 bg-[var(--sm-background-color)] border border-[var(--sm-border-color)] rounded-lg shadow-xs">
+    <div [ngClass]="{'opacity-100 flex': isMenuExpanded, 'hidden': !isMenuExpanded}"
+        class="opacity-0 absolute right-1 mt-2 w-max w-maw max-w-40 flex-col justify-end py-1 mb-4 space-y-2 bg-[var(--sm-background-color)] border border-[var(--sm-border-color)] rounded-lg shadow-xs">
         <ul class="text-sm text-[var(--sm-text-color)]">
             <li>
                 <span href="#"

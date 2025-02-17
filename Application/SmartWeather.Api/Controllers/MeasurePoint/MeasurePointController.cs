@@ -106,7 +106,6 @@ public class MeasurePointController : Controller
             string.IsNullOrWhiteSpace(request.Name) ||
             string.IsNullOrWhiteSpace(request.Color) ||
             !(request.ComponentId > 0) ||
-            !(request.LocalId > 0) || 
             !(request.Unit >= 0))
         {
             return BadRequest(ApiResponse<MeasurePointResponse>.Failure(BaseResponses.ARGUMENT_ERROR));
@@ -118,7 +117,7 @@ public class MeasurePointController : Controller
             return Unauthorized(response);
         }
 
-        var updatedMeasurePoint = _measurePointService.UpdateMeasurePoint(request.Id, request.LocalId, request.Name, request.Color, request.Unit, request.ComponentId);
+        var updatedMeasurePoint = _measurePointService.UpdateMeasurePoint(request.Id, request.Name, request.Color, request.Unit, request.ComponentId);
 
         if (updatedMeasurePoint.IsFailure)
         {

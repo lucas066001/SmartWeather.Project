@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserQuickAccessComponent } from '@components/molecules/user-quick-access/user-quick-access.component';
-import { AppPages } from '@constants/app-pages';
+import { AppPages } from '@constants/ui/app-pages';
 
 @Component({
   selector: 'app-dashboard-header',
