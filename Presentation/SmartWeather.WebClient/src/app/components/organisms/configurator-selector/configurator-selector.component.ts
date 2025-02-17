@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { StationClaimToolComponent } from '@components/molecules/station-claim-tool/station-claim-tool.component';
 import { StationListComponent } from '@components/molecules/station-list/station-list.component';
-import { Status } from '@constants/api-status';
+import { Status } from '@constants/api/api-status';
 import { StationResponse } from '@models/dtos/station-dtos';
 import { AuthService } from '@services/core/auth.service';
 import { StationService } from '@services/station/station.service';

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ConfiguratorSelectorComponent } from '@components/organisms/configurator-selector/configurator-selector.component';
 import { ConfiguratorStationComponent } from '@components/organisms/configurator-station/configurator-station.component';
-import { Status } from '@constants/api-status';
+import { Status } from '@constants/api/api-status';
 import { StationResponse } from '@models/dtos/station-dtos';
 import { AuthService } from '@services/core/auth.service';
 import { StationService } from '@services/station/station.service';

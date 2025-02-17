@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { SwitchComponent } from '@components/atoms/switch/switch.component';
-import { UITheme } from '@constants/ui-theme';
+import { UITheme } from '@constants/ui/ui-theme';
 import { ThemeService } from '@services/core/theme.service';
 
 @Component({

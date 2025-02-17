@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ApiResponse } from '@models/api-response';
-import { ComponentListResponse, ComponentResponse } from '@models/dtos/component-dtos';
+import { ComponentListResponse, ComponentResponse, ComponentUpdateRequest } from '@models/dtos/component-dtos';
 import { HttpApiService } from '@services/transport/http-api.service';
 import { Observable } from 'rxjs';
 
@@ -17,6 +17,13 @@ export class ComponentService {
    */
   getFromStation(stationId: number, includeComponents: boolean): Observable<ApiResponse<ComponentListResponse>> {
     return this.httpApiService.get<ComponentListResponse>(`${this.baseEndpoint}/GetFromStation?`, { 'stationId': stationId, 'includeComponents': includeComponents });
+  }
+
+  /**
+   * Update a component
+   */
+  update(updatedComponent: ComponentUpdateRequest): Observable<ApiResponse<ComponentResponse>> {
+    return this.httpApiService.put<ComponentResponse>(`${this.baseEndpoint}/Update`, updatedComponent);
   }
 
 }

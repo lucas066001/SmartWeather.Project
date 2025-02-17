@@ -7,7 +7,7 @@ import { AuthenticationService } from '@services/authentication/authentication.s
 import { UserSigninRequest, UserSigninResponse } from '@models/dtos/authentication-dtos';
 import { ApiResponse } from '@models/api-response';
 import { Router } from '@angular/router';
-import { Status } from '@constants/api-status';
+import { Status } from '@constants/api/api-status';
 import { AuthService } from '@services/core/auth.service';
 
 @Component({

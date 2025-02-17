@@ -5,7 +5,7 @@ import { StationResponse, StationUpdateRequest } from '@models/dtos/station-dtos
 import { ThemeService } from '@services/core/theme.service';
 import { ComponentEditorComponent } from '../component-editor/component-editor.component';
 import { ComponentService } from '@services/component/component.service';
-import { Status } from '@constants/api-status';
+import { Status } from '@constants/api/api-status';
 import { ComponentResponse } from '@models/dtos/component-dtos';
 import { MapEditorComponent } from '../map-editor/map-editor.component';
 import { StationService } from '@services/station/station.service';
@@ -56,6 +56,7 @@ export class ConfiguratorStationComponent {
 
       this.componentService.getFromStation(this._stationToEdit.id, true).subscribe({
         next: (response) => {
+          console.log(response)
           if (response.status == Status.OK && response.data?.componentList) {
             this.components = response.data.componentList;
           }

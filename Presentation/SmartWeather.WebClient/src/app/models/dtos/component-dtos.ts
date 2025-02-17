@@ -1,4 +1,4 @@
-import { ComponentType } from "@constants/component-type";
+import { ComponentType } from "@constants/entities/component-type";
 import { MeasurePointResponse } from "@models/dtos/measurepoint-dtos";
 
 export interface ComponentResponse {
@@ -13,4 +13,13 @@ export interface ComponentResponse {
 
 export interface ComponentListResponse {
     componentList: ComponentResponse[] | null;
+}
+
+export interface ComponentUpdateRequest {
+    id: number;
+    gpioPin: number;
+    name: string;
+    color: string;
+    type: number;
+    stationId: number;
 }

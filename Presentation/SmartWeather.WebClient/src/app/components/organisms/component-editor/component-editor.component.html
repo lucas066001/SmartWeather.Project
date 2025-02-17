@@ -1,20 +1,77 @@
-<section id="component-editor"
-    class="text-[var(--sm-text-color)] flex flex-col rounded-lg shadow-2xs border-1 p-2 border-[var(--sm-card-border-color)] bg-[var(--sm-detached-background-color)]"
-    *ngIf="!isEditing">
-    <h6
-        class="text-center mt-2 pb-2 mb-2 text-lg text-[var(--sm-tertiary-color)] border-b-2 font-medium border-b-[var(--sm-tertiary-color-light)]">
-        {{componentToEdit?.name}}</h6>
+<form id="component-editor" [formGroup]="componentEditForm"
+    class="text-[var(--sm-text-color)] flex flex-col rounded-lg shadow-2xs border-1 p-2 border-[var(--sm-card-border-color)] bg-[var(--sm-detached-background-color)]">
+
+    <h5 *ngIf="isErrorSaving">Unable to save your modifications</h5>
+
+    <div class="w-full flex justify-between items-center text-[var(--sm-tertiary-color)] p-2 text-2xl font-medium">
+
+
+        <h6 *ngIf="!isEditing"
+            class="text-center mt-2 pb-2 mb-2 text-lg text-[var(--sm-tertiary-color)] border-b-2 font-medium border-b-[var(--sm-tertiary-color-light)]">
+            {{componentToEdit?.name}} [{{ componentToEdit? pinoutLabels.get(componentToEdit.gpioPin) : 'err' }}]</h6>
+
+        <div *ngIf="isEditing" class="flex gap-3 w-full mr-4">
+            <div class="w-2/3">
+                <label for="station-name-field" class="block mb-2 text-sm text-start font-medium">
+                    Component name
+                </label>
+                <input type="text" id="component-name-field" class="border text-sm rounded-lg block w-full p-2.5"
+                    formControlName="componentName" (click)="resetError()">
+            </div>
+
+            <div class="w-1/3">
+                <label for="station-name-field" class="block mb-2 text-sm text-start font-medium">
+                    Socket number
+                </label>
+                <select formControlName="componentPin" class="h-auto border text-sm rounded-lg block  p-1"
+                    (click)="resetError()">
+                    <option *ngFor="let pin of pinKeys" [value]="pin"> {{ pinoutLabels.get(pin) }}</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="edit-buttons" class="flex gap-1">
+            <img *ngIf="!isEditing" class="h-5 cursor-pointer hover:opacity-80 mb-2 ml-2"
+                [src]="themeService.getIconPath('blue-edit-icon')" alt="edit-icon" (click)="setEditMode(true)">
+            <img *ngIf="isEditing" class="h-5 me-2 cursor-pointer hover:opacity-80"
+                [src]="themeService.getIconPath('blue-save-icon')" alt="save-icon" (click)="saveComponent()">
+            <img *ngIf="isEditing" class="h-5 cursor-pointer hover:opacity-80"
+                [src]="themeService.getIconPath('blue-cancel-icon')" alt="cancel-icon" (click)="setEditMode(false)">
+        </div>
+    </div>
+
     <div id="measure-point-editor">
         <h6 class="font-medium text-[var(--sm-text-muted-color)]">Measure points :</h6>
-        <div class="ps-3">
+        <div *ngIf="!isEditing" class="ps-3">
             <ng-container *ngFor="let measurePoint of componentToEdit?.measurePoints">
                 <div class="flex gap-2 items-center justify-between">
                     <span class="block size-[1em] rounded-sm"
                         [ngStyle]="{'background-color': measurePoint?.color}"></span>
                     <span>{{measurePoint?.name}}</span>
-                    <span>{{ measurePoint ? measureUnitLabels[measurePoint.unit] : 'N/A' }}</span>
+                    <span>{{ measurePoint ? measureUnitLabels.get(measurePoint.unit) : 'N/A' }}</span>
+                </div>
+            </ng-container>
+        </div>
+        <div *ngIf="isEditing" class="ps-3" formArrayName="measurePoints">
+            <div class="flex gap-2 items-center justify-between mb-1">
+                <h6 class="w-1/5">Color</h6>
+                <h6 class="w-3/5">Measure point name</h6>
+                <h6 class="w-1/5">Unit</h6>
+            </div>
+            <ng-container *ngFor="let measurePoint of measurePoints.controls; let i = index">
+                <div [formGroupName]="i" class="flex gap-2 items-center justify-between mb-1">
+                    <input type="hidden" formControlName="id" (click)="resetError()">
+                    <div class="w-1/5">
+                        <input type="color" formControlName="color" class="size-6 border-none rounded-lg"
+                            (click)="resetError()">
+                    </div>
+                    <input type="text" formControlName="name" class="w-3/5 border text-sm rounded-lg block  p-1">
+                    <select formControlName="unit" class="w-1/5 border text-sm rounded-lg block  p-1"
+                        (click)="resetError()">
+                        <option *ngFor="let unit of unitKeys" [value]="unit"> {{ measureUnitLabels.get(unit) }}</option>
+                    </select>
                 </div>
             </ng-container>
         </div>
     </div>
-</section>
+</form>

@@ -1,4 +1,4 @@
-import { StationType } from "@constants/station-type";
+import { StationType } from "@constants/entities/station-type";
 import { ComponentResponse } from "./component-dtos";
 
 export interface StationResponse {
