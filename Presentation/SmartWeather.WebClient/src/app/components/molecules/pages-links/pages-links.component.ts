@@ -21,6 +21,6 @@ export class PagesLinksComponent {
   }
 
   isLinkActive(url: string): boolean {
-    return this.router.url === url;
+    return this.router.url.includes(url);
   }
 }
