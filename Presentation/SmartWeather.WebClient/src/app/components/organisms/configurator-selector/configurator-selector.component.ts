@@ -1,10 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { StationClaimToolComponent } from '@components/molecules/station-claim-tool/station-claim-tool.component';
 import { StationListComponent } from '@components/molecules/station-list/station-list.component';
-import { Status } from '@constants/api/api-status';
 import { StationResponse } from '@models/dtos/station-dtos';
-import { AuthService } from '@services/core/auth.service';
-import { StationService } from '@services/station/station.service';
 
 @Component({
   selector: 'app-configurator-selector',
@@ -14,7 +11,7 @@ import { StationService } from '@services/station/station.service';
 })
 export class ConfiguratorSelectorComponent {
 
-  @Output() stationSelectedEvent: EventEmitter<StationResponse> = new EventEmitter<StationResponse>();
+  @Output() stationSelectedEvent: EventEmitter<number> = new EventEmitter<number>();
 
   @Input() stationsFromUser: StationResponse[] = [];
 
@@ -23,6 +20,6 @@ export class ConfiguratorSelectorComponent {
   }
 
   handleStationSelected(selectedStation: StationResponse) {
-    this.stationSelectedEvent.emit(selectedStation);
+    this.stationSelectedEvent.emit(selectedStation.id);
   }
 }

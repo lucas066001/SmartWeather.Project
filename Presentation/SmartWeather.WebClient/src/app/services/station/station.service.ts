@@ -48,12 +48,12 @@ export class StationService {
     return this.httpApiService.get<StationListResponse>(`${this.baseEndpoint}/GetFromUser?userId=${userId}`);
   }
 
-  // /**
-  //  * Get a station by its ID
-  //  */
-  // getById(idStation: number): Observable<ApiResponse<StationResponse>> {
-  //   return this.httpApiService.get<StationResponse>(`${this.baseEndpoint}/GetById?idStation=${idStation}`);
-  // }
+  /**
+   * Get a station by its ID
+   */
+  getById(idStation: number): Observable<ApiResponse<StationResponse>> {
+    return this.httpApiService.get<StationResponse>(`${this.baseEndpoint}/GetById?idStation=${idStation}`);
+  }
 
   // /**
   //  * Get all stations with optional parameters

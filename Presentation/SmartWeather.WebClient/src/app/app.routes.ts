@@ -9,6 +9,7 @@ export const routes: Routes = [
     { path: 'register', component: RegisterPageComponent },
     { path: 'dashboard', component: DashboardPageComponent },
     { path: 'config', component: ConfiguratorPageComponent },
+    { path: 'config/:id', component: ConfiguratorPageComponent },
     { path: 'watering', component: DashboardPageComponent },
     { path: '', redirectTo: 'login', pathMatch: 'full' },
 ];
