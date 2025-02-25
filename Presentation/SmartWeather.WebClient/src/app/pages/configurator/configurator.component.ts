@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfiguratorSelectorComponent } from '@components/organisms/configurator-selector/configurator-selector.component';
-import { ConfiguratorStationComponent } from '@components/organisms/configurator-station/configurator-station.component';
+import { ConfiguratorSelectorComponent } from '@components/organisms/stations/configurator-selector/configurator-selector.component';
+import { ConfiguratorStationComponent } from '@components/organisms/stations/configurator-station/configurator-station.component';
 import { Status } from '@constants/api/api-status';
 import { ApiResponse } from '@models/api-response';
 import { StationResponse } from '@models/dtos/station-dtos';

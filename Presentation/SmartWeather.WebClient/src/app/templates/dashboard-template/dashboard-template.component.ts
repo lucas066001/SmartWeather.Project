@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { DashboardHeaderComponent } from '@components/organisms/dashboard-header/dashboard-header.component';
-import { DashboardSidebarComponent } from '@components/organisms/dashboard-sidebar/dashboard-sidebar.component';
+import { DashboardHeaderComponent } from '@components/organisms/templates/dashboard-header/dashboard-header.component';
+import { DashboardSidebarComponent } from '@components/organisms/templates/dashboard-sidebar/dashboard-sidebar.component';
 import { AuthService } from '@services/core/auth.service';
 import { ThemeService } from '@services/core/theme.service';
 
