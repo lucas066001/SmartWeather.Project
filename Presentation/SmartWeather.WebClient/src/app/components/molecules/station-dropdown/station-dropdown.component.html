@@ -1,0 +1,26 @@
+<div class="relative w-full text-sm">
+    <button
+        class="w-full p-2.5 bg-[var(--sm-input-background)] text-[var(--sm-text-color)] border border-[var(--sm-border-color)] rounded-lg text-left flex justify-between items-center cursor-pointer hover:bg-[var(--sm-detached-background-color)]"
+        (click)="toggleDropdown()"
+        [ngClass]="{'text-[var(--sm-text-color)]' : selectedStations.length > 0, 'text-[var(--sm-text-muted-color)]' : selectedStations.length <= 0 }">
+        {{ selectedStations.length }} station(s) sélectionnée(s)
+        <span [class.rotate]="isOpen" class="ms-1 transition-transform duration-200">▼</span>
+    </button>
+
+    <div class="absolute top-full left-0 right-0 bg-[var(--sm-card-background)] border border-[var(--sm-border-color)] shadow-lg z-10 max-h-60 overflow-y-auto rounded-lg mt-1"
+        *ngIf="isOpen">
+        <div class="p-2 font-bold flex items-center gap-2 cursor-pointer hover:bg-[var(--sm-detached-background-color)] border-b border-[var(--sm-border-color)]"
+            (click)="toggleSelectAll()">
+            <input type="checkbox" [checked]="selectedStations.length === stations.length"
+                class="accent-[var(--sm-primary-color)]" />
+            Tout sélectionner
+        </div>
+
+        <div *ngFor="let station of stations"
+            class="p-2 flex items-center gap-2 cursor-pointer hover:bg-[var(--sm-detached-background-color)]"
+            (click)="toggleSelection(station)">
+            <input type="checkbox" [checked]="isSelected(station)" class="accent-[var(--sm-primary-color)]" />
+            {{ station.name }}
+        </div>
+    </div>
+</div>

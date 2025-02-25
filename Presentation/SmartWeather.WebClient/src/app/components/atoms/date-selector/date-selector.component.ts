@@ -1,13 +1,15 @@
+import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-date-selector',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './date-selector.component.html',
   styleUrl: './date-selector.component.css'
 })
 export class DateSelectorComponent {
   @Input() initialDate: string | null = null;
+  @Input() label: string = "";
   @Output() dateChange: EventEmitter<string | null> = new EventEmitter<string | null>();
 
   currentDate: string | null = null;

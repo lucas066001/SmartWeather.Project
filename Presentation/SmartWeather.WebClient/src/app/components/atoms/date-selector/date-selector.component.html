@@ -1,5 +1,8 @@
+<label class="text-xs text-[var(--sm-text-muted-color)]">{{label}}</label>
 <div class="border text-sm rounded-lg block w-full p-2.5 focus:ring-[var(--sm-primary)] focus:border-[var(--sm-primary)]
-bg-[var(--sm-input-background)] border-[var(--sm-border-color)] text-[var(--sm-text-color)] 
-placeholder-[var(--sm-placeholder-color)]">
+    bg-[var(--sm-input-background)] border-[var(--sm-border-color)] 
+    placeholder-[var(--sm-placeholder-color)]"
+    [ngClass]="{'text-[var(--sm-text-color)]' : currentDate, 'text-[var(--sm-text-muted-color)]' : !currentDate }">
+
     <input type="date" [value]="currentDate" (change)="onDateChange($event)" [disabled]="isDisabled" />
 </div>
