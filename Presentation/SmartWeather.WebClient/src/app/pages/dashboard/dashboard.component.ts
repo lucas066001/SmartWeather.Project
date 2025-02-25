@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { DateStationFilterBarComponent } from '@components/molecules/date-station-filter-bar/date-station-filter-bar.component';
 import { MappedStationsListComponent } from '@components/organisms/stations/mapped-stations-list/mapped-stations-list.component';
 import { Status } from '@constants/api/api-status';
 import { StationResponse } from '@models/dtos/station-dtos';
@@ -8,7 +9,7 @@ import { DashboardTemplateComponent } from '@templates/dashboard-template/dashbo
 
 @Component({
   selector: 'app-dashboard',
-  imports: [DashboardTemplateComponent, MappedStationsListComponent],
+  imports: [DashboardTemplateComponent, MappedStationsListComponent, DateStationFilterBarComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
