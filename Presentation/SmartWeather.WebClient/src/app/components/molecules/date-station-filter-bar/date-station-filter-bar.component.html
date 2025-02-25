@@ -1,7 +1,8 @@
 <div
     class="flex gap-4 p-2 bg-[var(--sm-detached-background-color)] rounded-md border-1 border-[var(--sm-card-border-color)]">
-    <app-date-selector [label]="'Start period'"></app-date-selector>
-    <app-date-selector [label]="'End period'"></app-date-selector>
-    <app-station-dropdown class="mt-auto" [stations]="stationsInFilter"></app-station-dropdown>
-    <app-button class="mt-auto">Apply</app-button>
+    <app-date-selector [label]="'Start period'" (dateChange)="handleStartDateChange($event)"></app-date-selector>
+    <app-date-selector [label]="'End period'" (dateChange)="handleEndDateChange($event)"></app-date-selector>
+    <app-station-dropdown class="mt-auto" [stations]="stationsInFilter"
+        (selectionChange)="handleStationListChange($event)"></app-station-dropdown>
+    <app-button class="mt-auto" (click)="handleApplyChanges()">Apply</app-button>
 </div>

@@ -1,4 +1,5 @@
 <app-dashboard-template>
-    <app-date-station-filter-bar [stationsInFilter]="stationsFromUser" class="w-[80%]"></app-date-station-filter-bar>
+    <app-date-station-filter-bar [stationsInFilter]="stationsFromUser" class="w-[80%]"
+        (filterApplyEvent)="handleFilterChange($event)"></app-date-station-filter-bar>
     <app-mapped-stations-list [stationsFromUser]="stationsFromUser" class="h-[90%] w-[20em]"></app-mapped-stations-list>
 </app-dashboard-template>
