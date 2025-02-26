@@ -1,4 +1,5 @@
 <div
     class="h-full w-full flex gap-4 p-2 bg-[var(--sm-detached-background-color)] rounded-md border-1 border-[var(--sm-card-border-color)]">
-    <div echarts [attr.id]="chartId" [options]="options" class="demo-chart h-full w-full"></div>
+    <div echarts (chartInit)="onChartInit($event)" [attr.id]="chartId" [options]="options"
+        class="demo-chart h-full w-full"></div>
 </div>

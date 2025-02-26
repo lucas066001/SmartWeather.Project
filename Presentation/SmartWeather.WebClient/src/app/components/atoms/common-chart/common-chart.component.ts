@@ -29,7 +29,10 @@ export class CommonChartComponent implements OnInit, OnChanges {
   @Input() chartType: string = "";
 
   options: EChartsCoreOption | null = null;
-  readonly MAX_POINTS = 100;
+  chartInstance: any;
+  displayedData: TimeSerie[] = [];
+
+  readonly MAX_POINTS = 200;
 
   constructor() {
 
@@ -42,35 +45,78 @@ export class CommonChartComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['seriesData']) {
       setTimeout(() => {
+        this.displayedData = structuredClone(this.seriesData);
         this.updateChart();
       }, 500);
     }
   }
 
-  private sampleData(data: [Date, number][], maxPoints: number): any[] {
-    console.log("Sampling data : ");
-    console.log(data.length);
+  onChartInit(chartInstance: any) {
+    this.chartInstance = chartInstance;
 
+    // for the moment let the zoom sampling appart
+    // chartInstance.on('dataZoom', (params: any) => {
+    //   const start = params.start;
+    //   const end = params.end;
+
+    //   console.log(`Zoom: ${start}% → ${end}%`);
+
+    //   console.log("********************")
+    //   console.log("vvvvvvvvvvvvvvvvvvvvv")
+    //   console.log(this.displayedData)
+
+    //   this.seriesData.forEach((serie, index) => {
+    //     const startIndex = Math.floor((start / 100) * serie.data.length);
+    //     const endIndex = Math.ceil((end / 100) * serie.data.length);
+
+    //     const filteredData: [Date, number][] = serie.data.slice(startIndex, endIndex);
+
+    //     // const filteredData: [Date, number][] = serie.data.filter((point) => {
+    //     //   const timestamp = new Date(point.x).getTime();
+    //     //   return timestamp >= start && timestamp <= end;
+    //     // }).map(p => [p.x, p.y]);
+    //     this.displayedData[index].data = filteredData;
+    //   });
+    //   console.log(this.displayedData)
+
+    //   console.log("^^^^^^^^^^^^^^^^^^^^")
+    //   console.log("********************")
+    //   this.updateChart();
+    //   chartInstance.setOption(this.options, true);
+    // });
+  }
+
+  private sampleData(data: [Date, number][], maxPoints: number): any[] {
     if (data.length <= maxPoints) return data;
 
     const step = Math.ceil(data.length / maxPoints);
-    console.log("Sampled data : ", data.filter((_, index) => index % step === 0));
-    return data.filter((_, index) => index % step === 0);
+    const sampledData: [Date, number][] = [];
+
+    for (let i = 0; i < data.length; i += step) {
+      const chunk = data.slice(i, i + step);
+      const avgX = new Date(
+        chunk.reduce((sum, point) => sum + point[0].getTime(), 0) / chunk.length
+      );
+      const avgY =
+        chunk.reduce((sum, point) => sum + point[1], 0) / chunk.length;
+
+      sampledData.push([avgX, avgY]);
+    }
+
+    return sampledData;
   }
 
-  private updateChart() {
-    console.log("Update !!!", this.seriesData);
-    console.log("Update !!!", this.seriesData.map(series => series.name));
 
+  private updateChart() {
     this.options = {
       legend: {
-        data: this.seriesData.map(series => series.name),
+        data: this.displayedData.map(series => series.name),
         align: 'left',
       },
       tooltip: {
-        trigger: 'axis', // Affiche les infos pour toutes les séries au survol
+        trigger: 'axis',
         axisPointer: {
-          type: 'cross' // Ligne de suivi pour mieux lire les valeurs
+          type: 'cross'
         }
       },
       xAxis: {
@@ -81,24 +127,25 @@ export class CommonChartComponent implements OnInit, OnChanges {
         }
       },
       yAxis: { type: 'value' },
-      series: this.seriesData.map(serie => ({
+      series: this.displayedData.map(serie => ({
         name: serie.name,
         type: this.chartType || 'line',
-        data: this.sampleData(serie.data.sort((a, b) => a.x.getTime() - b.x.getTime()).map(p => [p.x, p.y]), this.MAX_POINTS),
+        data: this.sampleData(serie.data.sort((a, b) => a[0].getTime() - b[0].getTime()), this.MAX_POINTS),
         smooth: true,
         sampling: 'average',
+        treshold: 10,
         itemStyle: {
           color: serie.color
         }
       })),
       dataZoom: [
         {
-          type: 'inside', // Zoom avec la molette ou le pinch sur mobile
+          type: 'inside',
           start: 0,
           end: 100,
         },
         {
-          type: 'slider', // Barre de zoom contrôlable
+          type: 'slider',
           show: true,
           start: 0,
           end: 100,
@@ -107,39 +154,6 @@ export class CommonChartComponent implements OnInit, OnChanges {
       animationEasing: 'elasticOut',
       animationDelayUpdate: idx => idx * 5,
     };
-
-    console.log(this.options);
-
+    this.chartInstance
   }
-
-  // private updateChart() {
-  //   console.log("Update !!!", this.seriesData)
-  //   this.options = {
-  //     legend: {
-  //       data: this.seriesData.map(series => (series.name)),
-  //       align: 'left',
-  //     },
-  //     tooltip: {},
-  //     xAxis: {
-  //       type: 'time',
-  //       boundaryGap: false,
-  //       axisLabel: {
-  //         formatter: (value: number) => new Date(value).toLocaleTimeString()
-  //       }
-  //     },
-  //     yAxis: { type: 'value' },
-  //     series: this.seriesData.map(series => ({
-  //       name: series.name,
-  //       type: this.chartType,
-  //       data: series.data.map(p => p.y),
-  //       smooth: true,
-  //     })),
-  //     animationEasing: 'elasticOut',
-  //     animationDelayUpdate: idx => idx * 5,
-  //   };
-  // }
-
-
-
 }
-

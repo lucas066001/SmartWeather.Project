@@ -25,12 +25,12 @@ export class DashboardPageComponent implements OnInit, AfterViewInit {
 
   stationsFromUser: StationResponse[] = [];
   temperatureSeries: TimeSerie[] = [
-    { name: 'Série 1', color: "#000000", data: [{ x: new Date(1), y: 10 }, { x: new Date(2), y: 20 }, { x: new Date(3), y: 15 }] },
-    { name: 'Série 2', color: "#000000", data: [{ x: new Date(1), y: 5 }, { x: new Date(2), y: 15 }, { x: new Date(3), y: 25 }] }
+    { name: 'Série 1', color: "#000000", data: [[new Date(1), 10], [new Date(2), 20], [new Date(3), 15]] },
+    { name: 'Série 2', color: "#000000", data: [[new Date(1), 5], [new Date(2), 15], [new Date(3), 25]] }
   ];
-  humiditySeries = [
-    { name: 'Série 1', color: "#000000", data: [{ x: new Date(1), y: 10 }, { x: new Date(2), y: 20 }, { x: new Date(3), y: 15 }] },
-    { name: 'Série 2', color: "#000000", data: [{ x: new Date(1), y: 5 }, { x: new Date(2), y: 15 }, { x: new Date(3), y: 25 }] }
+  humiditySeries: TimeSerie[] = [
+    { name: 'Série 1', color: "#000000", data: [[new Date(1), 10], [new Date(2), 20], [new Date(3), 15]] },
+    { name: 'Série 2', color: "#000000", data: [[new Date(1), 5], [new Date(2), 15], [new Date(3), 25]] }
   ];
 
 
@@ -72,13 +72,13 @@ export class DashboardPageComponent implements OnInit, AfterViewInit {
                           if (measurePoint.unit == MeasureUnit.Celsius) {
                             tmpTemperatureSeries.push({
                               name: measurePoint.name,
-                              data: response.data.measureDataList?.map(md => ({ x: new Date(md.dateTime), y: md.value })),
+                              data: response.data.measureDataList?.map(md => ([new Date(md.dateTime), md.value])),
                               color: measurePoint.color
                             })
                           } else {
                             tmpHumiditySeries.push({
                               name: measurePoint.name,
-                              data: response.data.measureDataList?.map(md => ({ x: new Date(md.dateTime), y: md.value })),
+                              data: response.data.measureDataList?.map(md => ([new Date(md.dateTime), md.value])),
                               color: measurePoint.color
                             })
                           }
