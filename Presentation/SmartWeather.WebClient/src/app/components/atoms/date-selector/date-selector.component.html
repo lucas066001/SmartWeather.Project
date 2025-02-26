@@ -4,5 +4,5 @@
     placeholder-[var(--sm-placeholder-color)]"
     [ngClass]="{'text-[var(--sm-text-color)]' : currentDate, 'text-[var(--sm-text-muted-color)]' : !currentDate }">
 
-    <input type="date" [value]="currentDate" (change)="onDateChange($event)" [disabled]="isDisabled" />
+    <input type="datetime-local" [value]="currentDate" (change)="onDateChange($event)" [disabled]="isDisabled" />
 </div>

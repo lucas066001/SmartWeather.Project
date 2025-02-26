@@ -11,6 +11,7 @@ import { TooltipComponent } from 'echarts/components';
 import { LegendComponent } from 'echarts/components';
 import { DataZoomComponent } from 'echarts/components';
 import { TimeSerie } from '@models/ui/charting';
+import { ThemeService } from '@services/core/theme.service';
 echarts.use([DataZoomComponent, BarChart, GridComponent, CanvasRenderer, LineChart, TooltipComponent, LegendComponent]);
 
 @Component({
@@ -34,7 +35,7 @@ export class CommonChartComponent implements OnInit, OnChanges {
 
   readonly MAX_POINTS = 200;
 
-  constructor() {
+  constructor(public themeService: ThemeService) {
 
   }
 

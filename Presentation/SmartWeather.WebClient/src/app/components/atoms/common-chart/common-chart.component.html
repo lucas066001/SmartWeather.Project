@@ -1,5 +1,14 @@
 <div
     class="h-full w-full flex gap-4 p-2 bg-[var(--sm-detached-background-color)] rounded-md border-1 border-[var(--sm-card-border-color)]">
-    <div echarts (chartInit)="onChartInit($event)" [attr.id]="chartId" [options]="options"
+
+    <div *ngIf="seriesData.length > 0" echarts (chartInit)="onChartInit($event)" [attr.id]="chartId" [options]="options"
         class="demo-chart h-full w-full"></div>
+
+    <div *ngIf="seriesData.length <= 0"
+        class="flex border-dashed border-2 border-[var(--sm-text-muted-color)] rounded-lg items-center justify-center  w-full h-full">
+        <span class="text-[var(--sm-text-muted-color)] me-2">
+            Set filters to see charts
+        </span>
+        <img [src]="themeService.getIconPath('click-icon')" alt="click icon" class="h-5">
+    </div>
 </div>

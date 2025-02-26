@@ -24,14 +24,8 @@ import { connect, getInstanceByDom } from 'echarts/core';
 export class DashboardPageComponent implements OnInit, AfterViewInit {
 
   stationsFromUser: StationResponse[] = [];
-  temperatureSeries: TimeSerie[] = [
-    { name: 'Série 1', color: "#000000", data: [[new Date(1), 10], [new Date(2), 20], [new Date(3), 15]] },
-    { name: 'Série 2', color: "#000000", data: [[new Date(1), 5], [new Date(2), 15], [new Date(3), 25]] }
-  ];
-  humiditySeries: TimeSerie[] = [
-    { name: 'Série 1', color: "#000000", data: [[new Date(1), 10], [new Date(2), 20], [new Date(3), 15]] },
-    { name: 'Série 2', color: "#000000", data: [[new Date(1), 5], [new Date(2), 15], [new Date(3), 25]] }
-  ];
+  temperatureSeries: TimeSerie[] = [];
+  humiditySeries: TimeSerie[] = [];
 
 
   constructor(private authService: AuthService, private stationService: StationService, private componentService: ComponentService, private measureDataService: MeasureDataService) { }
