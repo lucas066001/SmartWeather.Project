@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { consumerMarkDirty } from '@angular/core/primitives/signals';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { CommonChartComponent } from '@components/atoms/common-chart/common-chart.component';
 import { DateStationFilterBarComponent } from '@components/molecules/date-station-filter-bar/date-station-filter-bar.component';
 import { MappedStationsListComponent } from '@components/organisms/stations/mapped-stations-list/mapped-stations-list.component';
 import { Status } from '@constants/api/api-status';
@@ -7,22 +7,34 @@ import { MeasureUnit } from '@constants/entities/measure-unit';
 import { ApiResponse } from '@models/api-response';
 import { ComponentListResponse } from '@models/dtos/component-dtos';
 import { StationResponse } from '@models/dtos/station-dtos';
+import { TimeSerie } from '@models/ui/charting';
 import { ComponentService } from '@services/component/component.service';
 import { AuthService } from '@services/core/auth.service';
+import { MeasureDataService } from '@services/measure-data/measure-data.service';
 import { StationService } from '@services/station/station.service';
 import { DashboardTemplateComponent } from '@templates/dashboard-template/dashboard-template.component';
+import { connect, getInstanceByDom } from 'echarts/core';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [DashboardTemplateComponent, MappedStationsListComponent, DateStationFilterBarComponent],
+  imports: [DashboardTemplateComponent, MappedStationsListComponent, DateStationFilterBarComponent, CommonChartComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardPageComponent implements OnInit {
+export class DashboardPageComponent implements OnInit, AfterViewInit {
 
   stationsFromUser: StationResponse[] = [];
+  temperatureSeries: TimeSerie[] = [
+    { name: 'Série 1', color: "#000000", data: [{ x: new Date(1), y: 10 }, { x: new Date(2), y: 20 }, { x: new Date(3), y: 15 }] },
+    { name: 'Série 2', color: "#000000", data: [{ x: new Date(1), y: 5 }, { x: new Date(2), y: 15 }, { x: new Date(3), y: 25 }] }
+  ];
+  humiditySeries = [
+    { name: 'Série 1', color: "#000000", data: [{ x: new Date(1), y: 10 }, { x: new Date(2), y: 20 }, { x: new Date(3), y: 15 }] },
+    { name: 'Série 2', color: "#000000", data: [{ x: new Date(1), y: 5 }, { x: new Date(2), y: 15 }, { x: new Date(3), y: 25 }] }
+  ];
 
-  constructor(private authService: AuthService, private stationService: StationService, private componentService: ComponentService) { }
+
+  constructor(private authService: AuthService, private stationService: StationService, private componentService: ComponentService, private measureDataService: MeasureDataService) { }
 
   ngOnInit(): void {
     let retreivedUserId = this.authService.getUserId();
@@ -47,23 +59,45 @@ export class DashboardPageComponent implements OnInit {
       this.componentService.getFromStation(station.id, true).subscribe(({
         next: (response) => {
           if (response.status == Status.OK && response.data) {
+            let tmpTemperatureSeries: TimeSerie[] = [];
+            let tmpHumiditySeries: TimeSerie[] = [];
             response.data.componentList?.forEach(component => {
               component.measurePoints?.forEach(measurePoint => {
                 switch (measurePoint.unit) {
                   case MeasureUnit.Celsius:
-                    console.log(station.name + "contains temp measure point")
-                    //Retreive data from it and include it in visualization
-                    break;
                   case MeasureUnit.Percentage:
-                    console.log(station.name + "contains humidity measure point")
-                    //Retreive data from it and include it in visualization
+                    this.measureDataService.getFromMeasurePoint(measurePoint.id, filters.start, filters.end).subscribe(({
+                      next: (response) => {
+                        if (response.status == Status.OK && response.data) {
+                          if (measurePoint.unit == MeasureUnit.Celsius) {
+                            tmpTemperatureSeries.push({
+                              name: measurePoint.name,
+                              data: response.data.measureDataList?.map(md => ({ x: new Date(md.dateTime), y: md.value })),
+                              color: measurePoint.color
+                            })
+                          } else {
+                            tmpHumiditySeries.push({
+                              name: measurePoint.name,
+                              data: response.data.measureDataList?.map(md => ({ x: new Date(md.dateTime), y: md.value })),
+                              color: measurePoint.color
+                            })
+                          }
+                        }
+                      },
+                      error: (error: ApiResponse<ComponentListResponse>) => {
 
+                      }
+                    })
+                    );
                     break;
                   default:
                     break;
                 }
-              })
-            })
+              });
+            });
+            console.log(tmpHumiditySeries);
+            this.temperatureSeries = tmpTemperatureSeries;
+            this.humiditySeries = tmpHumiditySeries;
           }
         },
         error: (error: ApiResponse<ComponentListResponse>) => {
@@ -73,4 +107,20 @@ export class DashboardPageComponent implements OnInit {
     });
   }
 
+  ngAfterViewInit() {
+    setTimeout(() => {
+      const chartElement1 = document.getElementById('temperature-chart');
+      const chartElement2 = document.getElementById('humidity-chart');
+      if (chartElement1 &&
+        chartElement2) {
+        const chart1 = getInstanceByDom(chartElement1);
+        const chart2 = getInstanceByDom(chartElement2);
+        if (chart1 &&
+          chart2) {
+          console.log("should be connected")
+          connect([chart1, chart2]);
+        }
+      }
+    });
+  }
 }
