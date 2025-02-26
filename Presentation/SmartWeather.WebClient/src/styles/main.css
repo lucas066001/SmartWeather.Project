@@ -15,3 +15,7 @@ body {
 .sm-menu-icon path {
     fill: var(--sm-text-muted-color);
 }
+
+* {
+    scrollbar-width: thin;
+}

@@ -1,0 +1,8 @@
+<div
+    class="text-[var(--sm-text-color)] flex gap-3 flex-col h-full w-full rounded-lg shadow-2xs border-1 p-2 border-[var(--sm-card-border-color)] bg-[var(--sm-detached-background-color)]">
+    <app-map-points class="flex items-center justify-center w-full" style="height: 20em;"
+        [pointsCoordinates]="stationsCoordinates" [focusCoordinates]="currentSelectedCoordinates"></app-map-points>
+    <app-station-list (stationEditEvent)="handleStationEdited($event)"
+        (stationSelectEvent)="handleStationSelected($event)" [stations]="stationsFromUser"
+        class="max-h-[45vh] overflow-y-auto"></app-station-list>
+</div>

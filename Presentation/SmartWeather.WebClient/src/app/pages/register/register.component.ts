@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RegisterFormComponent } from '@components/organisms/register-form/register-form.component';
+import { RegisterFormComponent } from '@components/organisms/auth/register-form/register-form.component';
 import { AuthenticationTemplateComponent } from '@templates/authentication-template/authentication-template.component';
 
 @Component({

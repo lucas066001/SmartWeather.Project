@@ -1,3 +1,12 @@
 <app-dashboard-template>
-
+    <section id="charting-area" class="w-3/4 h-[calc(100vh-7em)] flex flex-col gap-2">
+        <app-date-station-filter-bar [stationsInFilter]="stationsFromUser" class="w-full"
+            (filterApplyEvent)="handleFilterChange($event)"></app-date-station-filter-bar>
+        <app-common-chart class="h-full" [seriesData]="temperatureSeries" [chartType]="'line'"
+            [chartId]="'temperature-chart'"></app-common-chart>
+        <app-common-chart class="h-full" [seriesData]="humiditySeries" [chartType]="'bar'"
+            [chartId]="'humidity-chart'"></app-common-chart>
+    </section>
+    <app-mapped-stations-list [stationsFromUser]="stationsFromUser"
+        class="h-[calc(100vh-7em)] w-1/4"></app-mapped-stations-list>
 </app-dashboard-template>

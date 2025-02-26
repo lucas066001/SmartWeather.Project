@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { StationResponse, StationUpdateRequest } from '@models/dtos/station-dtos';
 import { ThemeService } from '@services/core/theme.service';
-import { ComponentEditorComponent } from '../component-editor/component-editor.component';
+import { ComponentEditorComponent } from '../../components/component-editor/component-editor.component';
 import { ComponentService } from '@services/component/component.service';
 import { Status } from '@constants/api/api-status';
 import { ComponentResponse } from '@models/dtos/component-dtos';

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, AfterViewInit, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import { CommonPointRadius } from '@constants/ui/map';
 import { ThemeService } from '@services/core/theme.service';
 import * as L from 'leaflet';
 
@@ -21,7 +22,7 @@ export class MapEditorComponent implements AfterViewInit, OnChanges {
   private map: L.Map | undefined;
   private marker: L.Circle | undefined;
   private circle: L.Circle | undefined;
-  private radius: number = 1000; // Rayon par défaut en mètres
+  private radius: number = CommonPointRadius;
 
   constructor(public themeService: ThemeService) { }
 

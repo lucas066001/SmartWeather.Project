@@ -27,11 +27,11 @@
               }
             ],
             "styles": [
-              "src/styles/main.css",
               "src/styles/dark-theme/fonts.css",
               "src/styles/dark-theme/colors.css",
               "src/styles/light-theme/fonts.css",
               "src/styles/light-theme/colors.css",
+              "src/styles/main.css",
               "node_modules/leaflet/dist/leaflet.css"
             ],
             "scripts": []
