@@ -4,6 +4,7 @@ using SmartWeather.Entities.Common;
 using SmartWeather.Entities.Common.Exceptions;
 using SmartWeather.Entities.Component;
 using SmartWeather.Entities.Component.Exceptions;
+using SmartWeather.Entities.MeasurePoint;
 using SmartWeather.Services.Repositories;
 
 public class ComponentService (IRepository<Component> componentBaseRepository, IComponentRepository componentRepository)
@@ -66,24 +67,22 @@ public class ComponentService (IRepository<Component> componentBaseRepository, I
     /// <returns>Result containing modified component in database.</returns>
     public Result<Component> UpdateComponent(int id, string name, string color, int type, int stationId, int gpioPin)
     {
-        try
+        var ComponentToUpdate = componentBaseRepository.GetById(id);
+        if (ComponentToUpdate.IsSuccess)
         {
-            Component componentToUpdate = new(name, color, type, stationId, gpioPin)
-            {
-                Id = id
-            };
-            return componentBaseRepository.Update(componentToUpdate);
+            ComponentToUpdate.Value.Name = name;
+            ComponentToUpdate.Value.Color = color;
+            ComponentToUpdate.Value.Type = (ComponentType)type;
+            ComponentToUpdate.Value.StationId = stationId;
+            ComponentToUpdate.Value.GpioPin = gpioPin;
+
+            return componentBaseRepository.Update(ComponentToUpdate.Value);
         }
-        catch(Exception ex) when (ex is InvalidComponentGpioPinException ||
-                                  ex is InvalidComponentNameException ||
-                                  ex is InvalidComponentColorException ||
-                                  ex is InvalidComponentTypeException ||
-                                  ex is InvalidComponentStationIdException)
+        else
         {
             return Result<Component>.Failure(string.Format(
-                                        ExceptionsBaseMessages.ENTITY_FORMAT,
-                                        nameof(Component),
-                                        ex.Message));
+                                        ExceptionsBaseMessages.ENTITY_FETCH,
+                                        nameof(Component)));
         }
     }
 
