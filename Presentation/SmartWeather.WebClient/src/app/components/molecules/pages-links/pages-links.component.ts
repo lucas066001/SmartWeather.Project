@@ -3,11 +3,12 @@ import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { HomeIconComponent } from '@components/atoms/menu-icons/home-icon/home-icon.component';
 import { ToolsIconComponent } from '@components/atoms/menu-icons/tools-icon/tools-icon.component';
+import { WaterCanIconComponent } from '@components/atoms/menu-icons/water-can-icon/water-can-icon.component';
 import { ThemeService } from '@services/core/theme.service';
 
 @Component({
   selector: 'app-pages-links',
-  imports: [CommonModule, HomeIconComponent, ToolsIconComponent],
+  imports: [CommonModule, HomeIconComponent, ToolsIconComponent, WaterCanIconComponent],
   templateUrl: './pages-links.component.html',
   styleUrl: './pages-links.component.css'
 })

@@ -1,0 +1,68 @@
+<form [formGroup]="stationForm" *ngIf="stationToEdit" id="configurator-station"
+    class="text-[var(--sm-text-color)] flex flex-col rounded-lg shadow-2xs h-full border-1 p-2 border-[var(--sm-card-border-color)] bg-[var(--sm-detached-background-color)]">
+
+    <section id="configurator-status" class="mb-4">
+        <div class="w-full flex justify-center items-center text-[var(--sm-tertiary-color)] p-2 text-2xl font-medium">
+            <h5>
+                {{ stationToEdit.name }}
+            </h5>
+        </div>
+
+        <div id="configurator-map" class="flex items-center justify-between gap-5 p-5 w-full" style="height: 20em;">
+            <app-map-points class="flex items-center justify-center w-full" style="height: 20em;"
+                [pointsCoordinates]="stationsCoordinates"
+                [focusCoordinates]="currentSelectedCoordinates"></app-map-points>
+
+            <div class="h-1/4 flex items-center justify-center">
+                <img [src]="themeService.getIconPath('weather-station')" alt="weather station" class="h-35">
+            </div>
+        </div>
+    </section>
+
+    <hr class="border-2 border-[var(--sm-tertiary-light-color)] border-dashed mb-3 mx-auto w-1/2" />
+
+    <div id="configurator-watering-pumps" class="h-full w-full flex flex-col gap-3 justify-center items-center">
+        <div class="w-full flex justify-center items-center text-[var(--sm-tertiary-color)] p-2 text-2xl font-medium">
+            <h5>
+                Water pumps
+            </h5>
+        </div>
+        <div id="configurator-components" class="flex justify-center flex-wrap items-center gap-5 m-2 ">
+            <div class="border-2 border-dashed border-[var(--sm-card-border-color)] flex w-full gap-5 p-5 rounded-sm"
+                *ngFor="let component of components">
+                <h6>{{component.name}}</h6>
+                <div class="flex flex-col">
+                    <label class="text-[var(--sm-text-muted)]">Watering timing (ms)</label>
+                    <input class="border-1 border-[var(--sm-card-border-color)] rounded-sm" type="number"
+                        [attr.id]="'pinvalue-'+component.gpioPin">
+                </div>
+                <app-button [theme]="'blue'" (click)="handleWaterRequest(component.gpioPin)">Water now</app-button>
+            </div>
+        </div>
+    </div>
+
+    <hr class="border-2 border-[var(--sm-tertiary-light-color)] mt-3 border-dashed mb-3 mx-auto w-1/2" />
+
+    <div id="configurator-watering-pumps" class="h-full w-full flex flex-col gap-3 justify-center items-center">
+        <div class="w-full flex justify-center items-center text-[var(--sm-tertiary-color)] p-2 text-2xl font-medium">
+            <h5>
+                Watering plans
+            </h5>
+        </div>
+        <div id="configurator-components" class="flex justify-center flex-wrap items-center gap-3 m-2 ">
+            <h6 class="text-[var(--sm-text-muted-color)]">Coming soon...</h6>
+        </div>
+    </div>
+</form>
+
+
+<section *ngIf="!stationToEdit" id="configurato-selector"
+    class="text-[var(--sm-text-color)] flex flex-col h-full rounded-lg shadow-2xs border-1 p-5 border-[var(--sm-card-border-color)] bg-[var(--sm-detached-background-color)]">
+    <div
+        class="flex border-dashed border-2 border-[var(--sm-text-muted-color)] rounded-lg items-center justify-center h-full">
+        <span class="text-[var(--sm-text-muted-color)] me-2">
+            Select a station to edit it
+        </span>
+        <img [src]="themeService.getIconPath('click-icon')" alt="click icon" class="h-5">
+    </div>
+</section>

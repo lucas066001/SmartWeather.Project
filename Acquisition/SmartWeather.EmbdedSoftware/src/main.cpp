@@ -65,19 +65,19 @@ void loop()
     // Acquisition process can now be launched
     BrokerService brokerService(brokerSingleton, commonService, boardStateService, connectionService);
 
-    DhtRepository dhtRepository(&brokerService);
-    AnalogRepository uvRepository(UV_PIN, &brokerService);
     AnalogRepository moistureRepository(MOISTURE_PIN, &brokerService);
-    DigitalActuatorRepository pumpRepository(PUMP_PIN, &brokerService);
+    // DhtRepository dhtRepository(&brokerService);
+    // AnalogRepository uvRepository(UV_PIN, &brokerService);
+    // DigitalActuatorRepository pumpRepository(PUMP_PIN, &brokerService);
 
-    brokerService.RegisterAcquisitionRepo(&dhtRepository);
-    brokerService.RegisterAcquisitionRepo(&uvRepository);
     brokerService.RegisterAcquisitionRepo(&moistureRepository);
-    brokerService.RegisterActuatorRepo(&pumpRepository);
+    // brokerService.RegisterAcquisitionRepo(&dhtRepository);
+    // brokerService.RegisterAcquisitionRepo(&uvRepository);
+    // brokerService.RegisterActuatorRepo(&pumpRepository);
 
     ActuatorCommandRequestHandler actuatorRequestHandler(brokerSingleton);
 
-    actuatorRequestHandler.RegisterActuatorRepository(&pumpRepository);
+    // actuatorRequestHandler.RegisterActuatorRepository(&pumpRepository);
     brokerSingleton->Handlers.push_back(&actuatorRequestHandler);
 
     // Initialize Broker service to start publish / subscribe events
