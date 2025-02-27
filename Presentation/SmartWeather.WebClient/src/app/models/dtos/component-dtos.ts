@@ -23,3 +23,9 @@ export interface ComponentUpdateRequest {
     type: number;
     stationId: number;
 }
+
+export interface ActuatorCommandRequest {
+    stationId: number;
+    componentGpioPin: number;
+    componentValueUpdate: number;
+}

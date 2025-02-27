@@ -1,0 +1,5 @@
+<app-dashboard-template class="min-h-[90%]">
+    <app-configurator-selector class="w-[25%] h-full" (stationSelectedEvent)="handleStationSectedEvent($event)"
+        [stationsFromUser]="stationsFromUser" [isClaimingToolVisible]="false"></app-configurator-selector>
+    <app-configurator-watering class="w-[75%]" [stationToEdit]="currentSelectedStation"></app-configurator-watering>
+</app-dashboard-template>

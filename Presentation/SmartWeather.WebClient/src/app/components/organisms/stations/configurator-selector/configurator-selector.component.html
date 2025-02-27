@@ -3,8 +3,10 @@
     <h3
         class="w-full text-center mt-2 pb-2 mb-2 text-xl text-[var(--sm-tertiary-color)] border-b-2 font-medium border-b-[var(--sm-tertiary-color-light)]">
         Stations</h3>
-    <app-station-claim-tool (newStationClaimedEvent)="handleNewStationClaimed($event)"></app-station-claim-tool>
-    <hr class="mb-3 mt-3 border-1 border-dashed border-[var(--sm-tertiary-color)] opacity-50" />
+    <app-station-claim-tool *ngIf="isClaimingToolVisible"
+        (newStationClaimedEvent)="handleNewStationClaimed($event)"></app-station-claim-tool>
+    <hr *ngIf="isClaimingToolVisible"
+        class="mb-3 mt-3 border-1 border-dashed border-[var(--sm-tertiary-color)] opacity-50" />
     <app-station-list [stations]="stationsFromUser" (stationSelectEvent)="handleStationSelected($event)"
         class="overflow-auto "></app-station-list>
 </section>

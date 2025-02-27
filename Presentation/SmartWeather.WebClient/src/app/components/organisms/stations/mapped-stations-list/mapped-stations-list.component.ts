@@ -45,11 +45,6 @@ export class MappedStationsListComponent {
   }
 
   generateCoorList() {
-    console.log(Array.isArray(this.stationsFromUser));
-
-    console.log(this.stationsFromUser);
-    console.log(this.stationsFromUser.length);
     this.stationsCoordinates = this._stationsFromUser.map(station => [station.latitude, station.longitude]);
-    console.log('generated coord list :', this.stationsCoordinates);
   }
 }

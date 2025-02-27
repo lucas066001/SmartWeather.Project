@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input } from '@angular/core';
+import { AfterViewInit, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonMapCenterPoint, CommonPointRadius } from '@constants/ui/map';
 import { LatLngExpression } from "leaflet";
 import L from 'leaflet';
@@ -9,9 +9,17 @@ import L from 'leaflet';
   templateUrl: './map-points.component.html',
   styleUrl: './map-points.component.css'
 })
-export class MapPointsComponent implements AfterViewInit {
+export class MapPointsComponent implements AfterViewInit, OnChanges {
 
-  @Input() _focusCoordinates: LatLngExpression | null = null;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes["pointsCoordinates"]) {
+      setTimeout(() => {
+        this.initMap();
+      });
+    }
+  }
+
 
   @Input()
   set focusCoordinates(value: LatLngExpression | null) {
@@ -28,6 +36,7 @@ export class MapPointsComponent implements AfterViewInit {
   @Input() pointsCoordinates: LatLngExpression[] = [];
 
   currentMapId: string = 'map-' + Math.random().toString(36).substring(7);
+  _focusCoordinates: LatLngExpression | null = null;
 
   private map: L.Map | undefined;
   private radius: number = CommonPointRadius;

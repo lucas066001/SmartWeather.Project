@@ -21,5 +21,16 @@
                     [ngClass]="{ 'font-bold text-[var(--sm-primary-color)]': isLinkActive('/config')}">Configurator</span>
             </button>
         </li>
+        <li>
+            <button type="button" (click)="redirectTo('watering')"
+                class="cursor-pointer relative inline-flex items-center p-3 text-sm font-medium text-center text-[var(--sm-text-muted-color)] hover:opacity-75">
+                <span class="p-3 me-2 rounded-lg"
+                    [ngClass]="{ 'bg-[var(--sm-button-color)]': isLinkActive('/watering')}">
+                    <app-water-can-icon [isSelected]="isLinkActive('/watering')"></app-water-can-icon>
+                </span>
+                <span *ngIf="isExpanded"
+                    [ngClass]="{ 'font-bold text-[var(--sm-primary-color)]': isLinkActive('/watering')}">Watering</span>
+            </button>
+        </li>
     </ul>
 </nav>
