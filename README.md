@@ -27,7 +27,13 @@ Key Features:
 - **Flexible Storage Solutions**: MySQL clusters for structured data and Elasticsearch for document-oriented data.
 - **Interactive Visualization**: Kibana, Kafka-ui and a web client for monitoring and administration.
 
-<img align="center" src="/images/architecture_diagram.png" alt="Top view" />
+<img align="center" src="/images/architecture_diagram.png" alt="Simplified architecture diagram" />
+
+### Note on persistence layer
+
+SmartWeather is built to be versatile and if you want to deploy a more robust and resilient version you can use the clustered version. This will automatically set up a master/cluster for the sql db and also for elastic search.
+
+<img align="center" src="/images/persistence_layer.png" alt="Note on persistence layer" />
 
 ---
 
