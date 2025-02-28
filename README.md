@@ -27,6 +27,8 @@ Key Features:
 - **Flexible Storage Solutions**: MySQL clusters for structured data and Elasticsearch for document-oriented data.
 - **Interactive Visualization**: Kibana, Kafka-ui and a web client for monitoring and administration.
 
+<img align="center" src="/images/architecture_diagram.png" alt="Top view" />
+
 ---
 
 ## Architecture 🏗️
