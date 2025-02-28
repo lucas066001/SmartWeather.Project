@@ -76,6 +76,7 @@ docker compose -f ./app.yml up -d
 | `/Persistence`           | Databases: MySQL clusters and Elasticsearch for data storage.                                        |
 | `/Presentation`          | Visualization tools (Kibana, Kafka UI) and a web client built with React/Next.js.                    |
 | `/libs`                  | Shared C# libraries for entities, repositories, and services.                                        |
+| `/3dModels`              | stl files that contains all 3d printable assets to build the station                                          |
 
 ---
 
@@ -115,6 +116,7 @@ Explore each subdirectory for more detailed documentation:
 - [Application](./Application/README.md)
 - [Persistence](./Persistence/README.md)
 - [Presentation](./Presentation/README.md)
+- [3D Models](./3dModels/README.md)
 - [Libraries](./libs/README.md)
 
 Happy coding! 😊
