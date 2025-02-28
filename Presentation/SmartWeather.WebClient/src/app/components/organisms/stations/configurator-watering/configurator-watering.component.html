@@ -35,6 +35,12 @@
                     <label class="text-[var(--sm-text-muted)]">Watering timing (ms)</label>
                     <input class="border-1 border-[var(--sm-card-border-color)] rounded-sm" type="number"
                         [attr.id]="'pinvalue-'+component.gpioPin">
+                    <p [attr.id]="'successmessage-'+component.gpioPin" class="hidden text-[var(--sm-success-color)]">
+                        Watering succeed !</p>
+                    <p [attr.id]="'errormessage-'+component.gpioPin" class="hidden text-[var(--sm-error-color)]">
+                        Watering failed...</p>
+                    <p [attr.id]="'waitingmessage-'+component.gpioPin" class="hidden text-[var(--sm-text-muted-color)]">
+                        Wating for response...</p>
                 </div>
                 <app-button [theme]="'blue'" (click)="handleWaterRequest(component.gpioPin)">Water now</app-button>
             </div>

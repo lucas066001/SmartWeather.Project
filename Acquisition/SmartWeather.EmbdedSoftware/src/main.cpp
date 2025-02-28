@@ -66,18 +66,18 @@ void loop()
     BrokerService brokerService(brokerSingleton, commonService, boardStateService, connectionService);
 
     AnalogRepository moistureRepository(MOISTURE_PIN, &brokerService);
-    // DhtRepository dhtRepository(&brokerService);
+    DhtRepository dhtRepository(&brokerService);
     // AnalogRepository uvRepository(UV_PIN, &brokerService);
-    // DigitalActuatorRepository pumpRepository(PUMP_PIN, &brokerService);
+    DigitalActuatorRepository pumpRepository(PUMP_PIN, &brokerService);
 
     brokerService.RegisterAcquisitionRepo(&moistureRepository);
-    // brokerService.RegisterAcquisitionRepo(&dhtRepository);
+    brokerService.RegisterAcquisitionRepo(&dhtRepository);
     // brokerService.RegisterAcquisitionRepo(&uvRepository);
-    // brokerService.RegisterActuatorRepo(&pumpRepository);
+    brokerService.RegisterActuatorRepo(&pumpRepository);
 
     ActuatorCommandRequestHandler actuatorRequestHandler(brokerSingleton);
 
-    // actuatorRequestHandler.RegisterActuatorRepository(&pumpRepository);
+    actuatorRequestHandler.RegisterActuatorRepository(&pumpRepository);
     brokerSingleton->Handlers.push_back(&actuatorRequestHandler);
 
     // Initialize Broker service to start publish / subscribe events

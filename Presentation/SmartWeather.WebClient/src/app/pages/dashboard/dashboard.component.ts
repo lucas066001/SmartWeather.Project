@@ -72,9 +72,17 @@ export class DashboardPageComponent implements OnInit, AfterViewInit {
                           } else {
                             tmpHumiditySeries.push({
                               name: measurePoint.name,
-                              data: response.data.measureDataList?.map(md => ([new Date(md.dateTime), md.value])),
+                              data: response.data.measureDataList?.map(md => {
+                                let value = md.value;
+
+                                if (value > 100) {
+                                  value = (1 - value / 4096) * 100;
+                                }
+
+                                return [new Date(md.dateTime), value];
+                              }),
                               color: measurePoint.color
-                            })
+                            });
                           }
                         }
                       },

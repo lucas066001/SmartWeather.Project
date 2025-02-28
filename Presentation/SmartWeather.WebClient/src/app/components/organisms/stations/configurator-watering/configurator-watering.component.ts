@@ -1,7 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ComponentEditorComponent } from '@components/organisms/components/component-editor/component-editor.component';
-import { MapEditorComponent } from '../map-editor/map-editor.component';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActuatorCommandRequest, ComponentResponse } from '@models/dtos/component-dtos';
 import { StationResponse, StationUpdateRequest } from '@models/dtos/station-dtos';
@@ -18,7 +16,7 @@ import { ButtonComponent } from '@components/atoms/button/button.component';
 
 @Component({
   selector: 'app-configurator-watering',
-  imports: [CommonModule, ComponentEditorComponent, MapPointsComponent, ReactiveFormsModule, ButtonComponent],
+  imports: [CommonModule, MapPointsComponent, ReactiveFormsModule, ButtonComponent],
   templateUrl: './configurator-watering.component.html',
   styleUrl: './configurator-watering.component.css'
 })
@@ -67,8 +65,7 @@ export class ConfiguratorWateringComponent {
         next: (response) => {
           console.log(response)
           if (response.status == Status.OK && response.data?.componentList) {
-            // this.components = response.data.componentList.filter(c => c.type == ComponentType.Actuator);
-            this.components = response.data.componentList;
+            this.components = response.data.componentList.filter(c => c.type == ComponentType.Actuator);
           }
         },
         error: (error) => {
@@ -112,8 +109,14 @@ export class ConfiguratorWateringComponent {
 
   handleWaterRequest(gpioPin: number) {
     const inputElement = document.getElementById("pinvalue-" + gpioPin) as HTMLInputElement;
+    const waitMessage = document.getElementById('waitingmessage-' + gpioPin) as HTMLElement;
+    const sucessElement = document.getElementById("successmessage-" + gpioPin) as HTMLElement;
+    const errorElement = document.getElementById("errormessage-" + gpioPin) as HTMLElement;
 
-    if (inputElement && this.stationToEdit) {
+    if (sucessElement && errorElement && waitMessage && inputElement && this.stationToEdit) {
+      waitMessage.classList.remove("hidden");
+      sucessElement.classList.add("hidden");
+      errorElement.classList.add("hidden");
       const pinValue = inputElement.valueAsNumber;
       console.log("Valeur de l'input :", pinValue);
       let request: ActuatorCommandRequest = {
@@ -124,9 +127,13 @@ export class ConfiguratorWateringComponent {
       this.componentService.actuatorCommand(request).subscribe(({
         next: (response) => {
           console.log(response);
+          sucessElement.classList.remove("hidden");
+          waitMessage.classList.add("hidden");
         },
         error: (error) => {
           console.log(error);
+          errorElement.classList.remove("hidden");
+          waitMessage.classList.add("hidden");
         }
       }))
     }
